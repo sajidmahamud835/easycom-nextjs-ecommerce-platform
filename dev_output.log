@@ -1,0 +1,19 @@
+
+> easycom@0.1.0 dev
+> next dev --turbopack
+
+▲ Next.js 16.1.1 (Turbopack)
+- Local:         http://localhost:3000
+- Network:       http://192.168.0.2:3000
+- Environments: .env
+
+✓ Starting...
+✓ Ready in 2s
+⨯ Error: Publishable key not valid.
+    at ignore-listed frames
+ GET / 404 in 1967ms (compile: -154527µs, proxy.ts: 1960ms, render: 162ms)
+○ Compiling /_not-found/page ...
+⨯ Error: @clerk/clerk-react: The publishableKey passed to Clerk is invalid. You can get your Publishable key at https://dashboard.clerk.com/last-active?path=api-keys. (key=demo_clerk_publishable_key)
+    at ignore-listed frames {
+  digest: '3277116194'
+}
