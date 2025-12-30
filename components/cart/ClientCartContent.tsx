@@ -71,16 +71,43 @@ export function ClientCartContent() {
     }
   }, [isLoaded, user]);
 
-  const refreshAddresses = async () => {
+  const refreshAddresses = async (newAddress?: Address) => {
     if (!user) return;
 
     const userEmail = user.emailAddresses[0]?.emailAddress;
     if (!userEmail) return;
 
+    // If new address is provided, optimize update without fetch
+    if (newAddress) {
+      setUserData((prev) => {
+        if (!prev) return prev;
+
+        let updatedAddresses = [...prev.addresses];
+
+        // If new address is default, uncheck others
+        if (newAddress.default) {
+          updatedAddresses = updatedAddresses.map(addr => ({
+            ...addr,
+            default: false
+          }));
+        }
+
+        // Add new address to the beginning
+        updatedAddresses.unshift(newAddress);
+
+        return {
+          ...prev,
+          addresses: updatedAddresses
+        };
+      });
+      return;
+    }
+
     try {
       // Only fetch addresses to refresh them
       const response = await fetch(
-        `/api/user-data?email=${encodeURIComponent(userEmail)}`
+        `/api/user-data?email=${encodeURIComponent(userEmail)}`,
+        { headers: { "Cache-Control": "no-cache" } }
       );
 
       if (!response.ok) {

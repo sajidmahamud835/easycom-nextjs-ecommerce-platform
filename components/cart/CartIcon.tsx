@@ -4,8 +4,8 @@ import { ShoppingBag } from "lucide-react";
 import Link from "next/link";
 
 const CartIcon = () => {
-  const { items } = useCartStore();
-  const itemCount = items?.length || 0;
+  const { getTotalItems } = useCartStore();
+  const itemCount = getTotalItems();
   const displayCount = itemCount > 9 ? "9+" : itemCount;
 
   return (

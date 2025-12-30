@@ -19,7 +19,8 @@ interface AddAddressSidebarProps {
   userEmail: string;
   isOpen: boolean;
   onClose: () => void;
-  onAddressAdded?: () => Promise<void>;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  onAddressAdded?: (address?: any) => Promise<void>;
   isFirstAddress?: boolean;
 }
 
@@ -71,7 +72,7 @@ export function AddAddressSidebar({
           throw new Error(errorData.error || "Failed to create address");
         }
 
-        await response.json();
+        const data = await response.json();
         toast.success("Address saved successfully!");
         setFormData({
           name: "",
@@ -86,7 +87,7 @@ export function AddAddressSidebar({
 
         // Call the callback to refresh addresses if provided
         if (onAddressAdded) {
-          await onAddressAdded();
+          await onAddressAdded(data.address);
         } else {
           // Fallback to page refresh if no callback provided
           window.location.reload();

@@ -33,7 +33,7 @@ interface AddressSelectorProps {
   addresses: Address[];
   selectedAddress: Address | null;
   onAddressSelect: (address: Address) => void;
-  onAddressesRefresh?: () => Promise<void>;
+  onAddressesRefresh?: (newAddress?: Address) => Promise<void>;
 }
 
 export function AddressSelector({
@@ -52,10 +52,10 @@ export function AddressSelector({
   const hasMoreAddresses = addresses.length > MAX_VISIBLE_ADDRESSES;
   const visibleAddresses = addresses.slice(0, MAX_VISIBLE_ADDRESSES);
 
-  const handleAddressAdded = async () => {
+  const handleAddressAdded = async (newAddress?: Address) => {
     if (onAddressesRefresh) {
       setIsLoading(true);
-      await onAddressesRefresh();
+      await onAddressesRefresh(newAddress);
       setIsLoading(false);
     }
     setIsSidebarOpen(false);
