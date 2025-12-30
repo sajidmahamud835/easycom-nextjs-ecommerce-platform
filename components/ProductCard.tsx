@@ -24,7 +24,7 @@ const ProductCard = ({ product }: Props) => {
       </button>
 
       {/* Discount Badge */}
-      {product?.discount && product.discount > 0 && (
+      {product?.discount != null && product.discount > 0 && (
         <div className="absolute top-3 left-3 z-10 bg-gradient-to-r from-rose-500 to-pink-500 text-white text-xs font-bold px-2.5 py-1 rounded-full shadow-lg">
           -{product.discount}%
         </div>
@@ -75,7 +75,7 @@ const ProductCard = ({ product }: Props) => {
         <div className="mt-auto pt-2">
           <PriceView
             price={product?.price}
-            discount={product?.discount}
+            discount={undefined}
             className="text-lg font-bold text-gray-900"
           />
 
