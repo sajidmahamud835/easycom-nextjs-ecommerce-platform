@@ -2,6 +2,7 @@
 import ProductCard from "@/components/ProductCard";
 import { getProducts } from "@/sanity/lib/products";
 import Link from "next/link";
+import Image from "next/image";
 
 export default async function Home() {
     const products = await getProducts();
@@ -16,11 +17,13 @@ export default async function Home() {
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6">
                     {/* Card 1: Deal of the Day */}
                     <div className="bg-white p-4 relative z-10 shadow-sm flex flex-col h-[320px]">
-                        <h3 className="font-bold text-xl mb-3">Today's Deals</h3>
+                        <h3 className="font-bold text-xl mb-3">Today&apos;s Deals</h3>
                         <div className="flex-1 rounded-sm overflow-hidden mb-2 relative">
-                            <div
-                                className="absolute inset-0 bg-cover bg-center"
-                                style={{ backgroundImage: "url('https://images.unsplash.com/photo-1607082348824-0a96f2a4b9da?auto=format&fit=crop&q=80&w=400')" }}
+                            <Image
+                                src="https://images.unsplash.com/photo-1607082348824-0a96f2a4b9da?auto=format&fit=crop&q=80&w=400"
+                                alt="Today's Deals"
+                                fill
+                                className="object-cover"
                             />
                             <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
                             <div className="absolute bottom-3 left-3 right-3">
@@ -34,9 +37,11 @@ export default async function Home() {
                     <div className="bg-white p-4 relative z-10 shadow-sm flex flex-col h-[320px]">
                         <h3 className="font-bold text-xl mb-3">Bulk Savings</h3>
                         <div className="flex-1 rounded-sm overflow-hidden mb-2 relative">
-                            <div
-                                className="absolute inset-0 bg-cover bg-center"
-                                style={{ backgroundImage: "url('https://images.unsplash.com/photo-1553062407-98eeb64c6a62?auto=format&fit=crop&q=80&w=400')" }}
+                            <Image
+                                src="https://images.unsplash.com/photo-1553062407-98eeb64c6a62?auto=format&fit=crop&q=80&w=400"
+                                alt="Bulk Savings"
+                                fill
+                                className="object-cover"
                             />
                             <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
                             <div className="absolute bottom-3 left-3 right-3">
@@ -51,9 +56,11 @@ export default async function Home() {
                     <div className="bg-white p-4 relative z-10 shadow-sm flex flex-col h-[320px]">
                         <h3 className="font-bold text-xl mb-3">Electronics</h3>
                         <div className="flex-1 rounded-sm overflow-hidden mb-2 relative">
-                            <div
-                                className="absolute inset-0 bg-cover bg-center"
-                                style={{ backgroundImage: "url('https://images.unsplash.com/photo-1498049860654-af1a5c5668ba?auto=format&fit=crop&q=80&w=400')" }}
+                            <Image
+                                src="https://images.unsplash.com/photo-1498049860654-af1a5c5668ba?auto=format&fit=crop&q=80&w=400"
+                                alt="Electronics"
+                                fill
+                                className="object-cover"
                             />
                             <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
                             <div className="absolute bottom-3 left-3 right-3">
