@@ -69,20 +69,20 @@ const HomeBanner = () => {
   return (
     <div className="max-w-[1500px] mx-auto px-4 mt-4 flex gap-4 h-[350px] md:h-[450px]">
       {/* Sidebar / Departments - Hidden on mobile */}
-      <div className="hidden lg:flex flex-col w-[250px] bg-white shadow-sm rounded-lg overflow-hidden flex-shrink-0 z-20">
-        <div className="bg-gradient-to-r from-[#232f3e] to-[#37475a] p-3 font-bold text-sm text-white">Shop by Department</div>
+      <div className="hidden lg:flex flex-col w-[250px] bg-white shadow-lg rounded-2xl overflow-hidden flex-shrink-0 z-20 border border-gray-100">
+        <div className="bg-gradient-to-r from-indigo-600 to-purple-600 p-4 font-bold text-sm text-white">Shop by Department</div>
         <div className="overflow-y-auto flex-1 py-2 custom-scrollbar">
           {categories.map((cat, i) => (
-            <Link href={"/category/" + cat.toLowerCase().replace(/ /g, '-')} key={i} className="flex justify-between items-center px-4 py-2.5 text-sm text-gray-700 hover:bg-gradient-to-r hover:from-teal-50 hover:to-purple-50 group transition-all border-l-2 border-transparent hover:border-teal-500">
+            <Link href={"/category/" + cat.toLowerCase().replace(/ /g, '-')} key={i} className="flex justify-between items-center px-4 py-2.5 text-sm text-gray-700 hover:bg-gradient-to-r hover:from-indigo-50 hover:to-purple-50 group transition-all border-l-2 border-transparent hover:border-indigo-500">
               {cat}
-              <ChevronRight className="w-4 h-4 text-gray-400 group-hover:text-teal-600 group-hover:translate-x-1 transition-all" />
+              <ChevronRight className="w-4 h-4 text-gray-400 group-hover:text-indigo-600 group-hover:translate-x-1 transition-all" />
             </Link>
           ))}
         </div>
       </div>
 
       {/* Hero Carousel */}
-      <div className="flex-1 rounded-lg overflow-hidden shadow-lg relative group" ref={emblaRef}>
+      <div className="flex-1 rounded-2xl overflow-hidden shadow-xl relative group" ref={emblaRef}>
         <div className="flex h-full">
           {banners.map((banner) => {
             const IconComponent = banner.icon;
@@ -147,8 +147,8 @@ const HomeBanner = () => {
               key={index}
               onClick={() => scrollTo(index)}
               className={`w-2 h-2 rounded-full transition-all ${selectedIndex === index
-                  ? 'bg-white w-8'
-                  : 'bg-white/50 hover:bg-white/80'
+                ? 'bg-white w-8'
+                : 'bg-white/50 hover:bg-white/80'
                 }`}
             />
           ))}
