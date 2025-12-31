@@ -460,9 +460,9 @@ const AdminAnalytics = () => {
                       />
                       <YAxis />
                       <Tooltip
-                        formatter={(value, name) => [
+                        formatter={(value: any, name: any) => [
                           name === "revenue"
-                            ? `$${value.toLocaleString()}`
+                            ? `$${(value || 0).toLocaleString()}`
                             : value,
                           name === "revenue" ? "Revenue" : "Sales",
                         ]}
@@ -514,8 +514,8 @@ const AdminAnalytics = () => {
                   $
                   {analytics?.revenue?.total && analytics?.orders?.total
                     ? (
-                        analytics.revenue.total / analytics.orders.total
-                      ).toFixed(2)
+                      analytics.revenue.total / analytics.orders.total
+                    ).toFixed(2)
                     : 0}
                 </div>
                 <div className="text-sm text-purple-500">Avg Order Value</div>
@@ -561,11 +561,11 @@ const AdminAnalytics = () => {
                   </div>
                 </div>
               )) || (
-                <div className="text-center py-6 text-light-color">
-                  <Activity className="w-8 h-8 mx-auto mb-2 opacity-50" />
-                  <p className="text-sm">No recent activity available</p>
-                </div>
-              )}
+                  <div className="text-center py-6 text-light-color">
+                    <Activity className="w-8 h-8 mx-auto mb-2 opacity-50" />
+                    <p className="text-sm">No recent activity available</p>
+                  </div>
+                )}
             </div>
           </CardContent>
         </Card>

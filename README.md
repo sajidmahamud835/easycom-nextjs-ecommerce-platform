@@ -246,7 +246,23 @@ npm run build     # Build for production
 npm start         # Start production server
 npm run lint      # Run ESLint
 npm run typegen   # Generate Sanity types
+npm test          # Run automated tests
 ```
+
+---
+
+## 🧪 Testing
+
+The project uses `jest` and `@testing-library` for automated testing.
+
+### Complex Logic Tests
+We maintain rigorous tests for critical business logic, specifically:
+-   **Points Calculation**: Complex scenarios for reward and loyalty points allocation, including:
+    -   tiered thresholds
+    -   diminishing returns logic
+    -   milestone tracking
+
+Results are archived in [test-results.txt](./test-results.txt).
 
 ---
 

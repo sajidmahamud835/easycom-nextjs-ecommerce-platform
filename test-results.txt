@@ -1,0 +1,8 @@
+PASS  tests/points-calculation.test.ts
+PASS  tests/example.test.tsx
+
+Test Suites: 2 passed, 2 total
+Tests:       10 passed, 10 total
+Snapshots:   0 total
+Time:        5.203 s
+Ran all test suites.
