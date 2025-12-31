@@ -3,10 +3,6 @@ import { auth } from "@clerk/nextjs/server";
 import { writeClient, client } from "@/sanity/lib/client";
 import Stripe from "stripe";
 
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
-  apiVersion: "2025-10-29.clover",
-});
-
 export const dynamic = "force-dynamic";
 export const revalidate = 0;
 
@@ -79,6 +75,10 @@ export async function POST(req: NextRequest) {
       order.stripePaymentIntentId
     ) {
       try {
+        const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
+          apiVersion: "2025-10-29.clover",
+        });
+
         // Create refund in Stripe
         const refund = await stripe.refunds.create({
           payment_intent: order.stripePaymentIntentId,
