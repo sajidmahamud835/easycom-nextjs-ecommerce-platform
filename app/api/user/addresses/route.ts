@@ -150,6 +150,7 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({
       success: true,
       addressId: newAddress._id,
+      address: newAddress,
       message: "Address created successfully",
     });
   } catch (error) {
