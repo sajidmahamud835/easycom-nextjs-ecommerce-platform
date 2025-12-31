@@ -22,7 +22,7 @@ const AdminLayout = ({ children }: AdminLayoutProps) => {
   // Redirect non-admin users
   useEffect(() => {
     if (isLoaded && !isAdmin) {
-      router.push("/admin/access-denied");
+      router.push("/access-denied");
     }
   }, [isLoaded, isAdmin, router]);
 
