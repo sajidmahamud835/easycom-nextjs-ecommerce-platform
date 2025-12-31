@@ -4,10 +4,11 @@ import { ClerkProvider } from "@clerk/nextjs";
 import localFont from "next/font/local";
 import { Toaster } from "sonner";
 import Script from "next/script";
-import Head from "next/head";
 import { UserDataProvider } from "@/contexts/UserDataContext";
 
 import "./globals.css";
+
+const GADSENSE_CLIENT_ID = "ca-pub-6542623777003381";
 
 const poppins = localFont({
   src: "./fonts/Poppins.woff2",
@@ -99,16 +100,15 @@ export const metadata: Metadata = {
   alternates: {
     canonical: process.env.NEXT_PUBLIC_BASE_URL || "https://sajidmahamud.vercel.app",
   },
+  other: {
+    "google-adsense-account": GADSENSE_CLIENT_ID,
+  },
 };
 
 const RootLayout = async ({ children }: { children: ReactNode }) => {
-  const GADSENSE_CLIENT_ID = "ca-pub-6542623777003381"; // Define it once
   return (
     <ClerkProvider>
       <html lang="en">
-        <Head>
-          <meta name="google-adsense-account" content={GADSENSE_CLIENT_ID} />
-        </Head>
         <body
           className={`${poppins.variable} ${raleway.variable} ${opensans.variable} antialiased`}
         >
