@@ -4,7 +4,6 @@ import { ClerkProvider } from "@clerk/nextjs";
 import localFont from "next/font/local";
 import { Toaster } from "sonner";
 import Script from "next/script";
-import Head from "next/head";
 import { UserDataProvider } from "@/contexts/UserDataContext";
 
 import "./globals.css";
@@ -106,9 +105,9 @@ const RootLayout = async ({ children }: { children: ReactNode }) => {
   return (
     <ClerkProvider>
       <html lang="en">
-        <Head>
+        <head>
           <meta name="google-adsense-account" content={GADSENSE_CLIENT_ID} />
-        </Head>
+        </head>
         <body
           className={`${poppins.variable} ${raleway.variable} ${opensans.variable} antialiased`}
         >
