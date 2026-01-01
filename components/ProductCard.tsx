@@ -12,7 +12,7 @@ interface Props {
 }
 
 const ProductCard = ({ product }: Props) => {
-  const rating = product?.rating || 4.5;
+  const rating = product?.averageRating || 4.5;
   const fullStars = Math.floor(rating);
 
   return (
