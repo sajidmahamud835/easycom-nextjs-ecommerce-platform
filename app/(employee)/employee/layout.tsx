@@ -3,6 +3,8 @@ import { PaidFeatureMessage } from "@/components/employee/PaidFeatureMessage";
 // Employee features are under development (coming soon)
 // Anyone can access this route to see the upgrade message
 
+export const dynamic = "force-dynamic";
+
 export default async function EmployeeLayout({
   children,
 }: {
