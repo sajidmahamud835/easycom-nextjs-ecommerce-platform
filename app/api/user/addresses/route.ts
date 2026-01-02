@@ -150,14 +150,7 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({
       success: true,
       addressId: newAddress._id,
-<<<<<<< HEAD
       address: newAddress,
-=======
-<<<<<<< HEAD
-      address: newAddress,
-=======
->>>>>>> origin/main
->>>>>>> origin/bugfix/address-state-cart-badge-9606215926048726513
       message: "Address created successfully",
     });
   } catch (error) {

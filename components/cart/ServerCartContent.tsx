@@ -53,11 +53,7 @@ interface ServerCartContentProps {
   userEmail: string;
   userAddresses: Address[];
   userOrders: UserOrder[];
-<<<<<<< HEAD
   onAddressesRefresh?: (newAddress?: Address) => Promise<void>;
-=======
-  onAddressesRefresh?: () => Promise<void>;
->>>>>>> origin/main
 }
 
 export function ServerCartContent({
