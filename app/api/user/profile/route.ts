@@ -11,12 +11,14 @@ export async function PUT(request: NextRequest) {
     }
 
     const body = await request.json();
-    const { firstName, lastName, phone, dateOfBirth, clerkUserId } = body;
+    // Sentinel: Removed clerkUserId from body destructuring to prevent IDOR.
+    // We must strictly use the authenticated userId.
+    const { firstName, lastName, phone, dateOfBirth } = body;
 
     // Update or create user in Sanity
     const sanityUser = {
       _type: "user",
-      clerkUserId: clerkUserId || userId,
+      clerkUserId: userId, // Always use authenticated userId
       email: "", // We'll get this from Clerk
       firstName,
       lastName,
@@ -28,7 +30,7 @@ export async function PUT(request: NextRequest) {
     // Check if user exists in Sanity
     const existingUser = await backendClient.fetch(
       `*[_type == "user" && clerkUserId == $clerkUserId][0]`,
-      { clerkUserId: clerkUserId || userId }
+      { clerkUserId: userId } // Always use authenticated userId
     );
 
     let result;
