@@ -550,6 +550,16 @@ const AdminNotifications: React.FC<AdminNotificationsProps> = ({
         .includes(userSearch.toLowerCase())
   );
 
+<<<<<<< HEAD
+=======
+<<<<<<< HEAD
+  // Filter notifications
+  // Note: Filtering is now done server-side, this is kept for compatibility
+  const filteredNotifications = sentNotifications;
+
+=======
+>>>>>>> origin/main
+>>>>>>> origin/bugfix/address-state-cart-badge-9606215926048726513
   // Get priority color
   const getPriorityColor = (priority: string) => {
     switch (priority) {
@@ -1041,7 +1051,15 @@ const AdminNotifications: React.FC<AdminNotificationsProps> = ({
         <CardContent>
           {loading ? (
             <div className="text-center py-8">Loading notifications...</div>
+<<<<<<< HEAD
           ) : sentNotifications.length === 0 ? (
+=======
+<<<<<<< HEAD
+          ) : filteredNotifications.length === 0 ? (
+=======
+          ) : sentNotifications.length === 0 ? (
+>>>>>>> origin/main
+>>>>>>> origin/bugfix/address-state-cart-badge-9606215926048726513
             <div className="text-center py-8 text-muted-foreground">
               No notifications sent yet
             </div>
@@ -1061,7 +1079,15 @@ const AdminNotifications: React.FC<AdminNotificationsProps> = ({
                   </TableRow>
                 </TableHeader>
                 <TableBody>
+<<<<<<< HEAD
                   {sentNotifications.map((notification) => {
+=======
+<<<<<<< HEAD
+                  {filteredNotifications.map((notification) => {
+=======
+                  {sentNotifications.map((notification) => {
+>>>>>>> origin/main
+>>>>>>> origin/bugfix/address-state-cart-badge-9606215926048726513
                     const readCount = notification.recipients.filter(
                       (r) => r.read
                     ).length;

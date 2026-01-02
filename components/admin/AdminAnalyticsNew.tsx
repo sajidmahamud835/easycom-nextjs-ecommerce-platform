@@ -460,9 +460,19 @@ const AdminAnalytics = () => {
                       />
                       <YAxis />
                       <Tooltip
+<<<<<<< HEAD
                         formatter={(value: any, name: any) => [
                           name === "revenue"
+<<<<<<< HEAD
                             ? `$${(value || 0).toLocaleString()}`
+=======
+                            ? `$${Number(value).toLocaleString()}`
+=======
+                        formatter={(value, name) => [
+                          name === "revenue"
+                            ? `$${value.toLocaleString()}`
+>>>>>>> origin/main
+>>>>>>> origin/bugfix/address-state-cart-badge-9606215926048726513
                             : value,
                           name === "revenue" ? "Revenue" : "Sales",
                         ]}

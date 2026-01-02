@@ -1,0 +1,6 @@
+﻿  origin/HEAD -> origin/main
+  origin/bugfix/address-state-cart-badge-9606215926048726513
+  origin/builder-fix-build-config-8444606439399931802
+  origin/fix/switch-to-npm-and-build-fixes-6729548098679078025
+  origin/improve-project-types-ui-1904798619379658031
+  origin/main
