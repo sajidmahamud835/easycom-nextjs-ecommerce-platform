@@ -4,29 +4,38 @@ import { client } from "@/sanity/lib/client";
 const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL || "https://sajidmahamud.vercel.app";
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  // Fetch all products
-  const products = await client.fetch(`
+  let products = [];
+  let categories = [];
+  let brands = [];
+
+  try {
+    // Fetch all products
+    products = await client.fetch(`
     *[_type == "product" && defined(slug.current)] {
       "slug": slug.current,
       _updatedAt
     }
   `);
 
-  // Fetch all categories
-  const categories = await client.fetch(`
+    // Fetch all categories
+    categories = await client.fetch(`
     *[_type == "category" && defined(slug.current)] {
       "slug": slug.current,
       _updatedAt
     }
   `);
 
-  // Fetch all brands
-  const brands = await client.fetch(`
+    // Fetch all brands
+    brands = await client.fetch(`
     *[_type == "brand" && defined(slug.current)] {
       "slug": slug.current,
       _updatedAt
     }
   `);
+  } catch (error) {
+    console.warn("Failed to fetch data for sitemap:", error);
+    // Continue with empty arrays if fetch fails (e.g. during build without proper env vars)
+  }
 
   // Static pages
   const staticPages = [

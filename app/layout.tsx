@@ -8,6 +8,8 @@ import { UserDataProvider } from "@/contexts/UserDataContext";
 
 import "./globals.css";
 
+const GADSENSE_CLIENT_ID = "ca-pub-6542623777003381";
+
 const poppins = localFont({
   src: "./fonts/Poppins.woff2",
   variable: "--font-poppins",
@@ -98,16 +100,15 @@ export const metadata: Metadata = {
   alternates: {
     canonical: process.env.NEXT_PUBLIC_BASE_URL || "https://sajidmahamud.vercel.app",
   },
+  other: {
+    "google-adsense-account": GADSENSE_CLIENT_ID,
+  },
 };
 
 const RootLayout = async ({ children }: { children: ReactNode }) => {
-  const GADSENSE_CLIENT_ID = "ca-pub-6542623777003381"; // Define it once
   return (
     <ClerkProvider>
       <html lang="en">
-        <head>
-          <meta name="google-adsense-account" content={GADSENSE_CLIENT_ID} />
-        </head>
         <body
           className={`${poppins.variable} ${raleway.variable} ${opensans.variable} antialiased`}
         >
