@@ -243,6 +243,12 @@ Look for issues labeled `good first issue` — these are great for newcomers!
 
 ---
 
+## 🛡️ Security Changelog
+
+| Date | Description | Severity | Author |
+|------|-------------|----------|--------|
+| 2025-01-31 | Fixed IDOR vulnerability in user access request API. | Critical | Sentinel |
+
 ## 📜 Scripts
 
 ```bash
