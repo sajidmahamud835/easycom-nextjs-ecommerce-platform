@@ -9,9 +9,10 @@ import { Product } from "@/sanity.types";
 
 interface Props {
   product: Product;
+  priority?: boolean;
 }
 
-const ProductCard = ({ product }: Props) => {
+const ProductCard = ({ product, priority = false }: Props) => {
   const rating = product?.averageRating || 4.5;
   const fullStars = Math.floor(rating);
 
@@ -39,7 +40,7 @@ const ProductCard = ({ product }: Props) => {
               alt={product.name || "Product Image"}
               fill
               className="object-contain drop-shadow-sm"
-              priority
+              priority={priority}
             />
           )}
         </Link>

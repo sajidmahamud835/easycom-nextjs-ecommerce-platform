@@ -155,7 +155,7 @@ const CategoryProducts = ({ categories, slug, initialProducts }: Props) => {
                     delay: index * 0.05, // Stagger the animation
                   }}
                 >
-                  <ProductCard product={product} />
+                  <ProductCard product={product} priority={index < 4} />
                 </motion.div>
               ))}
             </motion.div>

@@ -579,7 +579,7 @@ const ProductGrid = () => {
                   }}
                   className="group"
                 >
-                  <ProductCard product={product} />
+                  <ProductCard product={product} priority={index < 4} />
                 </motion.div>
               ))}
           </AnimatePresence>
