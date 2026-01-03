@@ -482,7 +482,7 @@ const ProductCatalog = ({ initialProducts, categories, brands }: Props) => {
               }`}
             >
               <AnimatePresence>
-                {filteredProducts.map((product) => (
+                {filteredProducts.map((product, index) => (
                   <motion.div
                     key={product._id}
                     layout
@@ -491,7 +491,7 @@ const ProductCatalog = ({ initialProducts, categories, brands }: Props) => {
                     exit={{ opacity: 0, scale: 0.9 }}
                     transition={{ duration: 0.2 }}
                   >
-                    <ProductCard product={product} />
+                    <ProductCard product={product} priority={index < 4} />
                   </motion.div>
                 ))}
               </AnimatePresence>
