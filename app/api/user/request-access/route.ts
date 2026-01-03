@@ -11,7 +11,10 @@ export async function POST(request: NextRequest) {
     }
 
     const body = await request.json();
-    const { clerkUserId, email, firstName, lastName } = body;
+    const { email, firstName, lastName } = body;
+
+    // Use the authenticated user ID strictly to prevent IDOR
+    const clerkUserId = userId;
 
     // Check if user request already exists
     const existingRequest = await backendClient.fetch(
