@@ -298,6 +298,7 @@ This project is open for educational purposes. See the repository for more detai
 **Sajid Mahamud**
 
 - GitHub: [@sajidmahamud835](https://github.com/sajidmahamud835)
+- Portfolio: [sajidmahamud835.github.io](https://sajidmahamud835.github.io/)
 
 ---
 
