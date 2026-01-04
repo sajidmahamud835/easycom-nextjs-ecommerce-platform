@@ -249,6 +249,12 @@ Look for issues labeled `good first issue` — these are great for newcomers!
 |------|-------------|----------|--------|
 | 2025-01-31 | Fixed IDOR vulnerability in user access request API. | Critical | Sentinel |
 
+## ⚡ Performance Changelog
+
+| Date | Description | Impact | Author |
+|------|-------------|----------|--------|
+| 2026-01-03 | Optimized AdSense script loading strategy from `beforeInteractive` to `afterInteractive` to prevent hydration blocking and improve TTI/TBT. | High | Bolt |
+
 ## 📜 Scripts
 
 ```bash
