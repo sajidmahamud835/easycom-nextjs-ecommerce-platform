@@ -84,7 +84,7 @@ const HomeBanner = () => {
       {/* Hero Carousel */}
       <div className="flex-1 rounded-2xl overflow-hidden shadow-xl relative group" ref={emblaRef}>
         <div className="flex h-full">
-          {banners.map((banner) => {
+          {banners.map((banner, index) => {
             const IconComponent = banner.icon;
             return (
               <div key={banner.id} className="flex-shrink-0 w-full h-full relative">
@@ -94,7 +94,9 @@ const HomeBanner = () => {
                   alt={banner.title}
                   fill
                   className="object-cover"
-                  priority
+                  // Prioritize only the first image (visible in viewport) to improve LCP
+                  // Lazy load subsequent images (default behavior) to save bandwidth
+                  priority={index === 0}
                 />
                 {/* Gradient Overlay */}
                 <div className={`absolute inset-0 bg-gradient-to-r ${banner.gradient}`} />
