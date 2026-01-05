@@ -243,6 +243,12 @@ Look for issues labeled `good first issue` — these are great for newcomers!
 
 ---
 
+## ⚡ Performance Changelog
+
+| Date | Description | Impact | Author |
+|------|-------------|--------|--------|
+| 2026-01-05 | Optimized HomeBanner to only prioritize the first image, reducing LCP and bandwidth usage. | High (LCP) | Bolt |
+
 ## 🛡️ Security Changelog
 
 | Date | Description | Severity | Author |
