@@ -130,10 +130,11 @@ const RootLayout = async ({ children }: { children: ReactNode }) => {
             }}
           />
 
+          {/* Optimization: Load AdSense after interactivity to prevent blocking hydration and improve TTI/TBT */}
           <Script
             async
             src={`https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${GADSENSE_CLIENT_ID}`}
-            strategy="beforeInteractive"
+            strategy="afterInteractive"
           />
         </body>
       </html>
