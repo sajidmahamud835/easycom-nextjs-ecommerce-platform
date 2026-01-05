@@ -1,0 +1,16 @@
+
+> easycom@0.1.0 dev
+> next dev --turbopack
+
+ ⚠ Port 3000 is in use by an unknown process, using available port 3001 instead.
+   ▲ Next.js 16.0.10 (Turbopack)
+   - Local:         http://localhost:3001
+   - Network:       http://192.168.0.2:3001
+
+ ✓ Starting...
+ ✓ Ready in 2s
+Clerk: Refreshing the session token resulted in an infinite redirect loop. This usually means that your Clerk instance keys do not match - make sure to copy the correct publishable and secret keys from the Clerk dashboard.
+ ○ Compiling / ...
+[getProducts] Fetched 23 products
+ GET / 200 in 12.4s (compile: 10.3s, proxy.ts: 17ms, render: 2.0s)
+ POST / 200 in 126ms (compile: 11ms, proxy.ts: 67ms, render: 48ms)
