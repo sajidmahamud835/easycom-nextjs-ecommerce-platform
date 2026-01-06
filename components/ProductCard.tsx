@@ -1,6 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
-import React from "react";
+import React, { memo } from "react";
 import PriceView from "./PriceView";
 import AddToCartButton from "./AddToCartButton";
 import { urlFor } from "@/sanity/lib/image";
@@ -12,7 +12,9 @@ interface Props {
   priority?: boolean;
 }
 
-const ProductCard = ({ product, priority = false }: Props) => {
+// Optimized with React.memo to prevent unnecessary re-renders when parent state changes (e.g. view mode, filters)
+// independent of the product data.
+const ProductCard = memo(({ product, priority = false }: Props) => {
   const rating = product?.averageRating || 4.5;
   const fullStars = Math.floor(rating);
 
@@ -99,7 +101,7 @@ const ProductCard = ({ product, priority = false }: Props) => {
       </div>
     </div>
   );
-};
+});
 
 ProductCard.displayName = "ProductCard";
 
