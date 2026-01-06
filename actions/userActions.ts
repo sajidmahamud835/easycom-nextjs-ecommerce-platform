@@ -46,9 +46,10 @@ export async function createOrUpdateUser(userData: CreateUserData) {
     }
 
     // Check if user already exists
+    // SECURITY: Use authenticated userId instead of userData.clerkUserId to prevent IDOR
     const existingUser = await client.fetch(
       `*[_type == "user" && clerkUserId == $clerkUserId][0]`,
-      { clerkUserId: userData.clerkUserId }
+      { clerkUserId: userId }
     );
 
     if (existingUser) {
@@ -70,7 +71,7 @@ export async function createOrUpdateUser(userData: CreateUserData) {
       // Create new user
       const newUser = await client.create({
         _type: "user",
-        clerkUserId: userData.clerkUserId,
+        clerkUserId: userId,
         email: userData.email,
         firstName: userData.firstName,
         lastName: userData.lastName,
