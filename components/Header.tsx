@@ -119,11 +119,14 @@ const Header = ({ categories }: Props) => {
           অল (All)
           {/* Mobile Side Menu Trigger (Visualize only for now) */}
         </div>
-        {["Today's Deals", "Customer Service", "Track My Product", "Gift Cards", "Sell"].map((item) => (
+        {["Today's Deals", "Customer Service", "Track My Product", "Gift Cards"].map((item) => (
           <Link key={item} href="#" className="whitespace-nowrap hover:ring-1 hover:ring-white px-2 py-1 rounded-sm transition-all">
             {item}
           </Link>
         ))}
+        <Link href="/sell" className="whitespace-nowrap hover:ring-1 hover:ring-white px-2 py-1 rounded-sm transition-all">
+          Sell
+        </Link>
       </div>
 
       <LocationModal

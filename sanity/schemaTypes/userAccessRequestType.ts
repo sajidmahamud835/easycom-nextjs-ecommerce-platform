@@ -28,6 +28,16 @@ export const userAccessRequestType = defineType({
       type: "string",
     }),
     defineField({
+      name: "businessName",
+      title: "Business Name",
+      type: "string",
+    }),
+    defineField({
+      name: "businessDescription",
+      title: "Business Description",
+      type: "text",
+    }),
+    defineField({
       name: "status",
       title: "Status",
       type: "string",
