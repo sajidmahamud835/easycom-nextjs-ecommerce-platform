@@ -299,6 +299,7 @@ async function updateOrderWithPaymentCompletion(
         user -> {
           clerkUserId
         }
+      }`,
       { orderId }
     );
 
@@ -311,40 +312,40 @@ async function updateOrderWithPaymentCompletion(
       // We need to fetch deliveryNotes first. It wasn't in the initial fetch above.
       // Let's refetch or include it in the query above.
       // But we are in a 'if (order)' block so we can just use the order object if we update the query.
-      
+
       // Let's optimize: Update the query to include deliveryNotes
       // See below for query update.
     }
 
-      // Update stock levels for purchased products
-      if (order.products) {
-        await updateStockLevels(order.products);
-      }
-
-      // Send payment confirmation notification
-      try {
-        const userClerkId = order.clerkUserId || order.user?.clerkUserId;
-
-        if (userClerkId) {
-          await sendOrderStatusNotification({
-            clerkUserId: userClerkId,
-            orderNumber: order.orderNumber,
-            orderId: orderId,
-            status: order.status || ORDER_STATUSES.PENDING,
-          });
-        }
-      } catch (notificationError) {
-        console.error(
-          "Failed to send payment confirmation notification:",
-          notificationError
-        );
-        // Don't fail the webhook if notification fails
-      }
+    // Update stock levels for purchased products
+    if (order.products) {
+      await updateStockLevels(order.products);
     }
-  } catch (error) {
-    console.error(`Failed to update order ${ orderId }: `, error);
-    throw error;
+
+    // Send payment confirmation notification
+    try {
+      const userClerkId = order.clerkUserId || order.user?.clerkUserId;
+
+      if (userClerkId) {
+        await sendOrderStatusNotification({
+          clerkUserId: userClerkId,
+          orderNumber: order.orderNumber,
+          orderId: orderId,
+          status: order.status || ORDER_STATUSES.PENDING,
+        });
+      }
+    } catch (notificationError) {
+      console.error(
+        "Failed to send payment confirmation notification:",
+        notificationError
+      );
+      // Don't fail the webhook if notification fails
+    }
   }
+  } catch (error) {
+  console.error(`Failed to update order ${orderId}: `, error);
+  throw error;
+}
 }
 
 // Function to update stock levels
@@ -364,7 +365,7 @@ async function updateStockLevels(
 
       if (!product || typeof product.stock !== "number") {
         console.warn(
-          `Product with ID ${ productId } not found or stock is invalid.`
+          `Product with ID ${productId} not found or stock is invalid.`
         );
         continue;
       }
@@ -375,7 +376,7 @@ async function updateStockLevels(
       await backendClient.patch(productId).set({ stock: newStock }).commit();
     } catch (error) {
       console.error(
-        `Failed to update stock for product ${ orderProduct.product._ref }: `,
+        `Failed to update stock for product ${orderProduct.product._ref}: `,
         error
       );
     }
