@@ -46,12 +46,16 @@ To create a unified commerce platform that seamlessly handles both consumer shop
 | **🎨 Modern UI** | Tailwind CSS, Framer Motion animations, shadcn/ui components |
 | **⭐ Reviews** | Customer ratings, product reviews |
 | **📧 Notifications** | Email confirmations via Nodemailer |
+| **📍 Location** | IP-based detection, detailed location selection modal |
+| **🔥 Deals** | "Today's Deal" algorithm, time-limited offers |
+| **🎫 Support** | Customer Service ticketing system |
+| **🎁 Gift Cards** | Purchase and redeem digital gift cards |
+| **🏪 Sellers** | Seller onboarding and business account application |
 
 ### 🟡 In Progress
 
 - 🤖 **AI-Powered Recommendations** — Personalized product suggestions
 - 📊 **Analytics Dashboard** — Comprehensive business insights
-- 👥 **Multi-tenant Support** — Vendor/seller accounts
 
 ### 🔵 Planned Features
 
@@ -243,6 +247,18 @@ Look for issues labeled `good first issue` — these are great for newcomers!
 | Date | Description | Impact | Author |
 |------|-------------|--------|--------|
 | 2026-01-05 | Optimized HomeBanner to only prioritize the first image, reducing LCP and bandwidth usage. | High (LCP) | Bolt |
+
+## 🚀 Feature Changelog
+
+| Date | Description | Status |
+|------|-------------|--------|
+| 2026-01-08 | **Gift Card System**: Full purchase and redemption flow with Stripe integration. | ✅ Released |
+| 2026-01-08 | **Seller Onboarding**: Dedicated page for new sellers to apply (`/sell`). | ✅ Released |
+| 2026-01-07 | **Customer Service**: Ticketing system for support inquiries. | ✅ Released |
+| 2026-01-07 | **Today's Deals**: Dynamic "Hot Deals" section with algorithmic selection. | ✅ Released |
+| 2026-01-06 | **Location Services**: IP-based detection and manual location picker. | ✅ Released |
+| 2026-01-06 | **Dynamic Categories**: Fetched directly from Sanity CMS with "All" dropdown. | ✅ Released |
+| 2026-01-05 | **Track My Product**: Real-time order tracking replacement for Registry. | ✅ Released |
 
 ## 🛡️ Security Changelog
 
