@@ -116,11 +116,14 @@ const Header = ({ categories }: Props) => {
       {/* Bottom Bar - Darker Gray/Blue */}
       <div className="bg-[#232f3e] text-white flex items-center gap-4 px-4 py-1.5 text-sm h-[40px] overflow-x-auto no-scrollbar">
         <SideMenu />
-        {["Today's Deals", "Customer Service", "Track My Product", "Gift Cards"].map((item) => (
+        {["Today's Deals", "Customer Service", "Track My Product"].map((item) => (
           <Link key={item} href="#" className="whitespace-nowrap hover:ring-1 hover:ring-white px-2 py-1 rounded-sm transition-all">
             {item}
           </Link>
         ))}
+        <Link href="/gift-cards" className="whitespace-nowrap hover:ring-1 hover:ring-white px-2 py-1 rounded-sm transition-all">
+          Gift Cards
+        </Link>
         <Link href="/sell" className="whitespace-nowrap hover:ring-1 hover:ring-white px-2 py-1 rounded-sm transition-all">
           Sell
         </Link>

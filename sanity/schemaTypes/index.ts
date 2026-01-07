@@ -17,6 +17,7 @@ import { userAccessRequestType } from "./userAccessRequestType";
 import { reviewType } from "./reviewType";
 import { subscriptionType } from "./subscriptionType";
 import { ticketType } from "./ticketType";
+import { giftCardType } from "./giftCardType";
 
 export const schema: { types: SchemaTypeDefinition[] } = {
   types: [
@@ -37,5 +38,6 @@ export const schema: { types: SchemaTypeDefinition[] } = {
     reviewType,
     subscriptionType,
     ticketType,
+    giftCardType,
   ],
 };

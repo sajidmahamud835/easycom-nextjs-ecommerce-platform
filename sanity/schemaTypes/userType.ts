@@ -221,6 +221,14 @@ export const userType = defineType({
       initialValue: 0,
       validation: (Rule) => Rule.min(0),
     }),
+    defineField({
+      name: "storeCredit",
+      title: "Store Credit",
+      type: "number",
+      initialValue: 0,
+      validation: (Rule) => Rule.min(0),
+      description: "Redeemable store credit from gift cards",
+    }),
     // Wallet/Balance System
     defineField({
       name: "walletBalance",
