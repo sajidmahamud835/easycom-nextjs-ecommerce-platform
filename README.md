@@ -248,6 +248,14 @@ Look for issues labeled `good first issue` — these are great for newcomers!
 |------|-------------|--------|--------|
 | 2026-01-05 | Optimized HomeBanner to only prioritize the first image, reducing LCP and bandwidth usage. | High (LCP) | Bolt |
 
+
+## 📚 Research & Architecture
+
+We believe in documenting not just the code, but the engineering philosophy behind it.
+
+*   **[Whitepaper: Deterministic Personalized Recommendation Engine](./docs/RESEARCH_WHITEPAPER.md)**
+    *   *Abstract*: How we achieved sub-100ms latency for personalized recommendations using GROQ scoring instead of vector databases, prioritizing privacy and minimizing infrastructure costs.
+
 ## 🚀 Feature Changelog
 
 | Date | Description | Status |
