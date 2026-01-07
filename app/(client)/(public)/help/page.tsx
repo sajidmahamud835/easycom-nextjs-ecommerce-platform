@@ -16,6 +16,7 @@ import {
   Shield,
   BookOpen,
   Video,
+  Tag,
 } from "lucide-react";
 import Link from "next/link";
 import Container from "@/components/Container";
@@ -410,8 +411,8 @@ const HelpPage = () => {
                     variant="outline"
                     className="w-full border-white text-white hover:bg-white/10"
                   >
-                    <Mail className="w-4 h-4 mr-2" />
-                    Contact Us
+                    <Tag className="w-4 h-4 mr-2" />
+                    Submit a Ticket
                   </Button>
                 </Link>
                 <Button
