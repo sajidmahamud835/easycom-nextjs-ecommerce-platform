@@ -13,6 +13,7 @@ import { useState } from "react";
 
 import useLocation from "./hooks/useLocation";
 import { Category } from "@/sanity.types";
+import LocationModal from "./LocationModal";
 
 interface Props {
   categories: Category[];
@@ -20,7 +21,8 @@ interface Props {
 
 const Header = ({ categories }: Props) => {
   const [category, setCategory] = useState("All");
-  const { location, loading } = useLocation();
+  const { location, loading, updateLocation } = useLocation();
+  const [isLocationModalOpen, setIsLocationModalOpen] = useState(false);
 
   return (
     <header className="sticky top-0 z-50 w-full shadow-md">
@@ -32,7 +34,10 @@ const Header = ({ categories }: Props) => {
         </Link>
 
         {/* Delivery Location - Hidden on small mobile */}
-        <div className="hidden lg:flex flex-col items-start hover:ring-1 hover:ring-white p-1 rounded-md cursor-pointer leading-tight transition-all min-w-[100px]">
+        <div 
+          className="hidden lg:flex flex-col items-start hover:ring-1 hover:ring-white p-1 rounded-md cursor-pointer leading-tight transition-all min-w-[100px]"
+          onClick={() => setIsLocationModalOpen(true)}
+        >
           <span className="text-gray-300 text-xs ml-4">Deliver to</span>
           <div className="flex items-center font-bold">
             <MapPin className="w-4 h-4 mr-1" />
@@ -120,7 +125,15 @@ const Header = ({ categories }: Props) => {
           </Link>
         ))}
       </div>
-    </header>
+      </div>
+      
+      <LocationModal 
+        isOpen={isLocationModalOpen} 
+        onOpenChange={setIsLocationModalOpen} 
+        onUpdateLocation={updateLocation}
+        currentLocation={location}
+      />
+    </header >
   );
 };
 export default Header;

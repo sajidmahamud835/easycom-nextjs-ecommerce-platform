@@ -55,7 +55,13 @@ const useLocation = () => {
         fetchLocation();
     }, []);
 
-    return { location, loading, error };
+    const updateLocation = (newLocation: LocationData) => {
+        setLocation(newLocation);
+        localStorage.setItem("userLocation", JSON.stringify(newLocation));
+    };
+
+    return { location, loading, error, updateLocation };
 };
 
 export default useLocation;
+export type { LocationData };
