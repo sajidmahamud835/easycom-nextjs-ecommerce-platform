@@ -9,7 +9,9 @@ import ProductsDetails from "@/components/ProductsDetails";
 import DynamicBreadcrumb from "@/components/DynamicBreadcrumb";
 import ProductSpecs from "@/components/ProductSpecs";
 import ProductReviews from "@/components/ProductReviews";
+
 import { trackProductView } from "@/lib/analytics";
+import { useUserInteractions } from "@/components/hooks/useUserInteractions";
 
 import { Product } from "@/sanity.types";
 import {
@@ -51,15 +53,28 @@ const ProductContent = ({
   const averageRating = product?.averageRating || 0;
   const totalReviews = product?.totalReviews || 0;
 
+
+  // Track product view on component mount
+  const { trackProductView: trackInteraction, trackCategoryView } = useUserInteractions();
+
   // Track product view on component mount
   useEffect(() => {
     if (product) {
+      // Analytics
       trackProductView({
         productId: product._id,
         name: product.name || "Unknown",
       });
+
+      // Personalization
+      trackInteraction(product._id);
+      if (product.categories) {
+        product.categories.forEach((cat) => {
+          if (cat._ref) trackCategoryView(cat._ref);
+        });
+      }
     }
-  }, [product]);
+  }, [product, trackInteraction, trackCategoryView]);
 
   return (
     <ProductAnimationWrapper>

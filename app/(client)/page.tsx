@@ -4,7 +4,8 @@ import { getProducts } from "@/sanity/lib/products";
 import Link from "next/link";
 import { ArrowRight, Zap, Gift, Cpu, Sparkles } from "lucide-react";
 
-import TodaysDeals from "@/components/TodaysDeals"; // Import added
+import TodaysDeals from "@/components/TodaysDeals";
+import RecommendedProducts from "@/components/RecommendedProducts";
 
 export default async function Home() {
     const products = await getProducts();
@@ -160,25 +161,8 @@ export default async function Home() {
                     <div className="absolute left-1/3 bottom-0 w-24 h-24 bg-white/10 rounded-full translate-y-1/2" />
                 </div>
 
-                {/* Products Section 2 */}
-                <div className="bg-white rounded-2xl p-6 shadow-lg shadow-gray-100/50">
-                    <div className="flex items-center justify-between mb-5">
-                        <div className="flex items-center gap-3">
-                            <div className="w-1 h-8 bg-gradient-to-b from-amber-500 to-orange-500 rounded-full" />
-                            <h2 className="text-xl font-bold text-gray-800">Recommended for You</h2>
-                        </div>
-                        <Link href="/shop" className="flex items-center gap-1 text-sm text-indigo-600 hover:text-indigo-800 font-medium group">
-                            View all
-                            <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
-                        </Link>
-                    </div>
-
-                    <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-5">
-                        {products?.slice(10, 20).map((product) => (
-                            <ProductCard key={product?._id} product={product} />
-                        ))}
-                    </div>
-                </div>
+                {/* Dynamic Recommended Products */}
+                <RecommendedProducts />
 
             </div>
         </div>
