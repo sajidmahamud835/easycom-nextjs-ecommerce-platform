@@ -34,7 +34,7 @@ const Header = ({ categories }: Props) => {
         </Link>
 
         {/* Delivery Location - Hidden on small mobile */}
-        <div 
+        <div
           className="hidden lg:flex flex-col items-start hover:ring-1 hover:ring-white p-1 rounded-md cursor-pointer leading-tight transition-all min-w-[100px]"
           onClick={() => setIsLocationModalOpen(true)}
         >
@@ -125,11 +125,10 @@ const Header = ({ categories }: Props) => {
           </Link>
         ))}
       </div>
-      </div>
-      
-      <LocationModal 
-        isOpen={isLocationModalOpen} 
-        onOpenChange={setIsLocationModalOpen} 
+
+      <LocationModal
+        isOpen={isLocationModalOpen}
+        onOpenChange={setIsLocationModalOpen}
         onUpdateLocation={updateLocation}
         currentLocation={location}
       />
