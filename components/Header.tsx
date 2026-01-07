@@ -13,7 +13,8 @@ import { useState } from "react";
 
 import useLocation from "./hooks/useLocation";
 import { Category } from "@/sanity.types";
-import LocationModal from "./LocationModal";
+import SideMenu from "./SideMenu";
+
 
 interface Props {
   categories: Category[];
@@ -114,11 +115,7 @@ const Header = ({ categories }: Props) => {
 
       {/* Bottom Bar - Darker Gray/Blue */}
       <div className="bg-[#232f3e] text-white flex items-center gap-4 px-4 py-1.5 text-sm h-[40px] overflow-x-auto no-scrollbar">
-        <div className="flex items-center font-bold hover:ring-1 hover:ring-white p-1 rounded-sm cursor-pointer transition-all relative group">
-          <Menu className="w-5 h-5 mr-1" />
-          অল (All)
-          {/* Mobile Side Menu Trigger (Visualize only for now) */}
-        </div>
+        <SideMenu />
         {["Today's Deals", "Customer Service", "Track My Product", "Gift Cards"].map((item) => (
           <Link key={item} href="#" className="whitespace-nowrap hover:ring-1 hover:ring-white px-2 py-1 rounded-sm transition-all">
             {item}
