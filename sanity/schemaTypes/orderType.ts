@@ -91,6 +91,12 @@ export const orderType = defineType({
               title: "Quantity Purchased",
               type: "number",
             }),
+            defineField({
+              name: "price",
+              title: "Price at Purchase",
+              type: "number",
+              description: "Override product price (e.g. for variable gift cards)",
+            }),
           ],
           preview: {
             select: {

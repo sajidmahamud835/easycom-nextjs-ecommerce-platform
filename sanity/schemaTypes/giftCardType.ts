@@ -73,6 +73,12 @@ export const giftCardType = defineType({
             name: "recipientEmail",
             title: "Recipient Email",
             type: "string",
+        }),
+        defineField({
+            name: "relatedOrder",
+            title: "Related Order",
+            type: "reference",
+            to: [{ type: "order" }],
         })
     ],
     preview: {

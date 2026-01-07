@@ -118,7 +118,7 @@ const Header = ({ categories }: Props) => {
       <div className="bg-[#232f3e] text-white flex items-center gap-4 px-4 py-1.5 text-sm h-[40px] overflow-x-auto no-scrollbar">
         <SideMenu />
         {["Today's Deals", "Customer Service", "Track My Product"].map((item) => (
-          <Link key={item} href="#" className="whitespace-nowrap hover:ring-1 hover:ring-white px-2 py-1 rounded-sm transition-all">
+          <Link key={item} href={item === "Today's Deals" ? "/deal" : "#"} className="whitespace-nowrap hover:ring-1 hover:ring-white px-2 py-1 rounded-sm transition-all">
             {item}
           </Link>
         ))}

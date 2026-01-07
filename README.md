@@ -18,7 +18,7 @@
 
 ---
 
-![EasyCom Preview](./public/preview.png)
+![EasyCom Preview](file:///C:/Users/Sajid/.gemini/antigravity/brain/3c294471-a264-4ea4-8c04-a6018d6b3bf7/uploaded_image_1767827497288.png)
 
 ## 🌟 About The Project
 

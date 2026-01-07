@@ -8,10 +8,11 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Gift, CreditCard, Sparkles, CheckCircle, AlertCircle, Copy, Wallet } from "lucide-react";
 import { useState } from "react";
 import { motion, AnimatePresence } from "motion/react";
-import { purchaseGiftCard, redeemGiftCard } from "@/actions/giftCard";
+import { createGiftCardOrder, redeemGiftCard } from "@/actions/giftCard";
 import { useUser } from "@clerk/nextjs";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { toast } from "sonner";
+import DirectPaymentModal from "@/components/DirectPaymentModal";
 
 const GiftCardPage = () => {
     const { user } = useUser();
@@ -21,6 +22,13 @@ const GiftCardPage = () => {
     const [message, setMessage] = useState("");
     const [purchasedCode, setPurchasedCode] = useState<string | null>(null);
     const [loading, setLoading] = useState(false);
+
+    // Payment State
+    const [isPaymentModalOpen, setIsPaymentModalOpen] = useState(false);
+    const [orderId, setOrderId] = useState<string | null>(null);
+    const [orderNumber, setOrderNumber] = useState<string | null>(null);
+
+
 
     const [redeemCode, setRedeemCode] = useState("");
     const [redeemStatus, setRedeemStatus] = useState<{ success: boolean; message: string; amount?: number } | null>(null);
@@ -32,16 +40,33 @@ const GiftCardPage = () => {
             return;
         }
 
-        setLoading(true);
-        // Simulate fetching user's Sanity ID (In a real app, this would be robust)
-        // For now, we pass undefined if not logged in, or handled by backend matching Clerk ID
-        const result = await purchaseGiftCard(amount, recipientEmail, message, undefined);
+        if (!user) {
+            toast.error("Please sign in to purchase gift cards");
+            return;
+        }
 
-        if (result.success && result.code) {
-            setPurchasedCode(result.code);
-            toast.success("Gift Card Purchased Successfully!");
-        } else {
-            toast.error(result.error || "Purchase failed");
+        setLoading(true);
+        // Create Order for Gift Card
+        try {
+            const result = await createGiftCardOrder(
+                amount,
+                recipientEmail,
+                message,
+                user.id,
+                user.primaryEmailAddress?.emailAddress || "",
+                user.fullName || "Valued Customer"
+            );
+
+            if (result.success && result.orderId && result.orderNumber) {
+                setOrderId(result.orderId);
+                setOrderNumber(result.orderNumber);
+                setIsPaymentModalOpen(true);
+            } else {
+                toast.error(result.error || "Failed to create order");
+            }
+        } catch (error) {
+            console.error("Purchase error:", error);
+            toast.error("An error occurred. Please try again.");
         }
         setLoading(false);
     };
@@ -151,8 +176,8 @@ const GiftCardPage = () => {
                                                         key={amt}
                                                         onClick={() => { setPurchaseAmount(amt); setCustomAmount(""); }}
                                                         className={`py-4 rounded-xl border-2 font-bold text-xl transition-all ${purchaseAmount === amt
-                                                                ? "border-[#febd69] bg-[#febd69]/10 text-[#232f3e]"
-                                                                : "border-gray-200 hover:border-gray-300 text-gray-600"
+                                                            ? "border-[#febd69] bg-[#febd69]/10 text-[#232f3e]"
+                                                            : "border-gray-200 hover:border-gray-300 text-gray-600"
                                                             }`}
                                                     >
                                                         ${amt}
@@ -274,6 +299,16 @@ const GiftCardPage = () => {
                     </Card>
                 </div>
             </Container>
+
+            {orderId && orderNumber && (
+                <DirectPaymentModal
+                    isOpen={isPaymentModalOpen}
+                    onClose={() => setIsPaymentModalOpen(false)}
+                    orderId={orderId}
+                    orderNumber={orderNumber}
+                    orderTotal={purchaseAmount || Number(customAmount)}
+                />
+            )}
         </div>
     );
 };

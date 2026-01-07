@@ -39,7 +39,7 @@ import { BRAND_QUERYResult } from "@/sanity.types";
 interface ProductContentProps {
   product: Product;
   relatedProducts: Product[];
-  brand: BRAND_QUERYResult | null;
+  brand: any;
 }
 
 const ProductContent = ({
@@ -86,9 +86,9 @@ const ProductContent = ({
             <div className="space-y-3">
               {product?.brand && (
                 <Badge className="bg-shop_light_green/10 text-shop_dark_green hover:bg-shop_light_green/20 w-fit">
-                  {brand && brand.length > 0 && (
+                  {brand && (
                     <span className="font-semibold tracking-wide">
-                      {brand[0]?.brandName}
+                      {brand.brandName}
                     </span>
                   )}
                 </Badge>
@@ -108,11 +108,10 @@ const ProductContent = ({
                       <StarIcon
                         key={index}
                         size={16}
-                        className={`${
-                          index < Math.floor(averageRating)
-                            ? "text-shop_light_green fill-shop_light_green"
-                            : "text-gray-300"
-                        }`}
+                        className={`${index < Math.floor(averageRating)
+                          ? "text-shop_light_green fill-shop_light_green"
+                          : "text-gray-300"
+                          }`}
                       />
                     ))}
                   </div>
@@ -148,19 +147,18 @@ const ProductContent = ({
               {/* Enhanced Stock Status */}
               <div className="flex items-center gap-3">
                 <Badge
-                  className={`text-sm font-semibold ${
-                    product?.stock === 0
-                      ? "bg-red-100 text-red-700 hover:bg-red-100"
-                      : product?.stock && product.stock < 10
+                  className={`text-sm font-semibold ${product?.stock === 0
+                    ? "bg-red-100 text-red-700 hover:bg-red-100"
+                    : product?.stock && product.stock < 10
                       ? "bg-yellow-100 text-yellow-700 hover:bg-yellow-100"
                       : "bg-green-100 text-green-700 hover:bg-green-100"
-                  }`}
+                    }`}
                 >
                   {product?.stock === 0
                     ? "Out of Stock"
                     : product?.stock && product.stock < 10
-                    ? `Only ${product.stock} left!`
-                    : "In Stock"}
+                      ? `Only ${product.stock} left!`
+                      : "In Stock"}
                 </Badge>
               </div>
 

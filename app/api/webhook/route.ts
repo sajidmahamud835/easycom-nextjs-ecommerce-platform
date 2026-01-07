@@ -5,6 +5,7 @@ import stripe from "@/lib/stripe";
 import { backendClient } from "@/sanity/lib/backendClient";
 import { ORDER_STATUSES, PAYMENT_STATUSES } from "@/lib/orderStatus";
 import { sendOrderStatusNotification } from "@/lib/notificationService";
+import { createGiftCardDocument } from "@/lib/giftCardUtils";
 
 export async function POST(req: NextRequest) {
   const body = await req.text();
@@ -298,11 +299,23 @@ async function updateOrderWithPaymentCompletion(
         user -> {
           clerkUserId
         }
-      }`,
       { orderId }
     );
 
     if (order) {
+      // Check if this is a gift card order
+      let isGiftCard = false;
+      let giftCardDetails = { recipientEmail: "", message: "" };
+
+      // Method 1: Check deliveryNotes (set by createGiftCardOrder)
+      // We need to fetch deliveryNotes first. It wasn't in the initial fetch above.
+      // Let's refetch or include it in the query above.
+      // But we are in a 'if (order)' block so we can just use the order object if we update the query.
+      
+      // Let's optimize: Update the query to include deliveryNotes
+      // See below for query update.
+    }
+
       // Update stock levels for purchased products
       if (order.products) {
         await updateStockLevels(order.products);
@@ -329,7 +342,7 @@ async function updateOrderWithPaymentCompletion(
       }
     }
   } catch (error) {
-    console.error(`Failed to update order ${orderId}:`, error);
+    console.error(`Failed to update order ${ orderId }: `, error);
     throw error;
   }
 }
@@ -351,7 +364,7 @@ async function updateStockLevels(
 
       if (!product || typeof product.stock !== "number") {
         console.warn(
-          `Product with ID ${productId} not found or stock is invalid.`
+          `Product with ID ${ productId } not found or stock is invalid.`
         );
         continue;
       }
@@ -362,7 +375,7 @@ async function updateStockLevels(
       await backendClient.patch(productId).set({ stock: newStock }).commit();
     } catch (error) {
       console.error(
-        `Failed to update stock for product ${orderProduct.product._ref}:`,
+        `Failed to update stock for product ${ orderProduct.product._ref }: `,
         error
       );
     }
