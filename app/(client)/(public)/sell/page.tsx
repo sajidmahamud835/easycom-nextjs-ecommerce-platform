@@ -103,9 +103,9 @@ const SellPage = () => {
                                     Apply Now
                                 </Button>
                                 <Button
-                                    variant="outline"
+                                    variant="secondary"
                                     size="lg"
-                                    className="border-white text-white hover:bg-white/10 h-14 px-8 text-lg"
+                                    className="bg-white/10 hover:bg-white/20 text-white border border-white/50 h-14 px-8 text-lg backdrop-blur-sm"
                                 >
                                     Learn More
                                 </Button>

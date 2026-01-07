@@ -125,7 +125,7 @@ const Header = ({ categories }: Props) => {
           Gift Cards
         </Link>
         <Link href="/sell" className="whitespace-nowrap hover:ring-1 hover:ring-white px-2 py-1 rounded-sm transition-all">
-          Sell
+          Become a Seller
         </Link>
       </div>
 
