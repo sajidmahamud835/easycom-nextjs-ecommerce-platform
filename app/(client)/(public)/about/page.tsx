@@ -79,20 +79,21 @@ const AboutPage = () => {
   return (
     <div className="bg-gradient-to-b from-shop_light_bg to-white min-h-screen">
       {/* Hero Section */}
-      <section className="py-20 bg-gradient-to-r from-shop_dark_green to-shop_light_green text-white">
+      {/* Hero Section */}
+      <section className="py-20 bg-gradient-to-r from-shop_light_bg to-white text-center">
         <Container className="max-w-6xl">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             className="text-center"
           >
-            <Badge className="mb-6 bg-white/20 text-white border-white/30 hover:bg-white/30">
+            <Badge className="mb-6 bg-shop_dark_green/10 text-shop_dark_green border-shop_dark_green/20 hover:bg-shop_dark_green/20">
               Est. 2025
             </Badge>
-            <h1 className="text-5xl lg:text-6xl font-bold mb-6">
+            <h1 className="text-5xl lg:text-6xl font-bold mb-6 text-shop_dark_green">
               About EasyCom
             </h1>
-            <p className="text-xl lg:text-2xl text-white/90 max-w-3xl mx-auto leading-relaxed">
+            <p className="text-xl lg:text-2xl text-gray-600 max-w-3xl mx-auto leading-relaxed">
               We&apos;re revolutionizing online shopping with curated products,
               exceptional service, and innovative technology that puts customers
               first.
