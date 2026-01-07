@@ -68,6 +68,7 @@ export default function PremiumFloatingButton() {
                 <button
                   onClick={() => setIsExpanded(false)}
                   className="absolute top-4 right-4 text-white/80 hover:text-white transition-colors"
+                  aria-label="Close premium features modal"
                 >
                   <X className="w-5 h-5" />
                 </button>
@@ -144,9 +145,10 @@ export default function PremiumFloatingButton() {
         {/* Floating Button */}
         <motion.button
           onClick={() => setIsExpanded(!isExpanded)}
-          className="relative group"
+          className="relative group border-none bg-transparent cursor-pointer p-0"
           whileHover={{ scale: 1.1 }}
           whileTap={{ scale: 0.95 }}
+          aria-label="Open premium features modal"
         >
           {/* Pulse animation ring */}
           <motion.div
