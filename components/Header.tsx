@@ -97,7 +97,7 @@ const Header = () => {
           <Menu className="w-5 h-5 mr-1" />
           All
         </div>
-        {["Today's Deals", "Customer Service", "Registry", "Gift Cards", "Sell"].map((item) => (
+        {["Today's Deals", "Customer Service", "Track My Product", "Gift Cards", "Sell"].map((item) => (
           <Link key={item} href="#" className="whitespace-nowrap hover:ring-1 hover:ring-white px-2 py-1 rounded-sm transition-all">
             {item}
           </Link>

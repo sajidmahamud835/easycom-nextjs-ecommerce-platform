@@ -11,7 +11,7 @@ export default async function Home() {
         <div className="bg-gradient-to-b from-slate-50 via-white to-slate-50 min-h-screen pb-16">
             <HomeBanner />
 
-            <div className="max-w-[1500px] mx-auto px-4 -mt-10 md:-mt-32 relative z-30 mb-8 space-y-8">
+            <div className="max-w-[1500px] mx-auto px-4 -mt-10 md:-mt-24 relative z-30 mb-8 space-y-8">
 
                 {/* Feature Cards Grid */}
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5">
