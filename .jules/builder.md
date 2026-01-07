@@ -1,4 +1,4 @@
-## 2025-02-13 - Redundant Dependency Installation
-**Issue:** The build process was performing `npm install` twice during deployment. `render.yaml` ran `npm install` (which skipped devDependencies due to `NODE_ENV=production`), and then `npm run build` triggered a `prebuild` script (`npm install --include=dev`) to install them.
-**Root Cause:** The `prebuild` script was a workaround to ensure devDependencies were available for the build step on Render, which defaults `NODE_ENV` to `production`.
-**Fix:** Updated `render.yaml` to explicitly install devDependencies (`npm install --include=dev`) and removed the redundant `prebuild` script from `package.json`.
+## 2025-01-06 - Render Build Resilience
+**Issue:** Deployment failed on Render because `cross-env` (a devDependency) was missing during the build command. Render's default environment sets `NODE_ENV=production`, causing `npm install` to skip devDependencies. Additionally, Render Dashboard settings may override `render.yaml`, preventing custom install commands.
+**Root Cause:** Removing the `prebuild` script caused the build to run without necessary build tools (`cross-env`, `tailwindcss`, `typescript`).
+**Fix:** Restored the `prebuild` script (`npm install --include=dev`) in `package.json`. This ensures that whenever `npm run build` is executed, devDependencies are explicitly installed first, making the build process resilient to environment configuration overrides.
