@@ -4,12 +4,16 @@ import { getProducts } from "@/sanity/lib/products";
 import Link from "next/link";
 import { ArrowRight, Zap, Gift, Cpu, Sparkles } from "lucide-react";
 
+import TodaysDeals from "@/components/TodaysDeals"; // Import added
+
 export default async function Home() {
     const products = await getProducts();
 
     return (
         <div className="bg-gradient-to-b from-slate-50 via-white to-slate-50 min-h-screen pb-16">
             <HomeBanner />
+
+            <TodaysDeals />
 
             <div className="max-w-[1500px] mx-auto px-4 -mt-10 md:-mt-24 relative z-30 mb-8 space-y-8">
 

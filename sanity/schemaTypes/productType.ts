@@ -41,6 +41,26 @@ export const productType = defineType({
       validation: (Rule) => Rule.required().min(0),
     }),
     defineField({
+      name: "isTodaysDeal",
+      title: "Today's Deal",
+      type: "boolean",
+      description: "Mark this product as one of Today's Deals",
+      initialValue: false,
+    }),
+    defineField({
+      name: "dealEndTime",
+      title: "Deal End Time",
+      type: "datetime",
+      hidden: ({ document }) => !document?.isTodaysDeal,
+    }),
+    defineField({
+      name: "discountPercentage",
+      title: "Discount Percentage",
+      type: "number",
+      validation: (Rule) => Rule.min(0).max(100),
+      description: "Percentage off (e.g. 50 for 50% off)",
+    }),
+    defineField({
       name: "discount",
       title: "Discount",
       type: "number",
