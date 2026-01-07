@@ -3,7 +3,7 @@ import { auth, clerkClient } from "@clerk/nextjs/server";
 import { isUserAdmin } from "@/lib/adminUtils";
 import { writeClient } from "@/sanity/lib/client";
 import { sendOrderStatusNotification } from "@/lib/notificationService";
-import { addWalletCredit } from "@/actions/walletActions";
+import { addWalletCredit } from "@/lib/walletUtils";
 
 export async function PATCH(
   req: NextRequest,

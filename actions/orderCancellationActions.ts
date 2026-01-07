@@ -2,7 +2,7 @@
 
 import { auth } from "@clerk/nextjs/server";
 import { backendClient } from "@/sanity/lib/backendClient";
-import { addWalletCredit } from "./walletActions";
+import { addWalletCredit } from "@/lib/walletUtils";
 import { sendOrderStatusNotification } from "@/lib/notificationService";
 import { revalidatePath } from "next/cache";
 import { isAdmin } from "@/lib/adminUtils";
