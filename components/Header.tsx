@@ -11,21 +11,11 @@ import {
 } from "lucide-react";
 import { useState } from "react";
 
-const categories = [
-  "All",
-  "Arts & Crafts",
-  "Automotive",
-  "Baby",
-  "Beauty & Personal Care",
-  "Books",
-  "Computers",
-  "Electronics",
-  "Women's Fashion",
-  "Men's Fashion"
-];
+import useLocation from "./hooks/useLocation";
 
 const Header = () => {
   const [category, setCategory] = useState("All");
+  const { location, loading } = useLocation();
 
   return (
     <header className="sticky top-0 z-50 w-full shadow-md">
@@ -37,11 +27,13 @@ const Header = () => {
         </Link>
 
         {/* Delivery Location - Hidden on small mobile */}
-        <div className="hidden lg:flex flex-col items-start hover:ring-1 hover:ring-white p-1 rounded-md cursor-pointer leading-tight transition-all">
+        <div className="hidden lg:flex flex-col items-start hover:ring-1 hover:ring-white p-1 rounded-md cursor-pointer leading-tight transition-all min-w-[100px]">
           <span className="text-gray-300 text-xs ml-4">Deliver to</span>
           <div className="flex items-center font-bold">
             <MapPin className="w-4 h-4 mr-1" />
-            <span>Bangladesh</span>
+            <span>
+              {loading ? "Loading..." : location?.country || "Select Location"}
+            </span>
           </div>
         </div>
 
