@@ -240,23 +240,23 @@ const FAQPage = () => {
   return (
     <div className="bg-gradient-to-b from-shop_light_bg to-white min-h-screen">
       {/* Hero Section */}
-      <section className="py-16 bg-gradient-to-r from-shop_dark_green to-shop_light_green text-white">
+      <section className="py-16 bg-gradient-to-r from-shop_light_bg to-white text-center">
         <Container className="max-w-6xl">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             className="text-center"
           >
-            <HelpCircle className="w-16 h-16 mx-auto mb-6 opacity-90" />
-            <h1 className="text-4xl lg:text-5xl font-bold mb-4">
+            <HelpCircle className="w-16 h-16 mx-auto mb-6 text-shop_light_green opacity-90" />
+            <h1 className="text-4xl lg:text-5xl font-bold mb-4 text-shop_dark_green">
               Frequently Asked Questions
             </h1>
-            <p className="text-xl text-white/90 max-w-3xl mx-auto mb-6">
+            <p className="text-xl text-gray-600 max-w-3xl mx-auto mb-6">
               Find answers to common questions about shopping, payments,
               shipping, and more. Can&apos;t find what you&apos;re looking for?
               Contact our support team.
             </p>
-            <Badge className="bg-white/20 text-white border-white/30 hover:bg-white/30">
+            <Badge className="bg-shop_dark_green/10 text-shop_dark_green border-shop_dark_green/20 hover:bg-shop_dark_green/20">
               Updated Daily
             </Badge>
           </motion.div>
@@ -318,22 +318,20 @@ const FAQPage = () => {
                     <button
                       key={category.id}
                       onClick={() => setActiveCategory(category.id)}
-                      className={`w-full flex items-center justify-between p-3 rounded-lg transition-all duration-200 ${
-                        activeCategory === category.id
+                      className={`w-full flex items-center justify-between p-3 rounded-lg transition-all duration-200 ${activeCategory === category.id
                           ? "bg-shop_light_green text-white shadow-md"
                           : "hover:bg-shop_light_green/10 text-gray-700 hover:text-shop_dark_green"
-                      }`}
+                        }`}
                     >
                       <div className="flex items-center gap-3">
                         <Icon className="w-4 h-4" />
                         <span className="font-medium">{category.label}</span>
                       </div>
                       <span
-                        className={`text-xs px-2 py-1 rounded-full ${
-                          activeCategory === category.id
+                        className={`text-xs px-2 py-1 rounded-full ${activeCategory === category.id
                             ? "bg-white/20"
                             : "bg-gray-200"
-                        }`}
+                          }`}
                       >
                         {category.count}
                       </span>

@@ -131,22 +131,22 @@ const PrivacyPage = () => {
   return (
     <div className="bg-gradient-to-b from-shop_light_bg to-white min-h-screen">
       {/* Hero Section */}
-      <section className="py-16 bg-gradient-to-r from-shop_dark_green to-shop_light_green text-white">
+      <section className="py-16 bg-gradient-to-r from-shop_light_bg to-white text-center">
         <Container className="max-w-6xl">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             className="text-center"
           >
-            <Shield className="w-16 h-16 mx-auto mb-6 opacity-90" />
-            <h1 className="text-4xl lg:text-5xl font-bold mb-4">
+            <Shield className="w-16 h-16 mx-auto mb-6 text-shop_light_green opacity-90" />
+            <h1 className="text-4xl lg:text-5xl font-bold mb-4 text-shop_dark_green">
               Privacy Policy
             </h1>
-            <p className="text-xl text-white/90 max-w-3xl mx-auto">
+            <p className="text-xl text-gray-600 max-w-3xl mx-auto">
               Your privacy is fundamental to how we operate. Learn how we
               collect, use, and protect your personal information.
             </p>
-            <Badge className="mt-6 bg-white/20 text-white border-white/30">
+            <Badge className="mt-6 bg-shop_dark_green/10 text-shop_dark_green border-shop_dark_green/20">
               Last updated: January 2024
             </Badge>
           </motion.div>

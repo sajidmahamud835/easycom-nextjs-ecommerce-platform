@@ -128,18 +128,18 @@ const ContactPage = () => {
   return (
     <div className="bg-gradient-to-b from-shop_light_bg to-white min-h-screen">
       {/* Hero Banner Section */}
-      <section className="py-20 bg-gradient-to-r from-shop_dark_green to-shop_light_green text-white">
+      <section className="py-20 bg-gradient-to-r from-shop_light_bg to-white text-center">
         <Container className="max-w-6xl">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             className="text-center"
           >
-            <Badge className="mb-6 bg-white/20 text-white border-white/30 hover:bg-white/30">
+            <Badge className="mb-6 bg-shop_dark_green/10 text-shop_dark_green border-shop_dark_green/20 hover:bg-shop_dark_green/20">
               We&apos;re Here to Help
             </Badge>
-            <h1 className="text-5xl lg:text-6xl font-bold mb-6">Contact Us</h1>
-            <p className="text-xl lg:text-2xl text-white/90 max-w-3xl mx-auto leading-relaxed">
+            <h1 className="text-5xl lg:text-6xl font-bold mb-6 text-shop_dark_green">Contact Us</h1>
+            <p className="text-xl lg:text-2xl text-gray-600 max-w-3xl mx-auto leading-relaxed">
               Have questions about our products or need assistance? We&apos;d
               love to hear from you. Our team is here to help with any inquiries
               you may have.
