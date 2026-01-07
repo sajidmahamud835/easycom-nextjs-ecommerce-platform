@@ -341,11 +341,10 @@ async function updateOrderWithPaymentCompletion(
       );
       // Don't fail the webhook if notification fails
     }
-  }
   } catch (error) {
-  console.error(`Failed to update order ${orderId}: `, error);
-  throw error;
-}
+    console.error(`Failed to update order ${orderId}: `, error);
+    throw error;
+  }
 }
 
 // Function to update stock levels
