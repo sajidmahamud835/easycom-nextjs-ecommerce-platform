@@ -14,6 +14,7 @@ import { useState } from "react";
 import useLocation from "./hooks/useLocation";
 import { Category } from "@/sanity.types";
 import SideMenu from "./SideMenu";
+import LocationModal from "./LocationModal";
 
 
 interface Props {
