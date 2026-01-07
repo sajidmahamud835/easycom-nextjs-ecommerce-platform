@@ -57,7 +57,7 @@ const HomeCategories = ({ categories }: Props) => {
             >
               {/* Image Container */}
               <div className="flex justify-center mb-5">
-                {category?.image && (
+                {category?.image ? (
                   <div className="relative w-20 h-20 rounded-2xl overflow-hidden bg-gradient-to-br from-shop_light_pink to-shop_light_bg p-3 group-hover:shadow-lg hoverEffect">
                     <Image
                       src={urlFor(category?.image).url()}
@@ -67,6 +67,22 @@ const HomeCategories = ({ categories }: Props) => {
                       className="w-full h-full object-contain group-hover:scale-110 hoverEffect"
                     />
                     <div className="absolute inset-0 bg-gradient-to-t from-shop_light_blue/10 to-transparent opacity-0 group-hover:opacity-100 hoverEffect rounded-xl"></div>
+                  </div>
+                ) : (
+                  <div className="relative w-20 h-20 rounded-2xl overflow-hidden bg-gradient-to-br from-gray-100 to-gray-50 p-3 group-hover:shadow-lg hoverEffect flex items-center justify-center text-gray-400 group-hover:text-shop_dark_blue group-hover:bg-shop_light_blue/10">
+                    <svg
+                      className="w-10 h-10 hoverEffect"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={1.5}
+                        d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"
+                      />
+                    </svg>
                   </div>
                 )}
               </div>
