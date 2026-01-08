@@ -13,11 +13,12 @@ import { useState } from "react";
 
 import useLocation from "./hooks/useLocation";
 import { Category } from "@/sanity.types";
-import SideMenu from "./SideMenu";
+// SideMenu removed
 import LocationModal from "./LocationModal";
 import GoogleTranslate from "./GoogleTranslate";
 import { SignInButton, useUser } from "@clerk/nextjs";
 import UserDropdown from "./UserDropdown";
+import useCartStore from "@/store";
 
 
 interface Props {
@@ -29,6 +30,7 @@ const Header = ({ categories }: Props) => {
   const { location, loading, updateLocation } = useLocation();
   const [isLocationModalOpen, setIsLocationModalOpen] = useState(false);
   const { user } = useUser();
+  const { items } = useCartStore();
 
   return (
     <header className="sticky top-0 z-50 w-full shadow-md">
@@ -130,7 +132,7 @@ const Header = ({ categories }: Props) => {
         <Link href="/cart" className="flex items-end font-bold hover:ring-1 hover:ring-white p-2 rounded-sm relative transition-all">
           <div className="relative">
             <ShoppingCart className="w-8 h-8" />
-            <span className="absolute -top-1 left-1/2 -translate-x-1/2 text-[#f08804] text-lg font-bold">0</span>
+            <span className="absolute -top-1 left-1/2 -translate-x-1/2 text-[#f08804] text-lg font-bold">{items.length}</span>
           </div>
           <span className="hidden xl:inline mb-1 ml-1 text-sm">Cart</span>
         </Link>
@@ -138,7 +140,7 @@ const Header = ({ categories }: Props) => {
 
       {/* Bottom Bar - Darker Gray/Blue */}
       <div className="bg-[#232f3e] text-white flex items-center gap-4 px-4 py-1.5 text-sm h-[40px] overflow-x-auto no-scrollbar">
-        <SideMenu />
+        {/* SideMenu removed as per user request */}
         {["Today's Deals", "Customer Service", "Track My Product"].map((item) => (
           <Link key={item} href={item === "Today's Deals" ? "/deal" : "#"} className="whitespace-nowrap hover:ring-1 hover:ring-white px-2 py-1 rounded-sm transition-all">
             {item}

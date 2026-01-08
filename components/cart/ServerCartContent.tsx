@@ -165,11 +165,11 @@ export function ServerCartContent({
   }
 
   return (
-    <div className="grid lg:grid-cols-3 gap-8">
+    <div className="grid lg:grid-cols-3 gap-8 pb-10">
       {/* Cart Items */}
-      <div className="lg:col-span-2 space-y-4">
+      <div className="lg:col-span-2 space-y-6">
         {cart.map((item) => (
-          <div key={item.product._id} className="border rounded-lg p-4">
+          <div key={item.product._id} className="bg-white rounded-2xl p-6 shadow-sm hover:shadow-md transition-shadow duration-200">
             <div className="flex gap-4">
               {/* Product Image */}
               <div className="relative w-24 h-24 flex-shrink-0">
@@ -278,65 +278,69 @@ export function ServerCartContent({
       </div>
 
       {/* Order Summary & Checkout */}
-      <div className="space-y-6 lg:sticky lg:top-28 lg:self-start">
+      <div className="lg:sticky lg:top-24 lg:self-start space-y-6">
         {/* Address Selection */}
-        <AddressSelector
-          userEmail={userEmail}
-          addresses={userAddresses}
-          selectedAddress={selectedAddress}
-          onAddressSelect={setSelectedAddress}
-          onAddressesRefresh={onAddressesRefresh}
-        />
+        <div className="bg-white rounded-2xl p-6 shadow-sm">
+          <AddressSelector
+            userEmail={userEmail}
+            addresses={userAddresses}
+            selectedAddress={selectedAddress}
+            onAddressSelect={setSelectedAddress}
+            onAddressesRefresh={onAddressesRefresh}
+          />
+        </div>
 
         {/* Order Summary */}
-        <div className="border rounded-lg p-6">
-          <h2 className="text-xl font-bold mb-4">Order Summary</h2>
-          <div className="space-y-3">
-            <div className="flex justify-between">
+        <div className="bg-white rounded-2xl p-6 shadow-md border-t-4 border-emerald-500">
+          <h2 className="text-xl font-bold mb-6 text-gray-900">Order Summary</h2>
+          <div className="space-y-4">
+            <div className="flex justify-between text-gray-600">
               <span>Subtotal ({cart.length} items)</span>
-              <PriceFormatter amount={grossSubtotal} />
+              <span className="font-medium text-gray-900"><PriceFormatter amount={grossSubtotal} /></span>
             </div>
             {totalDiscount > 0 && (
-              <div className="flex justify-between text-green-600">
+              <div className="flex justify-between text-emerald-600">
                 <span>Discount</span>
                 <span>
                   -<PriceFormatter amount={totalDiscount} />
                 </span>
               </div>
             )}
-            <div className="flex justify-between">
+            <div className="flex justify-between text-gray-600">
               <span>Shipping</span>
               {shipping === 0 ? (
-                <span className="text-green-600 font-medium">Free</span>
+                <span className="text-emerald-600 font-bold bg-emerald-50 px-2 py-0.5 rounded-full text-xs">Free</span>
               ) : (
-                <PriceFormatter amount={shipping} />
+                <span className="font-medium text-gray-900"><PriceFormatter amount={shipping} /></span>
               )}
             </div>
-            <div className="flex justify-between">
+            <div className="flex justify-between text-gray-600">
               <span>Tax</span>
-              <PriceFormatter amount={tax} />
+              <span className="font-medium text-gray-900"><PriceFormatter amount={tax} /></span>
             </div>
-            <Separator />
-            <div className="flex justify-between text-lg font-bold">
-              <span>Total</span>
-              <PriceFormatter amount={finalTotal} />
+
+            <div className="my-4 border-t border-dashed border-gray-200" />
+
+            <div className="flex justify-between items-end">
+              <span className="text-lg font-bold text-gray-900">Total</span>
+              <span className="text-2xl font-bold text-emerald-600"><PriceFormatter amount={finalTotal} /></span>
             </div>
 
             {shipping === 0 && (
-              <p className="text-sm text-green-600">
-                🎉 You got free shipping!
-              </p>
+              <div className="bg-emerald-50 text-emerald-700 px-4 py-3 rounded-xl text-sm font-medium flex items-center gap-2">
+                <span>🎉</span> You got free shipping!
+              </div>
             )}
             {currentSubtotal < 100 && (
-              <p className="text-sm text-muted-foreground">
-                Add <PriceFormatter amount={100 - currentSubtotal} /> more for
+              <p className="text-sm text-gray-500 text-center">
+                Add <span className="font-semibold text-gray-900"><PriceFormatter amount={100 - currentSubtotal} /></span> more for
                 free shipping
               </p>
             )}
           </div>
 
           {/* Checkout */}
-          <div className="mt-6">
+          <div className="mt-8">
             <CheckoutButton cart={cart} selectedAddress={selectedAddress} />
           </div>
         </div>
