@@ -46,9 +46,8 @@ const ResponsiveOrdersComponent = ({
             return (
               <div
                 key={index}
-                className={`relative ${imageSize} rounded-full overflow-hidden border-2 border-white shadow-sm bg-gray-100 ${
-                  index > 0 ? "-ml-2" : ""
-                }`}
+                className={`relative ${imageSize} rounded-full overflow-hidden border-2 border-white shadow-sm bg-gray-100 ${index > 0 ? "-ml-2" : ""
+                  }`}
                 style={{ zIndex: 30 - index * 10 }}
               >
                 {imageUrl ? (
@@ -71,9 +70,8 @@ const ResponsiveOrdersComponent = ({
               className={`-ml-2 ${imageSize} rounded-full bg-gray-600 border-2 border-white shadow-sm flex items-center justify-center z-10`}
             >
               <span
-                className={`${
-                  isCard ? "text-sm" : "text-xs"
-                } font-semibold text-white`}
+                className={`${isCard ? "text-sm" : "text-xs"
+                  } font-semibold text-white`}
               >
                 +{remainingCount}
               </span>
@@ -140,11 +138,13 @@ const ResponsiveOrdersComponent = ({
       order.status === "completed" ||
       order.status === "delivered"
     ) {
-      return "bg-green-100 text-green-800";
+      return "bg-emerald-100 text-emerald-700";
     } else if (order.status === "cancelled") {
-      return "bg-red-100 text-red-800";
+      return "bg-red-100 text-red-700";
+    } else if (order.status === "processing" || order.status === "shipped") {
+      return "bg-blue-100 text-blue-700";
     } else {
-      return "bg-yellow-100 text-yellow-800";
+      return "bg-amber-100 text-amber-700";
     }
   };
 
@@ -193,93 +193,96 @@ const ResponsiveOrdersComponent = ({
 
   // Mobile Card View Component
   const OrderCard = ({ order }: { order: MY_ORDERS_QUERYResult[0] }) => (
-    <Card className="w-full shadow-sm border border-gray-200 hover:shadow-md transition-shadow">
-      <CardHeader className="pb-3">
-        <div className="flex items-center justify-between">
-          <div className="space-y-1 flex-1 min-w-0">
-            <div className="font-medium text-sm truncate">
-              Order #{order.orderNumber?.slice(-10) ?? "N/A"}...
-            </div>
-            <div className="text-xs text-gray-500">
-              {order?.orderDate &&
-                format(new Date(order.orderDate), "dd/MM/yyyy")}
-            </div>
+    <div className="bg-white rounded-2xl p-5 shadow-sm hover:shadow-md transition-all duration-300">
+      {/* Header */}
+      <div className="flex items-center justify-between mb-4">
+        <div className="space-y-1 flex-1 min-w-0">
+          <div className="font-bold text-gray-900 text-base">
+            #{order.orderNumber?.slice(-8) ?? "N/A"}
           </div>
-          <Badge
-            className={`${getStatusBadgeVariant(
-              order
-            )} text-xs font-medium px-2 py-1 rounded-full shrink-0 ml-2`}
+          <div className="text-xs text-gray-500">
+            {order?.orderDate &&
+              format(new Date(order.orderDate), "MMM dd, yyyy")}
+          </div>
+        </div>
+        <Badge
+          className={`${getStatusBadgeVariant(
+            order
+          )} text-xs font-semibold px-3 py-1.5 rounded-full shrink-0 ml-2`}
+        >
+          {order?.status
+            ? order.status.charAt(0).toUpperCase() + order.status.slice(1)
+            : "Pending"}
+        </Badge>
+      </div>
+
+      {/* Customer Info */}
+      <div className="flex items-center gap-2 text-sm mb-4 p-3 bg-gray-50 rounded-xl">
+        <div className="w-8 h-8 bg-emerald-100 rounded-full flex items-center justify-center">
+          <span className="text-emerald-600 font-bold text-sm">
+            {order.customerName?.charAt(0)?.toUpperCase() || "?"}
+          </span>
+        </div>
+        <div className="flex-1 min-w-0">
+          <div className="font-medium text-gray-900">{order.customerName}</div>
+          <div className="text-gray-500 text-xs truncate">{order.email}</div>
+        </div>
+      </div>
+
+      {/* Products & Total */}
+      <div className="flex items-center justify-between mb-4">
+        <div className="flex items-center gap-2">
+          <span className="text-sm text-gray-500">Products:</span>
+          {renderProductImages(order.products || [], true)}
+        </div>
+        <div className="text-lg font-bold text-emerald-600">
+          <PriceFormatter amount={order?.totalPrice} className="text-emerald-600" />
+        </div>
+      </div>
+
+      {/* Invoice & Actions */}
+      <div className="pt-4 border-t border-dashed border-gray-200">
+        <div className="flex items-center gap-2 mb-3">
+          <span className="text-sm text-gray-500">Invoice:</span>
+          {renderInvoiceSection(order)}
+        </div>
+
+        <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2">
+          <Button
+            asChild
+            variant="outline"
+            className="flex-1 sm:flex-none h-10 rounded-xl border-gray-200 hover:bg-gray-50"
           >
-            {order?.status
-              ? order.status.charAt(0).toUpperCase() + order.status.slice(1)
-              : "Pending"}
-          </Badge>
-        </div>
-      </CardHeader>{" "}
-      <CardContent className="space-y-4">
-        {/* Customer Info */}
-        <div className="flex items-center gap-2 text-sm">
-          <div className="font-medium">{order.customerName}</div>
-          <div className="text-gray-500">•</div>
-          <div className="text-gray-600 truncate">{order.email}</div>
-        </div>
-
-        {/* Products */}
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <span className="text-sm text-gray-500">Products:</span>
-            {renderProductImages(order.products || [], true)}
-          </div>
-          <div className="font-semibold">
-            <PriceFormatter amount={order?.totalPrice} className="text-black" />
-          </div>
-        </div>
-
-        {/* Invoice Section */}
-        <div className="space-y-3 pt-2 border-t">
-          <div className="flex items-center gap-2">
-            <span className="text-sm text-gray-500">Invoice:</span>
-            {renderInvoiceSection(order)}
-          </div>
-
-          {/* Actions */}
-          <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2">
-            <Button
-              asChild
-              variant="outline"
-              className="flex-1 sm:flex-none min-w-20 h-10"
+            <Link
+              href={`/user/orders/${order._id}`}
+              className="flex items-center justify-center"
             >
-              <Link
-                href={`/user/orders/${order._id}`}
-                className="flex items-center justify-center"
-              >
-                <Eye className="w-4 h-4 mr-2" />
-                <span className="text-sm">View</span>
-              </Link>
+              <Eye className="w-4 h-4 mr-2" />
+              <span>View Details</span>
+            </Link>
+          </Button>
+          {isOrderPayable(order) && (
+            <Button
+              onClick={() => handlePayNow(order._id)}
+              disabled={payingOrderId === order._id}
+              className="bg-emerald-600 hover:bg-emerald-700 text-white flex-1 sm:flex-none h-10 rounded-xl shadow-sm"
+            >
+              {payingOrderId === order._id ? (
+                <>
+                  <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
+                  <span>Processing...</span>
+                </>
+              ) : (
+                <>
+                  <CreditCard className="w-4 h-4 mr-2 shrink-0" />
+                  <span>Pay Now</span>
+                </>
+              )}
             </Button>
-            {isOrderPayable(order) && (
-              <Button
-                onClick={() => handlePayNow(order._id)}
-                disabled={payingOrderId === order._id}
-                className="bg-blue-600 hover:bg-blue-700 active:bg-blue-800 text-white disabled:opacity-50 disabled:cursor-not-allowed flex-1 sm:flex-none min-w-[100px] h-10 touch-manipulation transition-all duration-200 shadow-sm hover:shadow-md focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
-              >
-                {payingOrderId === order._id ? (
-                  <>
-                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
-                    <span className="text-sm font-medium">Paying...</span>
-                  </>
-                ) : (
-                  <>
-                    <CreditCard className="w-4 h-4 mr-2 shrink-0" />
-                    <span className="text-sm font-medium">Pay Now</span>
-                  </>
-                )}
-              </Button>
-            )}
-          </div>
+          )}
         </div>
-      </CardContent>
-    </Card>
+      </div>
+    </div>
   );
 
   return (
@@ -304,84 +307,84 @@ const ResponsiveOrdersComponent = ({
 
       {/* Desktop Table View - Hidden on small screens */}
       <div className="hidden lg:block">
-        <div className="overflow-x-auto">
+        <div className="bg-white rounded-2xl shadow-sm overflow-hidden">
           <table className="w-full">
             <thead>
-              <tr className="border-b">
-                <th className="text-left py-3 px-2 font-medium text-sm text-gray-700">
+              <tr className="bg-gray-50">
+                <th className="text-left py-4 px-4 font-semibold text-sm text-gray-700">
                   Order #
                 </th>
-                <th className="text-left py-3 px-2 font-medium text-sm text-gray-700">
+                <th className="text-left py-4 px-4 font-semibold text-sm text-gray-700">
                   Date
                 </th>
-                <th className="text-left py-3 px-2 font-medium text-sm text-gray-700">
+                <th className="text-left py-4 px-4 font-semibold text-sm text-gray-700">
                   Customer
                 </th>
-                <th className="text-left py-3 px-2 font-medium text-sm text-gray-700">
+                <th className="text-left py-4 px-4 font-semibold text-sm text-gray-700">
                   Email
                 </th>
-                <th className="text-left py-3 px-2 font-medium text-sm text-gray-700">
+                <th className="text-left py-4 px-4 font-semibold text-sm text-gray-700">
                   Products
                 </th>
-                <th className="text-left py-3 px-2 font-medium text-sm text-gray-700">
+                <th className="text-left py-4 px-4 font-semibold text-sm text-gray-700">
                   Total
                 </th>
-                <th className="text-left py-3 px-2 font-medium text-sm text-gray-700">
+                <th className="text-left py-4 px-4 font-semibold text-sm text-gray-700">
                   Status
                 </th>
-                <th className="text-left py-3 px-2 font-medium text-sm text-gray-700">
+                <th className="text-left py-4 px-4 font-semibold text-sm text-gray-700">
                   Invoice
                 </th>
-                <th className="text-left py-3 px-2 font-medium text-sm text-gray-700">
+                <th className="text-left py-4 px-4 font-semibold text-sm text-gray-700">
                   Actions
                 </th>
               </tr>
             </thead>
-            <tbody>
+            <tbody className="divide-y divide-gray-100">
               {orders.map((order) => (
                 <tr
                   key={order._id}
-                  className="border-b hover:bg-gray-50 transition-colors"
+                  className="hover:bg-emerald-50/50 transition-colors"
                 >
-                  <td className="py-4 px-2">
-                    <div className="font-medium text-sm">
-                      {order.orderNumber?.slice(-10) ?? "N/A"}...
+                  <td className="py-4 px-4">
+                    <div className="font-semibold text-gray-900 text-sm">
+                      #{order.orderNumber?.slice(-8) ?? "N/A"}
                     </div>
                   </td>
-                  <td className="py-4 px-2 text-sm">
+                  <td className="py-4 px-4 text-sm text-gray-600">
                     {order?.orderDate &&
-                      format(new Date(order.orderDate), "dd/MM/yyyy")}
+                      format(new Date(order.orderDate), "MMM dd, yyyy")}
                   </td>
-                  <td className="py-4 px-2">
-                    <div className="font-medium text-sm">
+                  <td className="py-4 px-4">
+                    <div className="font-medium text-sm text-gray-900">
                       {order.customerName}
                     </div>
                   </td>
-                  <td className="py-4 px-2 text-sm text-gray-600">
+                  <td className="py-4 px-4 text-sm text-gray-500">
                     <div className="truncate max-w-40">{order.email}</div>
                   </td>
-                  <td className="py-4 px-2">
+                  <td className="py-4 px-4">
                     {renderProductImages(order.products || [])}
                   </td>
-                  <td className="py-4 px-2">
+                  <td className="py-4 px-4">
                     <PriceFormatter
                       amount={order?.totalPrice}
-                      className="font-medium text-sm"
+                      className="font-bold text-emerald-600 text-sm"
                     />
                   </td>
-                  <td className="py-4 px-2">
+                  <td className="py-4 px-4">
                     <Badge
                       className={`${getStatusBadgeVariant(
                         order
-                      )} text-xs font-medium px-2 py-1 rounded-full`}
+                      )} text-xs font-semibold px-3 py-1.5 rounded-full`}
                     >
                       {order?.status
                         ? order.status.charAt(0).toUpperCase() +
-                          order.status.slice(1)
+                        order.status.slice(1)
                         : "Pending"}
                     </Badge>
                   </td>
-                  <td className="py-4 px-2">{renderInvoiceSection(order)}</td>
+                  <td className="py-4 px-4">{renderInvoiceSection(order)}</td>
                   <td className="py-4 px-2">
                     <div className="flex items-center justify-start gap-1 xl:gap-2">
                       <Button
