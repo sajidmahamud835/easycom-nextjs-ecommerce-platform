@@ -95,36 +95,36 @@ export default function UserLayout({
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
   return (
-    <div className="min-h-screen py-5 bg-gradient-to-br from-shop_light_bg via-white to-shop_light_pink/20">
-      <Container className="py-6">
-        <div className="flex flex-col gap-6">
-          {/* Mobile Header */}
+    <div className="min-h-screen pb-10 pt-24 bg-gradient-to-br from-gray-50 via-white to-gray-50 selection:bg-shop_light_green/20">
+      <Container>
+        <div className="flex flex-col lg:flex-row gap-8">
+          {/* Mobile Header (Keep for mobile visibility) */}
           <div className="lg:hidden">
-            <div className="flex items-center justify-between p-4 bg-white rounded-xl shadow-sm border border-shop_light_green/10">
+            <div className="flex items-center justify-between p-4 bg-white rounded-xl shadow-lg border border-gray-100/50 backdrop-blur-sm sticky top-20 z-40">
               <div className="flex items-center space-x-3">
                 {user?.imageUrl ? (
                   <img
                     src={user.imageUrl}
                     alt="User avatar"
-                    className="w-10 h-10 rounded-full object-cover border-2 border-shop_light_green/30"
+                    className="w-10 h-10 rounded-full object-cover ring-2 ring-shop_light_green/20"
                   />
                 ) : (
-                  <div className="w-10 h-10 rounded-full bg-shop_light_green/20 flex items-center justify-center">
-                    <User className="h-6 w-6 text-shop_dark_green" />
+                  <div className="w-10 h-10 rounded-full bg-shop_light_green/10 flex items-center justify-center text-shop_dark_green font-bold text-lg">
+                    {user?.firstName?.charAt(0) || "U"}
                   </div>
                 )}
                 <div>
-                  <h2 className="font-semibold text-gray-900">
+                  <h2 className="font-bold text-gray-900 leading-tight">
                     {user?.firstName} {user?.lastName}
                   </h2>
-                  <p className="text-sm text-gray-500">User Dashboard</p>
+                  <p className="text-xs text-gray-500 font-medium">Dashboard</p>
                 </div>
               </div>
               <Button
                 variant="ghost"
-                size="sm"
+                size="icon"
                 onClick={() => setSidebarOpen(!sidebarOpen)}
-                className="p-2"
+                className="hover:bg-shop_light_green/10 text-gray-600 hover:text-shop_dark_green transition-colors"
               >
                 {sidebarOpen ? (
                   <X className="h-5 w-5" />
@@ -135,316 +135,156 @@ export default function UserLayout({
             </div>
           </div>
 
-          {/* Desktop Top Navigation */}
-          <div className="hidden lg:block">
-            <div className="bg-white rounded-2xl shadow-xl border border-shop_light_green/10 overflow-hidden">
-              {/* User Profile Header */}
-              <div className="p-6 bg-gradient-to-r from-shop_dark_green to-shop_light_green text-white">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center space-x-4">
+          {/* Sidebar (Desktop & Mobile Drawer) */}
+          <aside className={cn(
+            "lg:w-80 lg:block lg:shrink-0 transition-all duration-300 z-50",
+            sidebarOpen ? "fixed inset-0 z-50 lg:static" : "hidden"
+          )}>
+            {/* Mobile Overlay */}
+            <div
+              className={cn("fixed inset-0 bg-black/50 backdrop-blur-sm lg:hidden", sidebarOpen ? "block" : "hidden")}
+              onClick={() => setSidebarOpen(false)}
+            />
+
+            {/* Sidebar Content */}
+            <div className={cn(
+              "bg-white h-full lg:h-auto lg:rounded-3xl lg:shadow-xl lg:sticky lg:top-24 border border-gray-100 overflow-hidden flex flex-col",
+              sidebarOpen ? "fixed inset-y-0 left-0 w-80 shadow-2xl z-50" : ""
+            )}>
+              {/* Profile Card Header */}
+              <div className="relative p-6 text-center">
+                <div className="absolute inset-0 bg-gradient-to-b from-shop_light_green/10 to-transparent opacity-50" />
+                <div className="relative z-10 flex flex-col items-center">
+                  <div className="relative mb-4 group">
+                    <div className="absolute inset-0 bg-shop_light_green/20 rounded-full blur-xl group-hover:blur-2xl transition-all duration-500" />
                     {user?.imageUrl ? (
                       <img
                         src={user.imageUrl}
-                        alt="User avatar"
-                        className="w-12 h-12 rounded-full object-cover border-2 border-white/30"
+                        alt="Profile"
+                        className="relative w-24 h-24 rounded-full object-cover border-4 border-white shadow-lg transform group-hover:scale-105 transition-transform duration-300"
                       />
                     ) : (
-                      <div className="w-12 h-12 rounded-full bg-white/20 flex items-center justify-center">
-                        <User className="h-6 w-6 text-white" />
+                      <div className="relative w-24 h-24 rounded-full bg-gradient-to-br from-shop_light_green to-shop_dark_green flex items-center justify-center text-white text-3xl font-bold border-4 border-white shadow-lg">
+                        {user?.firstName?.charAt(0)}
                       </div>
                     )}
-                    <div>
-                      <h2 className="font-bold text-lg text-white">
-                        {user?.firstName} {user?.lastName}
-                      </h2>
-                      <p className="text-white/80 text-sm">
-                        {user?.primaryEmailAddress?.emailAddress}
-                      </p>
-                    </div>
+                    <div className="absolute bottom-1 right-1 w-5 h-5 bg-green-500 border-2 border-white rounded-full" title="Active"></div>
                   </div>
-                  <div className="flex items-center space-x-4">
-                    <div className="flex items-center">
-                      <div className="w-2 h-2 bg-green-400 rounded-full mr-2"></div>
-                      <span className="text-white/90 text-sm">Active</span>
-                    </div>
-                    <Button
-                      onClick={() => signOut()}
-                      variant="ghost"
-                      size="sm"
-                      className="text-white hover:bg-white/20 border border-white/30"
-                    >
-                      <LogOut className="h-4 w-4 mr-2" />
-                      Sign Out
-                    </Button>
-                  </div>
+
+                  <h2 className="text-xl font-bold text-gray-900 mb-1">
+                    {user?.firstName} {user?.lastName}
+                  </h2>
+                  <p className="text-sm text-gray-500 mb-4 px-4 truncate max-w-full">
+                    {user?.primaryEmailAddress?.emailAddress}
+                  </p>
+
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="rounded-full px-6 border-shop_light_green/30 text-shop_dark_green hover:bg-shop_light_green/5 hover:text-shop_dark_green"
+                    asChild
+                  >
+                    <Link href="/user/profile">Edit Profile</Link>
+                  </Button>
                 </div>
               </div>
 
-              {/* Horizontal Navigation */}
-              <nav className="p-6">
-                <div className="flex flex-wrap gap-3">
+              {/* Navigation */}
+              <nav className="flex-1 p-4 space-y-1 overflow-y-auto max-h-[calc(100vh-250px)] lg:max-h-none custom-scrollbar">
+                <div className="space-y-1">
+                  <p className="px-4 py-2 text-xs font-semibold text-gray-400 uppercase tracking-wider">
+                    Menu
+                  </p>
                   {sidebarItems.map((item) => {
                     const isActive = pathname === item.href;
                     return (
                       <Link
                         key={item.title}
                         href={item.href}
+                        onClick={() => setSidebarOpen(false)}
                         className={cn(
-                          "flex items-center space-x-3 px-4 py-3 rounded-xl transition-all duration-200 group border",
+                          "flex items-center gap-3 px-4 py-3.5 rounded-2xl transition-all duration-300 group relative overflow-hidden",
                           isActive
-                            ? "bg-shop_light_green/10 border-shop_light_green/30 shadow-sm"
-                            : "hover:bg-gray-50 border-gray-200 hover:border-shop_light_green/30"
+                            ? "bg-shop_dark_green text-white shadow-lg shadow-shop_dark_green/25"
+                            : "text-gray-600 hover:bg-gray-50 hover:text-gray-900"
                         )}
                       >
-                        <div
-                          className={cn(
-                            "p-2 rounded-lg transition-colors",
-                            isActive
-                              ? "bg-shop_light_green text-white"
-                              : "bg-gray-100 text-gray-600 group-hover:bg-shop_light_green/20 group-hover:text-shop_dark_green"
-                          )}
-                        >
-                          <item.icon className="h-4 w-4" />
-                        </div>
-                        <div>
-                          <div
-                            className={cn(
-                              "font-medium text-sm",
-                              isActive
-                                ? "text-shop_dark_green"
-                                : "text-gray-900"
-                            )}
-                          >
-                            {item.title}
-                          </div>
-                          <div className="text-xs text-gray-500">
-                            {item.description}
-                          </div>
-                        </div>
+                        <div className={cn(
+                          "absolute inset-0 opacity-0 transition-opacity duration-300 pointer-events-none",
+                          isActive ? "bg-gradient-to-r from-white/10 to-transparent opacity-100" : ""
+                        )} />
+
+                        <item.icon className={cn(
+                          "w-5 h-5 transition-transform duration-300 group-hover:scale-110",
+                          isActive ? "text-white" : "text-gray-400 group-hover:text-shop_dark_green"
+                        )} />
+                        <span className="font-medium relative z-10">{item.title}</span>
+                        {isActive && (
+                          <ChevronRight className="w-4 h-4 ml-auto text-white/80" />
+                        )}
                       </Link>
                     );
                   })}
-
-                  {/* Admin Section - Show for sajidmahamud835@gmail.com */}
-                  {user?.emailAddresses?.[0]?.emailAddress ===
-                    "sajidmahamud835@gmail.com" && (
-                      <>
-                        <div className="w-full border-t border-gray-200 my-3"></div>
-                        <div className="w-full text-xs text-gray-500 mb-2 px-2">
-                          Admin Tools
-                        </div>
-                        {adminItems.map((item) => {
-                          const isActive = pathname === item.href;
-                          return (
-                            <Link
-                              key={item.title}
-                              href={item.href}
-                              className={cn(
-                                "flex items-center space-x-3 px-4 py-3 rounded-xl transition-all duration-200 group border",
-                                isActive
-                                  ? "bg-red-50 border-red-200 shadow-sm"
-                                  : "hover:bg-red-50 border-gray-200 hover:border-red-200"
-                              )}
-                            >
-                              <div
-                                className={cn(
-                                  "p-2 rounded-lg transition-colors",
-                                  isActive
-                                    ? "bg-red-500 text-white"
-                                    : "bg-gray-100 text-gray-600 group-hover:bg-red-100 group-hover:text-red-600"
-                                )}
-                              >
-                                <item.icon className="h-4 w-4" />
-                              </div>
-                              <div>
-                                <div
-                                  className={cn(
-                                    "font-medium text-sm",
-                                    isActive ? "text-red-700" : "text-gray-900"
-                                  )}
-                                >
-                                  {item.title}
-                                </div>
-                                <div className="text-xs text-gray-500">
-                                  {item.description}
-                                </div>
-                              </div>
-                            </Link>
-                          );
-                        })}
-                      </>
-                    )}
                 </div>
-              </nav>
-            </div>
-          </div>
 
-          {/* Mobile Sidebar */}
-          <div className={cn("lg:hidden", sidebarOpen ? "block" : "hidden")}>
-            <div className="bg-white rounded-2xl shadow-xl border border-shop_light_green/10 overflow-hidden">
-              {/* User Profile Section */}
-              <div className="p-6 bg-gradient-to-r from-shop_dark_green to-shop_light_green text-white">
-                <div className="flex items-center space-x-4">
-                  {user?.imageUrl ? (
-                    <img
-                      src={user.imageUrl}
-                      alt="User avatar"
-                      className="w-16 h-16 rounded-full object-cover border-3 border-white/30"
-                    />
-                  ) : (
-                    <div className="w-16 h-16 rounded-full bg-white/20 flex items-center justify-center">
-                      <User className="h-8 w-8 text-white" />
-                    </div>
-                  )}
-                  <div className="flex-1">
-                    <h2 className="font-bold text-lg text-white">
-                      {user?.firstName} {user?.lastName}
-                    </h2>
-                    <p className="text-white/80 text-sm">
-                      {user?.primaryEmailAddress?.emailAddress}
+                {/* Admin Tools Section */}
+                {user?.emailAddresses?.[0]?.emailAddress === "sajidmahamud835@gmail.com" && (
+                  <div className="mt-8 space-y-1">
+                    <p className="px-4 py-2 text-xs font-semibold text-red-400 uppercase tracking-wider flex items-center justify-between">
+                      <span>Admin Tools</span>
+                      <Shield className="w-3 h-3" />
                     </p>
-                    <div className="flex items-center mt-2">
-                      <div className="w-2 h-2 bg-green-400 rounded-full mr-2"></div>
-                      <span className="text-white/90 text-xs">Active</span>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              {/* Mobile Navigation */}
-              <nav className="p-4 space-y-2">
-                {sidebarItems.map((item) => {
-                  const isActive = pathname === item.href;
-                  return (
-                    <Link
-                      key={item.title}
-                      href={item.href}
-                      onClick={() => setSidebarOpen(false)}
-                      className={cn(
-                        "flex items-center justify-between p-4 rounded-xl transition-all duration-200 group",
-                        isActive
-                          ? "bg-shop_light_green/10 border border-shop_light_green/30 shadow-sm"
-                          : "hover:bg-gray-50 border border-transparent"
-                      )}
-                    >
-                      <div className="flex items-center space-x-3">
-                        <div
+                    {adminItems.map((item) => {
+                      const isActive = pathname === item.href;
+                      return (
+                        <Link
+                          key={item.title}
+                          href={item.href}
+                          onClick={() => setSidebarOpen(false)}
                           className={cn(
-                            "p-2 rounded-lg transition-colors",
+                            "flex items-center gap-3 px-4 py-3.5 rounded-2xl transition-all duration-300 group",
                             isActive
-                              ? "bg-shop_light_green text-white"
-                              : "bg-gray-100 text-gray-600 group-hover:bg-shop_light_green/20 group-hover:text-shop_dark_green"
+                              ? "bg-red-500 text-white shadow-lg shadow-red-500/25"
+                              : "text-gray-600 hover:bg-red-50 hover:text-red-700"
                           )}
                         >
-                          <item.icon className="h-5 w-5" />
-                        </div>
-                        <div>
-                          <div
-                            className={cn(
-                              "font-medium",
-                              isActive
-                                ? "text-shop_dark_green"
-                                : "text-gray-900"
-                            )}
-                          >
-                            {item.title}
-                          </div>
-                          <div className="text-xs text-gray-500">
-                            {item.description}
-                          </div>
-                        </div>
-                      </div>
-                      <ChevronRight
-                        className={cn(
-                          "h-4 w-4 transition-colors",
-                          isActive ? "text-shop_dark_green" : "text-gray-400"
-                        )}
-                      />
-                    </Link>
-                  );
-                })}
-
-                {/* Admin Section - Mobile */}
-                {user?.emailAddresses?.[0]?.emailAddress ===
-                  "sajidmahamud835@gmail.com" && (
-                    <>
-                      <div className="border-t border-gray-200 pt-4 mt-4">
-                        <div className="text-xs text-gray-500 mb-3 px-4">
-                          Admin Tools
-                        </div>
-                        {adminItems.map((item) => {
-                          const isActive = pathname === item.href;
-                          return (
-                            <Link
-                              key={item.title}
-                              href={item.href}
-                              onClick={() => setSidebarOpen(false)}
-                              className={cn(
-                                "flex items-center justify-between p-4 rounded-xl transition-all duration-200 group",
-                                isActive
-                                  ? "bg-red-50 border border-red-200 shadow-sm"
-                                  : "hover:bg-red-50 border border-transparent"
-                              )}
-                            >
-                              <div className="flex items-center space-x-3">
-                                <div
-                                  className={cn(
-                                    "p-2 rounded-lg transition-colors",
-                                    isActive
-                                      ? "bg-red-500 text-white"
-                                      : "bg-gray-100 text-gray-600 group-hover:bg-red-100 group-hover:text-red-600"
-                                  )}
-                                >
-                                  <item.icon className="h-4 w-4" />
-                                </div>
-                                <div>
-                                  <div
-                                    className={cn(
-                                      "font-medium text-sm",
-                                      isActive ? "text-red-700" : "text-gray-900"
-                                    )}
-                                  >
-                                    {item.title}
-                                  </div>
-                                  <div className="text-xs text-gray-500">
-                                    {item.description}
-                                  </div>
-                                </div>
-                              </div>
-                              <ChevronRight
-                                className={cn(
-                                  "h-4 w-4 transition-colors",
-                                  isActive ? "text-red-600" : "text-gray-400"
-                                )}
-                              />
-                            </Link>
-                          );
-                        })}
-                      </div>
-                    </>
-                  )}
+                          <item.icon className={cn(
+                            "w-5 h-5 transition-transform duration-300 group-hover:scale-110",
+                            isActive ? "text-white" : "text-gray-400 group-hover:text-red-500"
+                          )} />
+                          <span className="font-medium">{item.title}</span>
+                        </Link>
+                      );
+                    })}
+                  </div>
+                )}
               </nav>
 
-              {/* Mobile Sign Out Button */}
-              <div className="p-4 border-t border-gray-100">
+              {/* Logout Button */}
+              <div className="p-4 border-t border-gray-100 bg-gray-50/50">
                 <Button
                   onClick={() => signOut()}
                   variant="ghost"
-                  className="w-full justify-start text-red-600 hover:text-red-700 hover:bg-red-50"
+                  className="w-full justify-start text-gray-600 hover:text-red-600 hover:bg-red-50 rounded-xl py-6 group"
                 >
-                  <LogOut className="h-5 w-5 mr-3" />
-                  Sign Out
+                  <div className="p-2 rounded-lg bg-gray-200 group-hover:bg-red-100 transition-colors mr-3">
+                    <LogOut className="h-4 w-4" />
+                  </div>
+                  <span className="font-medium">Sign Out</span>
                 </Button>
               </div>
             </div>
-          </div>
+          </aside>
 
-          {/* Main Content */}
-          <div className="w-full">
-            <div className="bg-white rounded-2xl shadow-xl border border-shop_light_green/10 overflow-hidden">
-              <div className="p-6 lg:p-8">{children}</div>
+          {/* Main Content Area */}
+          <main className="flex-1 min-w-0">
+            <div className="bg-white rounded-3xl shadow-xl shadow-gray-100/50 border border-gray-100 min-h-[500px]">
+              {/* Content Overlay Fade (Optional aesthetic) */}
+              <div className="p-6 lg:p-10 animate-fade-in">
+                {children}
+              </div>
             </div>
-          </div>
+          </main>
         </div>
       </Container>
     </div>
