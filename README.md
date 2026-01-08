@@ -56,6 +56,21 @@ This platform implements **next-generation AI-powered commerce** capabilities:
 | Low user engagement | Implicit gamification using variable reward psychology |
 | Slow product pages | React Server Components + Edge caching |
 
+### ⚡ Performance Optimizations
+
+EasyCom implements aggressive caching for **blazing-fast guest user experiences**:
+
+| Data Source | Cache Duration | Revalidation Tag |
+|-------------|----------------|------------------|
+| **Homepage Products** | 1 hour | `products` |
+| **Today's Deals** | 15 minutes | `deals` |
+| **Trending Products** | 1 hour | `trending` |
+
+**Key Optimizations:**
+- ✅ **Sanity CDN Enabled** — Reads go through Sanity's global CDN
+- ✅ **Next.js Fetch Caching** — All public queries use `next.revalidate` and `next.tags`
+- ✅ **On-Demand Revalidation** — `/api/revalidate` endpoint for Sanity webhooks to purge cache instantly
+
 ---
 
 ## ✨ Features
