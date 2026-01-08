@@ -106,9 +106,55 @@ export const metadata: Metadata = {
 };
 
 const RootLayout = async ({ children }: { children: ReactNode }) => {
+  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || "https://easycom-opal.vercel.app";
+
+  // Organization Schema for SEO
+  const organizationJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "Organization",
+    name: "EasyCom",
+    url: baseUrl,
+    logo: `${baseUrl}/icon.png`,
+    description: "AI-Powered Next.js E-Commerce Platform with personalized recommendations and modern shopping experience.",
+    sameAs: [
+      "https://twitter.com/easycom",
+      "https://facebook.com/easycom",
+      "https://instagram.com/easycom",
+    ],
+  };
+
+  // WebSite Schema with SearchAction for SEO
+  const websiteJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "WebSite",
+    name: "EasyCom",
+    url: baseUrl,
+    description: "Shop the best deals on electronics, fashion, home goods and more at EasyCom.",
+    potentialAction: {
+      "@type": "SearchAction",
+      target: {
+        "@type": "EntryPoint",
+        urlTemplate: `${baseUrl}/shop?search={search_term_string}`,
+      },
+      "query-input": "required name=search_term_string",
+    },
+  };
+
   return (
     <ClerkProvider>
       <html lang="en">
+        <head>
+          {/* Organization Schema.org JSON-LD */}
+          <script
+            type="application/ld+json"
+            dangerouslySetInnerHTML={{ __html: JSON.stringify(organizationJsonLd) }}
+          />
+          {/* WebSite Schema.org JSON-LD */}
+          <script
+            type="application/ld+json"
+            dangerouslySetInnerHTML={{ __html: JSON.stringify(websiteJsonLd) }}
+          />
+        </head>
         <body
           className={`${poppins.variable} ${raleway.variable} ${opensans.variable} antialiased`}
         >

@@ -29,8 +29,7 @@ const nextConfig: NextConfig = {
 
   // Experimental performance features
   experimental: {
-    // ✅ Enable Partial Prerendering for faster page loads
-    ppr: "incremental",
+    // ✅ Enable Partial Prerendering (now via cacheComponents in Next.js 16)
     // Enable package optimization
     optimizePackageImports: [
       "lucide-react",
