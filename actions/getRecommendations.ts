@@ -1,16 +1,20 @@
 "use server";
 
 import { backendClient } from "@/sanity/lib/backendClient";
+import { client } from "@/sanity/lib/client";
 import { Product } from "@/sanity.types";
+
+// Cache duration for trending products (1 hour)
+const TRENDING_CACHE_DURATION = 3600;
 
 export async function getRecommendations(
     viewedProductIds: string[],
     viewedCategories: string[]
 ): Promise<Product[]> {
     try {
-        // If no history, return trending/featured products (fallback)
+        // If no history, return trending/featured products (fallback) - CACHED
         if (viewedProductIds.length === 0 && viewedCategories.length === 0) {
-            return await backendClient.fetch(
+            return await client.fetch(
                 `*[_type == "product" && stock > 0] | order(_createdAt desc) [0...6]{
           _id,
           name,
@@ -19,7 +23,14 @@ export async function getRecommendations(
           images,
           "brand": brand->{name},
           "categories": categories[]->{_id, title}
-        }`
+        }`,
+                undefined,
+                {
+                    next: {
+                        revalidate: TRENDING_CACHE_DURATION, // Cache for 1 hour
+                        tags: ["trending"], // Tag for on-demand revalidation
+                    },
+                }
             );
         }
 

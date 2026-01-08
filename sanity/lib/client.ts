@@ -2,12 +2,12 @@ import { createClient } from "next-sanity";
 
 import { apiVersion, dataset, projectId } from "../env";
 
-// Read-only client for fetching data
+// Read-only client for fetching data (with CDN for guest users)
 export const client = createClient({
   projectId,
   dataset,
   apiVersion,
-  useCdn: false, // Disable CDN for development
+  useCdn: true, // ✅ Enable CDN for faster guest user reads
   stega: {
     studioUrl:
       process.env.NODE_ENV === "production"
