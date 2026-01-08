@@ -126,10 +126,10 @@ export default function UserNotificationsPage() {
         const updatedNotifs = allNotifications.map((notification) =>
           notification.id === notificationId
             ? {
-                ...notification,
-                read: true,
-                readAt: new Date().toISOString(),
-              }
+              ...notification,
+              read: true,
+              readAt: new Date().toISOString(),
+            }
             : notification
         );
         setAllNotifications(updatedNotifs);
@@ -351,7 +351,7 @@ export default function UserNotificationsPage() {
 
   if (loading) {
     return (
-      <div className="space-y-6">
+      <div className="space-y-6 pb-10">
         <div className="flex items-center justify-between">
           <div>
             <Skeleton className="h-8 w-48" />
@@ -362,27 +362,25 @@ export default function UserNotificationsPage() {
           {Array(3)
             .fill(0)
             .map((_, index) => (
-              <Card key={index}>
-                <CardHeader>
-                  <div className="flex items-start justify-between">
-                    <div className="flex items-start space-x-3">
-                      <Skeleton className="h-6 w-6 rounded" />
-                      <div className="flex-1">
-                        <Skeleton className="h-6 w-48" />
-                        <Skeleton className="h-4 w-32 mt-2" />
-                      </div>
-                    </div>
-                    <div className="flex space-x-2">
-                      <Skeleton className="h-6 w-16" />
-                      <Skeleton className="h-8 w-20" />
+              <div key={index} className="bg-white rounded-2xl p-6 shadow-sm">
+                <div className="flex items-start justify-between">
+                  <div className="flex items-start space-x-3">
+                    <Skeleton className="h-10 w-10 rounded-xl" />
+                    <div className="flex-1">
+                      <Skeleton className="h-6 w-48" />
+                      <Skeleton className="h-4 w-32 mt-2" />
                     </div>
                   </div>
-                </CardHeader>
-                <CardContent>
+                  <div className="flex space-x-2">
+                    <Skeleton className="h-6 w-16 rounded-full" />
+                    <Skeleton className="h-8 w-20 rounded-xl" />
+                  </div>
+                </div>
+                <div className="mt-4 ml-13">
                   <Skeleton className="h-4 w-full" />
                   <Skeleton className="h-4 w-3/4 mt-2" />
-                </CardContent>
-              </Card>
+                </div>
+              </div>
             ))}
         </div>
       </div>
@@ -391,14 +389,14 @@ export default function UserNotificationsPage() {
 
   return (
     <>
-      <div className="space-y-6">
+      <div className="space-y-6 pb-10">
         <div className="flex items-center justify-between">
           <div>
             <h1 className="text-2xl font-bold text-gray-900">Notifications</h1>
-            <div className="text-gray-600 flex items-center gap-2">
+            <div className="text-gray-500 flex items-center gap-2 mt-1">
               <span>Stay updated with your account activity</span>
               {unreadCount > 0 && (
-                <Badge variant="destructive">{unreadCount} unread</Badge>
+                <Badge className="bg-red-500 text-white">{unreadCount} unread</Badge>
               )}
             </div>
           </div>
@@ -414,50 +412,42 @@ export default function UserNotificationsPage() {
         </div>
 
         {allNotifications.length === 0 ? (
-          <Card>
-            <CardContent className="pt-6">
-              <div className="text-center py-12">
-                <Bell className="mx-auto h-12 w-12 text-gray-400" />
-                <h3 className="mt-2 text-sm font-medium text-gray-900">
-                  No notifications
-                </h3>
-                <p className="mt-1 text-sm text-gray-500">
-                  You&apos;re all caught up! Check back later for updates.
-                </p>
-              </div>
-            </CardContent>
-          </Card>
+          <div className="bg-white rounded-2xl p-12 shadow-sm text-center">
+            <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
+              <Bell className="h-8 w-8 text-gray-400" />
+            </div>
+            <h3 className="text-lg font-semibold text-gray-900">No notifications</h3>
+            <p className="text-gray-500 mt-1">You&apos;re all caught up! Check back later for updates.</p>
+          </div>
         ) : (
           <>
             {/* Bulk Actions */}
             {selectedNotifications.length > 0 && (
-              <Card className="border-blue-200 bg-blue-50">
-                <CardContent className="pt-4">
-                  <div className="flex items-center justify-between">
-                    <p className="text-sm font-medium text-gray-900">
-                      {selectedNotifications.length} notification(s) selected
-                    </p>
-                    <div className="flex items-center gap-2">
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => setSelectedNotifications([])}
-                      >
-                        Clear Selection
-                      </Button>
-                      <Button
-                        variant="destructive"
-                        size="sm"
-                        onClick={handleBulkDelete}
-                        disabled={isDeletingBulk}
-                      >
-                        <Trash2 className="h-4 w-4 mr-2" />
-                        {isDeletingBulk ? "Deleting..." : "Delete Selected"}
-                      </Button>
-                    </div>
+              <div className="bg-blue-50 rounded-2xl p-4 shadow-sm border border-blue-100">
+                <div className="flex items-center justify-between">
+                  <p className="text-sm font-medium text-gray-900">
+                    {selectedNotifications.length} notification(s) selected
+                  </p>
+                  <div className="flex items-center gap-2">
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => setSelectedNotifications([])}
+                    >
+                      Clear Selection
+                    </Button>
+                    <Button
+                      variant="destructive"
+                      size="sm"
+                      onClick={handleBulkDelete}
+                      disabled={isDeletingBulk}
+                    >
+                      <Trash2 className="h-4 w-4 mr-2" />
+                      {isDeletingBulk ? "Deleting..." : "Delete Selected"}
+                    </Button>
                   </div>
-                </CardContent>
-              </Card>
+                </div>
+              </div>
             )}
 
             {/* Select All */}
@@ -478,130 +468,123 @@ export default function UserNotificationsPage() {
               </label>
             </div>
 
-            <div className="grid gap-3">
+            <div className="grid gap-4">
               {notifications.map((notification) => (
-                <Card
+                <div
                   key={notification.id}
-                  className={`hover:shadow-md transition-shadow ${
-                    !notification.read
-                      ? "border-l-4 border-l-blue-500 bg-blue-50/20"
+                  className={`bg-white rounded-2xl p-5 shadow-sm hover:shadow-md transition-all ${!notification.read
+                      ? "border-l-4 border-l-blue-500"
                       : ""
-                  } ${
-                    selectedNotifications.includes(notification.id)
-                      ? "ring-2 ring-blue-500"
+                    } ${selectedNotifications.includes(notification.id)
+                      ? "ring-2 ring-emerald-500"
                       : ""
-                  }`}
+                    }`}
                 >
-                  <CardHeader className="pb-2">
-                    <div className="flex items-start justify-between gap-4">
-                      <div className="flex items-start gap-3 flex-1 min-w-0">
-                        <Checkbox
-                          checked={selectedNotifications.includes(
-                            notification.id
-                          )}
-                          onCheckedChange={() =>
-                            toggleNotificationSelection(notification.id)
-                          }
-                          className="mt-1"
-                        />
-                        <div className="mt-0.5">
-                          {getNotificationIcon(notification.type)}
-                        </div>
-                        <div className="flex-1 min-w-0">
-                          <div className="flex items-center gap-2 flex-wrap mb-1">
-                            <CardTitle className="text-base font-semibold">
-                              {notification.title}
-                            </CardTitle>
-                            {!notification.read && (
-                              <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
-                            )}
-                          </div>
-                          <div className="flex items-center gap-2 flex-wrap">
-                            <Badge
-                              className={`text-xs ${getNotificationColor(
-                                notification.type
-                              )}`}
-                            >
-                              {notification.type}
-                            </Badge>
-                            {getPriorityBadge(notification.priority)}
-                            <span className="text-xs text-gray-500 flex items-center">
-                              <Clock className="h-3 w-3 mr-1" />
-                              {formatDate(notification.sentAt)}
-                            </span>
-                          </div>
-                        </div>
+                  <div className="flex items-start justify-between gap-4">
+                    <div className="flex items-start gap-3 flex-1 min-w-0">
+                      <Checkbox
+                        checked={selectedNotifications.includes(
+                          notification.id
+                        )}
+                        onCheckedChange={() =>
+                          toggleNotificationSelection(notification.id)
+                        }
+                        className="mt-1"
+                      />
+                      <div className={`p-2 rounded-xl ${notification.type === 'order' ? 'bg-blue-100' :
+                          notification.type === 'promo' ? 'bg-purple-100' :
+                            notification.type === 'marketing' ? 'bg-green-100' :
+                              'bg-gray-100'
+                        }`}>
+                        {getNotificationIcon(notification.type)}
                       </div>
-                      <div className="flex items-center gap-1">
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          onClick={() => deleteNotification(notification.id)}
-                          className="text-gray-400 hover:text-red-600 h-8 w-8 p-0"
-                        >
-                          <Trash2 className="h-4 w-4" />
-                        </Button>
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center gap-2 flex-wrap mb-1">
+                          <h3 className="text-base font-semibold text-gray-900">
+                            {notification.title}
+                          </h3>
+                          {!notification.read && (
+                            <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
+                          )}
+                        </div>
+                        <div className="flex items-center gap-2 flex-wrap">
+                          <Badge
+                            className={`text-xs ${getNotificationColor(
+                              notification.type
+                            )}`}
+                          >
+                            {notification.type}
+                          </Badge>
+                          {getPriorityBadge(notification.priority)}
+                          <span className="text-xs text-gray-500 flex items-center">
+                            <Clock className="h-3 w-3 mr-1" />
+                            {formatDate(notification.sentAt)}
+                          </span>
+                        </div>
                       </div>
                     </div>
-                  </CardHeader>
-                  <CardContent className="pt-0 pb-3">
-                    <p className="text-sm text-gray-600 line-clamp-2 mb-3 ml-10">
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => deleteNotification(notification.id)}
+                      className="text-gray-400 hover:text-red-600 h-8 w-8 p-0"
+                    >
+                      <Trash2 className="h-4 w-4" />
+                    </Button>
+                  </div>
+                  <div className="mt-3 ml-14">
+                    <p className="text-sm text-gray-600 line-clamp-2 mb-3">
                       {truncateMessage(notification.message)}
                     </p>
-                    <div className="ml-10">
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => openNotificationDetails(notification)}
-                        className="w-full sm:w-auto"
-                      >
-                        View Details
-                        <ChevronRight className="h-4 w-4 ml-1" />
-                      </Button>
-                    </div>
-                  </CardContent>
-                </Card>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => openNotificationDetails(notification)}
+                    >
+                      View Details
+                      <ChevronRight className="h-4 w-4 ml-1" />
+                    </Button>
+                  </div>
+                </div>
               ))}
             </div>
 
             {/* Pagination */}
             {totalPages > 1 && (
-              <Card>
-                <CardContent className="pt-4">
-                  <div className="flex items-center justify-between">
-                    <div className="text-sm text-gray-600">
-                      Page {currentPage} of {totalPages} (
-                      {allNotifications.length} total notifications)
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() =>
-                          setCurrentPage((prev) => Math.max(1, prev - 1))
-                        }
-                        disabled={currentPage === 1}
-                      >
-                        <ChevronLeft className="h-4 w-4 mr-1" />
-                        Previous
-                      </Button>
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() =>
-                          setCurrentPage((prev) =>
-                            Math.min(totalPages, prev + 1)
-                          )
-                        }
-                        disabled={currentPage === totalPages}
-                      >
-                        Next
-                        <ChevronRight className="h-4 w-4 ml-1" />
-                      </Button>
-                    </div>
+              <div className="bg-white rounded-2xl p-4 shadow-sm">
+                <div className="flex items-center justify-between">
+                  <div className="text-sm text-gray-600">
+                    Page {currentPage} of {totalPages} (
+                    {allNotifications.length} total notifications)
                   </div>
-                </CardContent>
-              </Card>
+                  <div className="flex items-center gap-2">
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() =>
+                        setCurrentPage((prev) => Math.max(1, prev - 1))
+                      }
+                      disabled={currentPage === 1}
+                    >
+                      <ChevronLeft className="h-4 w-4 mr-1" />
+                      Previous
+                    </Button>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() =>
+                        setCurrentPage((prev) =>
+                          Math.min(totalPages, prev + 1)
+                        )
+                      }
+                      disabled={currentPage === totalPages}
+                    >
+                      Next
+                      <ChevronRight className="h-4 w-4 ml-1" />
+                    </Button>
+                  </div>
+                </div>
+              </div>
             )}
           </>
         )}
