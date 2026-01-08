@@ -283,14 +283,43 @@ const OrderDetailsPage: React.FC<OrderDetailsPageProps> = ({ order }) => {
   };
 
   return (
-    <div className="max-w-6xl mx-auto space-y-6">
+    <div className="max-w-6xl mx-auto space-y-6 pb-10">
       {/* Header */}
       <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
         <div>
           <h1 className="text-3xl font-bold text-gray-900">Order Details</h1>
-          <p className="text-gray-600 mt-1">
-            Order #{currentOrder.orderNumber}
-          </p>
+          <div className="flex flex-col sm:flex-row sm:items-center gap-2 mt-2">
+            <div className="flex items-center gap-2">
+              <span className="text-gray-500">Order ID:</span>
+              <button
+                onClick={() => {
+                  navigator.clipboard.writeText(currentOrder._id);
+                  toast.success("Order ID copied to clipboard!");
+                }}
+                className="inline-flex items-center gap-1.5 px-3 py-1 bg-gray-100 hover:bg-gray-200 rounded-lg text-sm font-mono text-gray-700 transition-colors group"
+              >
+                {currentOrder.orderNumber?.slice(-12) || currentOrder._id.slice(-12)}
+                <svg className="w-4 h-4 text-gray-400 group-hover:text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
+                </svg>
+              </button>
+            </div>
+            <span className="hidden sm:inline text-gray-300">|</span>
+            <button
+              onClick={() => {
+                const trackingUrl = `${window.location.origin}/track-order?id=${currentOrder._id}`;
+                navigator.clipboard.writeText(trackingUrl);
+                toast.success("Tracking link copied to clipboard!");
+              }}
+              className="inline-flex items-center gap-1.5 px-3 py-1 bg-emerald-50 hover:bg-emerald-100 rounded-lg text-sm font-medium text-emerald-700 transition-colors group"
+            >
+              <Truck className="w-4 h-4" />
+              Copy Tracking Link
+              <svg className="w-4 h-4 text-emerald-400 group-hover:text-emerald-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
+              </svg>
+            </button>
+          </div>
         </div>
         <div className="flex flex-col sm:flex-row gap-2">
           {currentOrder.invoice?.hosted_invoice_url ? (

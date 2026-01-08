@@ -1,7 +1,7 @@
 "use client";
 
-import { useState } from "react";
-import { useRouter } from "next/navigation";
+import { useState, useEffect } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Package, Search, Truck, CheckCircle, Clock, MapPin, ArrowRight } from "lucide-react";
@@ -11,6 +11,15 @@ export default function TrackOrderPage() {
     const [orderId, setOrderId] = useState("");
     const [isSearching, setIsSearching] = useState(false);
     const router = useRouter();
+    const searchParams = useSearchParams();
+
+    // Auto-fill order ID from URL query parameter
+    useEffect(() => {
+        const id = searchParams.get("id");
+        if (id) {
+            setOrderId(id);
+        }
+    }, [searchParams]);
 
     const handleTrackOrder = async (e: React.FormEvent) => {
         e.preventDefault();

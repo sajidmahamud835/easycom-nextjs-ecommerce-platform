@@ -4,9 +4,7 @@ import Link from "next/link";
 import {
   Search,
   ShoppingCart,
-  Menu,
   MapPin,
-  User,
   ChevronDown
 } from "lucide-react";
 import { useState } from "react";
@@ -15,7 +13,6 @@ import useLocation from "./hooks/useLocation";
 import { Category } from "@/sanity.types";
 // SideMenu removed
 import LocationModal from "./LocationModal";
-import GoogleTranslate from "./GoogleTranslate";
 import { SignInButton, useUser } from "@clerk/nextjs";
 import UserDropdown from "./UserDropdown";
 import useCartStore from "@/store";
@@ -89,10 +86,6 @@ const Header = ({ categories }: Props) => {
           </button>
         </div>
 
-        {/* Language */}
-        <div className="hidden xl:flex items-center hover:ring-1 hover:ring-white p-2 rounded-sm cursor-pointer transition-all">
-          <GoogleTranslate />
-        </div>
 
         {/* Account */}
         {user ? (
