@@ -773,10 +773,10 @@ export default function UserDashboardPage() {
             <div className="grid grid-cols-1 gap-3">
               <Link href="/user/orders">
                 <Button
-                  variant="outline"
-                  className="w-full justify-start h-12 hover:bg-blue-50 hover:border-blue-200 transition-colors"
+                  variant="ghost"
+                  className="w-full justify-start h-12 bg-blue-50 text-blue-700 hover:bg-blue-100 border border-blue-100 transition-colors"
                 >
-                  <Package className="mr-3 h-4 w-4 text-blue-500" />
+                  <Package className="mr-3 h-4 w-4 text-blue-600" />
                   <span className="font-medium">View Orders</span>
                   <ArrowRight className="ml-auto h-4 w-4" />
                 </Button>
@@ -784,10 +784,10 @@ export default function UserDashboardPage() {
 
               <Link href="/user/notifications">
                 <Button
-                  variant="outline"
-                  className="w-full justify-start h-12 hover:bg-purple-50 hover:border-purple-200 transition-colors"
+                  variant="ghost"
+                  className="w-full justify-start h-12 bg-purple-50 text-purple-700 hover:bg-purple-100 border border-purple-100 transition-colors"
                 >
-                  <Bell className="mr-3 h-4 w-4 text-purple-500" />
+                  <Bell className="mr-3 h-4 w-4 text-purple-600" />
                   <span className="font-medium">Notifications</span>
                   {stats.unreadNotifications > 0 && (
                     <Badge variant="destructive" className="ml-auto">
@@ -802,10 +802,10 @@ export default function UserDashboardPage() {
 
               <Link href="/wishlist">
                 <Button
-                  variant="outline"
-                  className="w-full justify-start h-12 hover:bg-red-50 hover:border-red-200 transition-colors"
+                  variant="ghost"
+                  className="w-full justify-start h-12 bg-red-50 text-red-700 hover:bg-red-100 border border-red-100 transition-colors"
                 >
-                  <Heart className="mr-3 h-4 w-4 text-red-500" />
+                  <Heart className="mr-3 h-4 w-4 text-red-600" />
                   <span className="font-medium">Wishlist</span>
                   <ArrowRight className="ml-auto h-4 w-4" />
                 </Button>
@@ -813,10 +813,10 @@ export default function UserDashboardPage() {
 
               <Link href="/user/profile">
                 <Button
-                  variant="outline"
-                  className="w-full justify-start h-12 hover:bg-green-50 hover:border-green-200 transition-colors"
+                  variant="ghost"
+                  className="w-full justify-start h-12 bg-green-50 text-green-700 hover:bg-green-100 border border-green-100 transition-colors"
                 >
-                  <User className="mr-3 h-4 w-4 text-green-500" />
+                  <User className="mr-3 h-4 w-4 text-green-600" />
                   <span className="font-medium">Profile Settings</span>
                   <ArrowRight className="ml-auto h-4 w-4" />
                 </Button>
