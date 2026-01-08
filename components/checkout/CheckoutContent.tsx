@@ -328,136 +328,135 @@ export function CheckoutContent() {
   }
 
   return (
-    <div className="grid lg:grid-cols-3 gap-8">
+    <div className="grid lg:grid-cols-3 gap-8 pb-10">
       {/* Order Items */}
       <div className="lg:col-span-2 space-y-6">
         {/* Payment Method */}
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <CreditCard className="w-5 h-5" />
-              Payment Method
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <RadioGroup
-              value={selectedPaymentMethod}
-              onValueChange={(value) =>
-                setSelectedPaymentMethod(value as PaymentMethod)
-              }
-              className="space-y-3"
-            >
-              <div className="flex items-start space-x-3 p-3 border rounded-lg">
-                <RadioGroupItem
-                  value={PAYMENT_METHODS.CASH_ON_DELIVERY}
-                  id="cod"
-                  className="mt-1"
-                />
-                <div className="flex-1">
-                  <Label htmlFor="cod" className="cursor-pointer">
-                    <div className="flex items-center gap-2 font-medium">
-                      <Truck className="w-4 h-4" />
-                      Cash on Delivery
-                    </div>
-                    <p className="text-sm text-muted-foreground mt-1">
-                      Pay when your order is delivered to your doorstep
-                    </p>
-                  </Label>
-                </div>
-              </div>
-
-              <div className="flex items-start space-x-3 p-3 border rounded-lg">
-                <RadioGroupItem
-                  value={PAYMENT_METHODS.STRIPE}
-                  id="stripe"
-                  className="mt-1"
-                />
-                <div className="flex-1">
-                  <Label htmlFor="stripe" className="cursor-pointer">
-                    <div className="flex items-center gap-2 font-medium">
-                      <CreditCard className="w-4 h-4" />
-                      Credit/Debit Card
-                    </div>
-                    <p className="text-sm text-muted-foreground mt-1">
-                      Pay securely with your credit or debit card via Stripe
-                    </p>
-                  </Label>
-                </div>
-              </div>
-            </RadioGroup>
-          </CardContent>
-        </Card>
-        {/* Shipping Address */}
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <MapPin className="w-5 h-5" />
-              Shipping Address
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            {isLoadingAddresses ? (
-              <div className="space-y-3">
-                <div className="flex items-start gap-3 p-4 border rounded-lg">
-                  <div className="w-4 h-4 bg-gray-200 rounded-full animate-pulse mt-1"></div>
-                  <div className="flex-1 space-y-2">
-                    <div className="h-4 bg-gray-200 rounded animate-pulse w-32"></div>
-                    <div className="h-3 bg-gray-200 rounded animate-pulse w-48"></div>
-                    <div className="h-3 bg-gray-200 rounded animate-pulse w-40"></div>
-                  </div>
-                </div>
-                <div className="flex items-start gap-3 p-4 border rounded-lg">
-                  <div className="w-4 h-4 bg-gray-200 rounded-full animate-pulse mt-1"></div>
-                  <div className="flex-1 space-y-2">
-                    <div className="h-4 bg-gray-200 rounded animate-pulse w-28"></div>
-                    <div className="h-3 bg-gray-200 rounded animate-pulse w-52"></div>
-                    <div className="h-3 bg-gray-200 rounded animate-pulse w-36"></div>
-                  </div>
-                </div>
-              </div>
-            ) : searchParams.get("address") ? (
-              // Show only selected address when coming from cart
-              selectedAddress && (
-                <div className="p-4 border rounded-lg bg-muted/50">
-                  <div className="flex items-start justify-between">
-                    <div className="space-y-1">
-                      <p className="font-medium">{selectedAddress.name}</p>
-                      <p className="text-sm text-muted-foreground">
-                        {selectedAddress.address}
-                      </p>
-                      <p className="text-sm text-muted-foreground">
-                        {selectedAddress.city}, {selectedAddress.state}{" "}
-                        {selectedAddress.zip}
-                      </p>
-                      {selectedAddress.email && (
-                        <p className="text-sm text-muted-foreground">
-                          {selectedAddress.email}
-                        </p>
-                      )}
-                    </div>
-                    <div className="flex items-center gap-1 text-xs text-green-600 font-medium bg-green-50 px-2 py-1 rounded">
-                      ✓ Selected
-                    </div>
-                  </div>
-                </div>
-              )
-            ) : (
-              <OrderAddressSelector
-                addresses={addresses}
-                selectedAddress={selectedAddress}
-                onAddressSelect={setSelectedAddress}
-                isLoading={isLoadingAddresses}
+        <div className="bg-white rounded-2xl p-6 shadow-sm">
+          <div className="flex items-center gap-3 mb-6">
+            <div className="p-2 bg-blue-100 rounded-xl">
+              <CreditCard className="w-5 h-5 text-blue-600" />
+            </div>
+            <h2 className="text-xl font-bold text-gray-900">Payment Method</h2>
+          </div>
+          <RadioGroup
+            value={selectedPaymentMethod}
+            onValueChange={(value) =>
+              setSelectedPaymentMethod(value as PaymentMethod)
+            }
+            className="space-y-3"
+          >
+            <div className="flex items-start space-x-3 p-4 bg-gray-50 rounded-xl hover:bg-gray-100 transition-colors cursor-pointer">
+              <RadioGroupItem
+                value={PAYMENT_METHODS.CASH_ON_DELIVERY}
+                id="cod"
+                className="mt-1"
               />
-            )}
-          </CardContent>
-        </Card>
+              <div className="flex-1">
+                <Label htmlFor="cod" className="cursor-pointer">
+                  <div className="flex items-center gap-2 font-semibold text-gray-900">
+                    <Truck className="w-4 h-4 text-orange-500" />
+                    Cash on Delivery
+                  </div>
+                  <p className="text-sm text-gray-500 mt-1">
+                    Pay when your order is delivered to your doorstep
+                  </p>
+                </Label>
+              </div>
+            </div>
+
+            <div className="flex items-start space-x-3 p-4 bg-gray-50 rounded-xl hover:bg-gray-100 transition-colors cursor-pointer">
+              <RadioGroupItem
+                value={PAYMENT_METHODS.STRIPE}
+                id="stripe"
+                className="mt-1"
+              />
+              <div className="flex-1">
+                <Label htmlFor="stripe" className="cursor-pointer">
+                  <div className="flex items-center gap-2 font-semibold text-gray-900">
+                    <CreditCard className="w-4 h-4 text-blue-500" />
+                    Credit/Debit Card
+                  </div>
+                  <p className="text-sm text-gray-500 mt-1">
+                    Pay securely with your credit or debit card via Stripe
+                  </p>
+                </Label>
+              </div>
+            </div>
+          </RadioGroup>
+        </div>
+        {/* Shipping Address */}
+        <div className="bg-white rounded-2xl p-6 shadow-sm">
+          <div className="flex items-center gap-3 mb-6">
+            <div className="p-2 bg-emerald-100 rounded-xl">
+              <MapPin className="w-5 h-5 text-emerald-600" />
+            </div>
+            <h2 className="text-xl font-bold text-gray-900">Shipping Address</h2>
+          </div>
+          {isLoadingAddresses ? (
+            <div className="space-y-3">
+              <div className="flex items-start gap-3 p-4 border rounded-lg">
+                <div className="w-4 h-4 bg-gray-200 rounded-full animate-pulse mt-1"></div>
+                <div className="flex-1 space-y-2">
+                  <div className="h-4 bg-gray-200 rounded animate-pulse w-32"></div>
+                  <div className="h-3 bg-gray-200 rounded animate-pulse w-48"></div>
+                  <div className="h-3 bg-gray-200 rounded animate-pulse w-40"></div>
+                </div>
+              </div>
+              <div className="flex items-start gap-3 p-4 border rounded-lg">
+                <div className="w-4 h-4 bg-gray-200 rounded-full animate-pulse mt-1"></div>
+                <div className="flex-1 space-y-2">
+                  <div className="h-4 bg-gray-200 rounded animate-pulse w-28"></div>
+                  <div className="h-3 bg-gray-200 rounded animate-pulse w-52"></div>
+                  <div className="h-3 bg-gray-200 rounded animate-pulse w-36"></div>
+                </div>
+              </div>
+            </div>
+          ) : searchParams.get("address") ? (
+            // Show only selected address when coming from cart
+            selectedAddress && (
+              <div className="p-4 border rounded-lg bg-muted/50">
+                <div className="flex items-start justify-between">
+                  <div className="space-y-1">
+                    <p className="font-medium">{selectedAddress.name}</p>
+                    <p className="text-sm text-muted-foreground">
+                      {selectedAddress.address}
+                    </p>
+                    <p className="text-sm text-muted-foreground">
+                      {selectedAddress.city}, {selectedAddress.state}{" "}
+                      {selectedAddress.zip}
+                    </p>
+                    {selectedAddress.email && (
+                      <p className="text-sm text-muted-foreground">
+                        {selectedAddress.email}
+                      </p>
+                    )}
+                  </div>
+                  <div className="flex items-center gap-1 text-xs text-green-600 font-medium bg-green-50 px-2 py-1 rounded">
+                    ✓ Selected
+                  </div>
+                </div>
+              </div>
+            )
+          ) : (
+            <OrderAddressSelector
+              addresses={addresses}
+              selectedAddress={selectedAddress}
+              onAddressSelect={setSelectedAddress}
+              isLoading={isLoadingAddresses}
+            />
+          )}
+        </div>
 
         {/* Order Items */}
-        <Card>
-          <CardHeader>
-            <CardTitle>Order Items ({cart.length})</CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-4">
+        <div className="bg-white rounded-2xl p-6 shadow-sm">
+          <div className="flex items-center gap-3 mb-6">
+            <div className="p-2 bg-purple-100 rounded-xl">
+              <ShoppingBag className="w-5 h-5 text-purple-600" />
+            </div>
+            <h2 className="text-xl font-bold text-gray-900">Order Items ({cart.length})</h2>
+          </div>
+          <div className="space-y-4">
             {cart.map((item: CartItem) => (
               <div
                 key={item.product._id}
@@ -494,23 +493,21 @@ export function CheckoutContent() {
                 </div>
               </div>
             ))}
-          </CardContent>
-        </Card>
+          </div>
+        </div>
       </div>
 
       {/* Order Summary */}
-      <div className="space-y-6">
-        <Card>
-          <CardHeader>
-            <CardTitle>Order Summary</CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-3">
-            <div className="flex justify-between">
+      <div className="lg:sticky lg:top-24 lg:self-start space-y-6">
+        <div className="bg-white rounded-2xl p-6 shadow-md border-t-4 border-emerald-500">
+          <h2 className="text-xl font-bold mb-6 text-gray-900">Order Summary</h2>
+          <div className="space-y-4">
+            <div className="flex justify-between text-gray-600">
               <span>Subtotal ({cart.length} items)</span>
-              <PriceFormatter amount={grossSubtotal} />
+              <span className="font-medium text-gray-900"><PriceFormatter amount={grossSubtotal} /></span>
             </div>
             {totalDiscount > 0 && (
-              <div className="flex justify-between text-green-600">
+              <div className="flex justify-between text-emerald-600">
                 <span>Discount</span>
                 <span>
                   -<PriceFormatter amount={totalDiscount} />
@@ -525,25 +522,27 @@ export function CheckoutContent() {
                 </span>
               </div>
             )}
-            <div className="flex justify-between">
+            <div className="flex justify-between text-gray-600">
               <span>Shipping</span>
               {shipping === 0 ? (
-                <span className="text-green-600 font-medium">Free</span>
+                <span className="text-emerald-600 font-bold bg-emerald-50 px-2 py-0.5 rounded-full text-xs">Free</span>
               ) : (
-                <PriceFormatter amount={shipping} />
+                <span className="font-medium text-gray-900"><PriceFormatter amount={shipping} /></span>
               )}
             </div>
-            <div className="flex justify-between">
+            <div className="flex justify-between text-gray-600">
               <span>Tax</span>
-              <PriceFormatter amount={tax} />
+              <span className="font-medium text-gray-900"><PriceFormatter amount={tax} /></span>
             </div>
-            <Separator />
-            <div className="flex justify-between text-lg font-bold">
-              <span>Total</span>
-              <PriceFormatter amount={total} />
+
+            <div className="my-4 border-t border-dashed border-gray-200" />
+
+            <div className="flex justify-between items-end">
+              <span className="text-lg font-bold text-gray-900">Total</span>
+              <span className="text-2xl font-bold text-emerald-600"><PriceFormatter amount={total} /></span>
             </div>
-          </CardContent>
-        </Card>
+          </div>
+        </div>
 
         <div className="space-y-3">
           <Button
