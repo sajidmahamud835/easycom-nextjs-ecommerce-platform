@@ -106,8 +106,8 @@ const RelatedProducts = memo(({ relatedProducts }: RelatedProductsProps) => {
                           key={index}
                           size={12}
                           className={`${index < 4
-                              ? "text-shop_light_green fill-shop_light_green"
-                              : "text-gray-300"
+                            ? "text-shop_light_green fill-shop_light_green"
+                            : "text-gray-300"
                             }`}
                         />
                       ))}
@@ -143,7 +143,7 @@ const RelatedProducts = memo(({ relatedProducts }: RelatedProductsProps) => {
       <div className="text-center mt-8">
         <Button
           variant="outline"
-          className="border-shop_dark_green text-shop_dark_green hover:bg-shop_dark_green hover:text-white"
+          className="border-shop_dark_green text-shop_dark_green hover:bg-shop_dark_green hover:text-white transition-colors duration-300"
           asChild
         >
           <Link href="/shop">View More Products</Link>
