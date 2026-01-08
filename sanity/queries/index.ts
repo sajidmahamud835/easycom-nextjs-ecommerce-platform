@@ -1,5 +1,6 @@
 import { unstable_cache } from "next/cache";
 import { sanityFetch } from "../lib/live";
+import { writeClient } from "../lib/client";
 import {
   ADDRESS_QUERY,
   ALL_PRODUCTS_QUERY,
@@ -308,25 +309,24 @@ const getAdminCategories = async () => {
 
 /**
  * Get product by slug - cached for 30 minutes
- * Product details don't change frequently
+ * Uses writeClient with token since products require authentication
  */
 const getProductBySlug = async (slug: string) => {
   return unstable_cache(
     async () => {
       try {
-        const product = await sanityFetch({
-          query: PRODUCT_BY_SLUG_QUERY,
-          params: {
-            slug,
-          },
-        });
-        return product?.data || null;
+        // Use writeClient (with token) since products may not be publicly visible
+        const product = await writeClient.fetch(
+          PRODUCT_BY_SLUG_QUERY,
+          { slug }
+        );
+        return product || null;
       } catch (error) {
         console.error("Error fetching product by slug:", error);
         return null;
       }
     },
-    ["product-by-slug-v1", slug],
+    ["product-by-slug-v2", slug],
     { revalidate: 1800, tags: ["products", "reviews"] }
   )();
 };
