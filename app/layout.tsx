@@ -100,9 +100,6 @@ export const metadata: Metadata = {
   alternates: {
     canonical: process.env.NEXT_PUBLIC_BASE_URL || "https://sajidmahamud.vercel.app",
   },
-  other: {
-    "google-adsense-account": GADSENSE_CLIENT_ID,
-  },
 };
 
 const RootLayout = async ({ children }: { children: ReactNode }) => {
