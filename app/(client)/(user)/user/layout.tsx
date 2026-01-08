@@ -65,22 +65,22 @@ const sidebarItems = [
 
 const adminItems = [
   {
-    title: "Manage Users",
+    title: "User Directory",
     href: "/user/admin/manage-users",
     icon: Users,
-    description: "User premium status",
+    description: "Manage all registered users",
   },
   {
-    title: "Premium Accounts",
+    title: "Premium Applications",
     href: "/user/admin/premium-accounts",
     icon: Shield,
-    description: "Premium approvals",
+    description: "Review membership requests",
   },
   {
-    title: "Business Accounts",
+    title: "Business Verification",
     href: "/user/admin/business-accounts",
     icon: Building2,
-    description: "Business approvals",
+    description: "Approve corporate partners",
   },
 ];
 
