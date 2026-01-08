@@ -1,12 +1,11 @@
 "use client";
 
 import { Product } from "@/sanity.types";
-import { Loader2, Timer } from "lucide-react";
+import { Loader2, Timer, Sparkles } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useState } from "react";
 import { getTodaysDeals } from "@/actions/getTodaysDeals";
-import { Button } from "./ui/button";
 import { Card, CardContent } from "./ui/card";
 import { Badge } from "./ui/badge";
 import { motion } from "motion/react";
@@ -14,24 +13,37 @@ import { urlFor } from "@/sanity/lib/image";
 
 const PLACEHOLDER_IMAGE = "https://placehold.co/400x400/f3f4f6/9ca3af?text=No+Image";
 
-const TodaysDeals = () => {
+const TodaysDeals = ({ fallbackProducts }: { fallbackProducts?: Product[] }) => {
     const [deals, setDeals] = useState<Product[]>([]);
     const [loading, setLoading] = useState(true);
+    const [isFallback, setIsFallback] = useState(false);
 
     useEffect(() => {
         const fetchDeals = async () => {
             try {
                 const data = await getTodaysDeals();
-                setDeals(data);
+                if (data && data.length > 0) {
+                    setDeals(data);
+                    setIsFallback(false);
+                } else if (fallbackProducts && fallbackProducts.length > 0) {
+                    // Use first 2 products as fallback deals
+                    setDeals(fallbackProducts.slice(0, 2));
+                    setIsFallback(true);
+                }
             } catch (err) {
                 console.error("Failed to fetch deals", err);
+                // On error, also use fallback
+                if (fallbackProducts && fallbackProducts.length > 0) {
+                    setDeals(fallbackProducts.slice(0, 2));
+                    setIsFallback(true);
+                }
             } finally {
                 setLoading(false);
             }
         };
 
         fetchDeals();
-    }, []);
+    }, [fallbackProducts]);
 
     if (loading) return <div className="py-10 flex justify-center"><Loader2 className="animate-spin w-8 h-8 text-[#febd69]" /></div>;
 
@@ -42,12 +54,16 @@ const TodaysDeals = () => {
             <div className="container mx-auto px-4">
                 <div className="flex items-center justify-between mb-6">
                     <h2 className="text-2xl font-bold flex items-center gap-2">
-                        Today's Deals
-                        <span className="text-xs font-normal text-red-600 bg-red-100 px-2 py-0.5 rounded-full flex items-center">
-                            <Timer className="w-3 h-3 mr-1" /> Ending Soon
+                        {isFallback ? "Featured Deals" : "Today's Deals"}
+                        <span className={`text-xs font-normal px-2 py-0.5 rounded-full flex items-center ${isFallback ? 'text-emerald-600 bg-emerald-100' : 'text-red-600 bg-red-100'}`}>
+                            {isFallback ? (
+                                <><Sparkles className="w-3 h-3 mr-1" /> Top Picks</>
+                            ) : (
+                                <><Timer className="w-3 h-3 mr-1" /> Ending Soon</>
+                            )}
                         </span>
                     </h2>
-                    <Link href="/deals" className="text-[#007185] hover:underline hover:text-[#C7511F] text-sm font-semibold">
+                    <Link href="/deal" className="text-[#007185] hover:underline hover:text-[#C7511F] text-sm font-semibold">
                         See all deals
                     </Link>
                 </div>

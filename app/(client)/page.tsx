@@ -14,7 +14,7 @@ export default async function Home() {
         <div className="bg-gradient-to-b from-slate-50 via-white to-slate-50 min-h-screen pb-16">
             <HomeBanner />
 
-            <TodaysDeals />
+            <TodaysDeals fallbackProducts={products} />
 
             <div className="max-w-[1500px] mx-auto px-4 -mt-10 md:-mt-24 relative z-30 mb-8 space-y-8">
 
