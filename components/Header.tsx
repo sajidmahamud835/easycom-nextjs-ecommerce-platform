@@ -15,6 +15,7 @@ import useLocation from "./hooks/useLocation";
 import { Category } from "@/sanity.types";
 import SideMenu from "./SideMenu";
 import LocationModal from "./LocationModal";
+import GoogleTranslate from "./GoogleTranslate";
 
 
 interface Props {
@@ -85,9 +86,8 @@ const Header = ({ categories }: Props) => {
         </div>
 
         {/* Language */}
-        <div className="hidden xl:flex items-center font-bold hover:ring-1 hover:ring-white p-2 rounded-sm cursor-pointer transition-all">
-          <span className="mr-1">EN</span>
-          <ChevronDown className="w-3 h-3 opacity-70" />
+        <div className="hidden xl:flex items-center hover:ring-1 hover:ring-white p-2 rounded-sm cursor-pointer transition-all">
+          <GoogleTranslate />
         </div>
 
         {/* Account */}
