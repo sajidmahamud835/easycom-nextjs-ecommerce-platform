@@ -20,7 +20,8 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Checkbox } from "@/components/ui/checkbox";
-import { RefreshCw, Trash2, Eye, Package } from "lucide-react";
+import { RefreshCw, Trash2, Eye, Package, Plus } from "lucide-react";
+import Link from "next/link";
 import { OrdersSkeleton } from "./SkeletonLoaders";
 import { DeleteConfirmationDialog } from "./DeleteConfirmationDialog";
 import OrderDetailsSidebar from "./OrderDetailsSidebar";
@@ -100,9 +101,8 @@ const AdminOrders: React.FC = () => {
       try {
         const statusParam = orderStatus === "all" ? "" : orderStatus;
         const timestamp = Date.now(); // Add timestamp to bust cache
-        const url = `/api/admin/orders?limit=${limit}&offset=${
-          page * limit
-        }&status=${statusParam}&_t=${timestamp}`;
+        const url = `/api/admin/orders?limit=${limit}&offset=${page * limit
+          }&status=${statusParam}&_t=${timestamp}`;
 
         const data = await safeApiCall(url);
 
@@ -292,6 +292,12 @@ const AdminOrders: React.FC = () => {
         <div className="flex items-center justify-between">
           <h3 className="text-lg font-semibold">Orders Management</h3>
           <div className="flex items-center gap-2">
+            <Link href="/admin/orders/create">
+              <Button size="sm" className="bg-emerald-600 hover:bg-emerald-700">
+                <Plus className="h-4 w-4 mr-2" /> Create Order
+              </Button>
+            </Link>
+            <div className="border-l h-6 mx-1"></div>
             <Select
               value={perPage.toString()}
               onValueChange={handlePerPageChange}
@@ -338,9 +344,8 @@ const AdminOrders: React.FC = () => {
               disabled={loading || isRefreshing}
             >
               <RefreshCw
-                className={`h-4 w-4 ${
-                  loading || isRefreshing ? "animate-spin" : ""
-                }`}
+                className={`h-4 w-4 ${loading || isRefreshing ? "animate-spin" : ""
+                  }`}
               />
             </Button>
           </div>
@@ -503,11 +508,9 @@ const AdminOrders: React.FC = () => {
         onClose={() => setIsDeleteDialogOpen(false)}
         onConfirm={handleDeleteOrders}
         title="Delete Orders"
-        description={`Are you sure you want to delete ${
-          selectedOrders.length
-        } order${
-          selectedOrders.length > 1 ? "s" : ""
-        }? This action cannot be undone.`}
+        description={`Are you sure you want to delete ${selectedOrders.length
+          } order${selectedOrders.length > 1 ? "s" : ""
+          }? This action cannot be undone.`}
         itemCount={selectedOrders.length}
         isLoading={isDeleting}
       />
