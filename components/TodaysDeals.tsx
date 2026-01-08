@@ -61,9 +61,9 @@ const TodaysDeals = () => {
                             <Card className="border-0 shadow-none hover:shadow-lg transition-shadow rounded-md overflow-hidden h-full flex flex-col">
                                 <CardContent className="p-0">
                                     <div className="relative bg-gray-100 aspect-square p-4 flex items-center justify-center">
-                                        {product.image && (
+                                        {product.images?.[0] && (
                                             <Image
-                                                src={urlFor(product.image).url()}
+                                                src={urlFor(product.images[0]).url()}
                                                 alt={product.name || "Deal Product"}
                                                 fill
                                                 className="object-contain mix-blend-multiply p-4 transition-transform group-hover:scale-105"

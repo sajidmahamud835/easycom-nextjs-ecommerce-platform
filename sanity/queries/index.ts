@@ -97,7 +97,9 @@ const getAllProducts = unstable_cache(
 const getDealProducts = unstable_cache(
   async () => {
     try {
-      const { data } = await sanityFetch({ query: DEAL_PRODUCTS });
+      // Use writeClient for authenticated fetch
+      const { writeClient } = await import('../lib/client');
+      const data = await writeClient.fetch(DEAL_PRODUCTS);
       return data ?? [];
     } catch (error) {
       console.log("Error fetching deal products:", error);
@@ -368,14 +370,16 @@ const getRelatedProducts = async (
   return unstable_cache(
     async () => {
       try {
-        const { data } = await sanityFetch({
-          query: RELATED_PRODUCTS_QUERY,
-          params: {
+        // Use writeClient for authenticated fetch
+        const { writeClient } = await import('../lib/client');
+        const data = await writeClient.fetch(
+          RELATED_PRODUCTS_QUERY,
+          {
             categoryIds,
             currentSlug,
             limit,
-          },
-        });
+          }
+        );
         return data ?? [];
       } catch (error) {
         console.error("Error fetching related products:", error);
