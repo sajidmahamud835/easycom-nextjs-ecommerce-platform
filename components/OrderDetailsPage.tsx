@@ -130,28 +130,28 @@ const getStatusColor = (status: string) => {
   switch (status) {
     case ORDER_STATUSES.PAID:
     case ORDER_STATUSES.DELIVERED:
-      return "bg-green-100 text-green-800";
+      return "bg-emerald-100 text-emerald-700";
     case ORDER_STATUSES.CANCELLED:
-      return "bg-red-100 text-red-800";
+      return "bg-red-100 text-red-700";
     case ORDER_STATUSES.SHIPPED:
     case ORDER_STATUSES.OUT_FOR_DELIVERY:
-      return "bg-blue-100 text-blue-800";
+      return "bg-blue-100 text-blue-700";
     case ORDER_STATUSES.PROCESSING:
-      return "bg-yellow-100 text-yellow-800";
+      return "bg-amber-100 text-amber-700";
     default:
-      return "bg-gray-100 text-gray-800";
+      return "bg-gray-100 text-gray-700";
   }
 };
 
 const getPaymentStatusColor = (status: string) => {
   switch (status) {
     case PAYMENT_STATUSES.PAID:
-      return "bg-green-100 text-green-800";
+      return "bg-emerald-100 text-emerald-700";
     case PAYMENT_STATUSES.FAILED:
     case PAYMENT_STATUSES.CANCELLED:
-      return "bg-red-100 text-red-800";
+      return "bg-red-100 text-red-700";
     default:
-      return "bg-yellow-100 text-yellow-800";
+      return "bg-amber-100 text-amber-700";
   }
 };
 
@@ -246,13 +246,13 @@ const OrderDetailsPage: React.FC<OrderDetailsPageProps> = ({ order }) => {
         // Update the current order to show cancellation request pending
         setCurrentOrder(
           (prev) =>
-            ({
-              ...prev,
-              cancellationRequested: true,
-              cancellationRequestedAt: new Date().toISOString(),
-              cancellationRequestReason:
-                cancellationReason || "Cancelled by customer",
-            } as any)
+          ({
+            ...prev,
+            cancellationRequested: true,
+            cancellationRequestedAt: new Date().toISOString(),
+            cancellationRequestReason:
+              cancellationReason || "Cancelled by customer",
+          } as any)
         );
         setShowCancelDialog(false);
         setCancellationReason("");
@@ -373,245 +373,231 @@ const OrderDetailsPage: React.FC<OrderDetailsPageProps> = ({ order }) => {
         <div className="lg:col-span-2 space-y-6">
           {/* Cancellation Request Notice */}
           {(currentOrder as any).cancellationRequested && (
-            <Card className="border-orange-300 bg-orange-50">
-              <CardHeader>
-                <CardTitle className="text-orange-800 flex items-center gap-2">
-                  <Clock className="w-5 h-5" />
-                  Cancellation Request Pending
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <p className="text-sm text-orange-700">
-                  Your cancellation request has been submitted and is awaiting
-                  admin review. You will be notified once it has been processed.
-                </p>
-                {(currentOrder as any).cancellationRequestedAt && (
-                  <p className="text-xs text-orange-600 mt-2">
-                    Requested on:{" "}
-                    {format(
-                      new Date((currentOrder as any).cancellationRequestedAt),
-                      "MMM dd, yyyy 'at' h:mm a"
-                    )}
+            <div className="bg-amber-50 rounded-2xl p-6 shadow-sm border-l-4 border-amber-500">
+              <div className="flex items-start gap-3">
+                <div className="p-2 bg-amber-100 rounded-xl">
+                  <Clock className="w-5 h-5 text-amber-600" />
+                </div>
+                <div>
+                  <h3 className="font-bold text-amber-800">Cancellation Request Pending</h3>
+                  <p className="text-sm text-amber-700 mt-1">
+                    Your cancellation request has been submitted and is awaiting
+                    admin review. You will be notified once it has been processed.
                   </p>
-                )}
-              </CardContent>
-            </Card>
+                  {(currentOrder as any).cancellationRequestedAt && (
+                    <p className="text-xs text-amber-600 mt-2">
+                      Requested on:{" "}
+                      {format(
+                        new Date((currentOrder as any).cancellationRequestedAt),
+                        "MMM dd, yyyy 'at' h:mm a"
+                      )}
+                    </p>
+                  )}
+                </div>
+              </div>
+            </div>
           )}
 
           {/* Order Status */}
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
+          <div className="bg-white rounded-2xl p-6 shadow-sm">
+            <div className="flex items-center gap-3 mb-6">
+              <div className="p-2.5 bg-blue-100 rounded-xl">
                 {getStatusIcon(currentOrder.status)}
-                Order Status
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
-                  <p className="text-sm text-gray-600">Order Status</p>
-                  <Badge
-                    className={`${getStatusColor(currentOrder.status)} mt-1`}
-                  >
-                    {currentOrder.status}
-                  </Badge>
-                </div>
-                <div>
-                  <p className="text-sm text-gray-600">Payment Status</p>
-                  <Badge
-                    className={`${getPaymentStatusColor(
-                      currentOrder.paymentStatus
-                    )} mt-1 flex items-center gap-1 w-fit`}
-                  >
-                    {getPaymentStatusIcon(currentOrder.paymentStatus)}
-                    {currentOrder.paymentStatus}
-                  </Badge>
-                </div>
-                <div>
-                  <p className="text-sm text-gray-600">Payment Method</p>
-                  <p className="font-medium capitalize flex items-center gap-2">
-                    <CreditCard className="w-4 h-4" />
-                    {currentOrder.paymentMethod.replace("_", " ")}
-                  </p>
-                </div>
-                <div>
-                  <p className="text-sm text-gray-600">Order Date</p>
-                  <p className="font-medium flex items-center gap-2">
-                    <CalendarDays className="w-4 h-4" />
-                    {format(new Date(currentOrder.orderDate), "PPP")}
-                  </p>
-                </div>
               </div>
-            </CardContent>
-          </Card>
+              <h2 className="text-lg font-bold text-gray-900">Order Status</h2>
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="p-4 bg-gray-50 rounded-xl">
+                <p className="text-sm text-gray-500 mb-1">Order Status</p>
+                <Badge
+                  className={`${getStatusColor(currentOrder.status)}`}
+                >
+                  {currentOrder.status}
+                </Badge>
+              </div>
+              <div className="p-4 bg-gray-50 rounded-xl">
+                <p className="text-sm text-gray-500 mb-1">Payment Status</p>
+                <Badge
+                  className={`${getPaymentStatusColor(
+                    currentOrder.paymentStatus
+                  )} flex items-center gap-1 w-fit`}
+                >
+                  {getPaymentStatusIcon(currentOrder.paymentStatus)}
+                  {currentOrder.paymentStatus}
+                </Badge>
+              </div>
+              <div className="p-4 bg-gray-50 rounded-xl">
+                <p className="text-sm text-gray-500 mb-1">Payment Method</p>
+                <p className="font-medium capitalize flex items-center gap-2 text-gray-900">
+                  <CreditCard className="w-4 h-4 text-gray-600" />
+                  {currentOrder.paymentMethod.replace("_", " ")}
+                </p>
+              </div>
+              <div className="p-4 bg-gray-50 rounded-xl">
+                <p className="text-sm text-gray-500 mb-1">Order Date</p>
+                <p className="font-medium flex items-center gap-2 text-gray-900">
+                  <CalendarDays className="w-4 h-4 text-gray-600" />
+                  {format(new Date(currentOrder.orderDate), "PPP")}
+                </p>
+              </div>
+            </div>
+          </div>
 
           {/* Order Timeline */}
           <OrderTimeline order={currentOrder} />
 
           {/* Products */}
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Package className="w-5 h-5" />
-                Order Items ({order.products.length})
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-4">
-                {order.products?.map(
-                  (
-                    item: {
-                      product: {
-                        _id: string;
-                        name: string;
-                        slug?: { current: string };
-                        image?: { asset: { url: string } };
-                        price: number;
-                        currency: string;
-                        categories?: Array<{ title: string }>;
-                      };
-                      quantity: number;
-                    },
-                    index: number
-                  ) => (
-                    <div
-                      key={index}
-                      className="flex items-center gap-4 p-4 border rounded-lg"
-                    >
-                      {item.product.image && (
-                        <div className="relative w-16 h-16 shrink-0">
-                          <Image
-                            src={urlFor(item.product.image).url()}
-                            alt={item.product.name}
-                            fill
-                            className="object-cover rounded-md"
-                          />
-                        </div>
-                      )}
-                      <div className="flex-1 min-w-0">
-                        <h3 className="font-medium text-gray-900 truncate">
-                          {item.product.slug ? (
-                            <Link
-                              href={`/product/${item.product.slug.current}`}
-                              className="hover:text-shop_dark_green transition-colors"
-                            >
-                              {item.product.name}
-                            </Link>
-                          ) : (
-                            item.product.name
-                          )}
-                        </h3>
-                        {item.product.categories && (
-                          <p className="text-sm text-gray-500 mt-1">
-                            {item.product.categories
-                              .map((cat) => cat.title)
-                              .join(", ")}
-                          </p>
-                        )}
-                        <div className="flex items-center gap-4 mt-2">
-                          <span className="text-sm text-gray-600">
-                            Qty: {item.quantity}
-                          </span>
-                          <PriceFormatter
-                            amount={item.product.price}
-                            className="font-medium"
-                          />
-                        </div>
+          <div className="bg-white rounded-2xl p-6 shadow-sm">
+            <div className="flex items-center gap-3 mb-6">
+              <div className="p-2.5 bg-purple-100 rounded-xl">
+                <Package className="w-5 h-5 text-purple-600" />
+              </div>
+              <h2 className="text-lg font-bold text-gray-900">Order Items ({order.products.length})</h2>
+            </div>
+            <div className="space-y-4">
+              {order.products?.map(
+                (
+                  item: {
+                    product: {
+                      _id: string;
+                      name: string;
+                      slug?: { current: string };
+                      image?: { asset: { url: string } };
+                      price: number;
+                      currency: string;
+                      categories?: Array<{ title: string }>;
+                    };
+                    quantity: number;
+                  },
+                  index: number
+                ) => (
+                  <div
+                    key={index}
+                    className="flex items-center gap-4 p-4 bg-gray-50 rounded-xl"
+                  >
+                    {item.product.image && (
+                      <div className="relative w-16 h-16 shrink-0">
+                        <Image
+                          src={urlFor(item.product.image).url()}
+                          alt={item.product.name}
+                          fill
+                          className="object-cover rounded-lg"
+                        />
                       </div>
-                      <div className="text-right">
+                    )}
+                    <div className="flex-1 min-w-0">
+                      <h3 className="font-semibold text-gray-900 truncate">
+                        {item.product.slug ? (
+                          <Link
+                            href={`/product/${item.product.slug.current}`}
+                            className="hover:text-emerald-600 transition-colors"
+                          >
+                            {item.product.name}
+                          </Link>
+                        ) : (
+                          item.product.name
+                        )}
+                      </h3>
+                      {item.product.categories && (
+                        <p className="text-sm text-gray-500 mt-1">
+                          {item.product.categories
+                            .map((cat) => cat.title)
+                            .join(", ")}
+                        </p>
+                      )}
+                      <div className="flex items-center gap-4 mt-2">
+                        <span className="text-sm text-gray-500">
+                          Qty: {item.quantity}
+                        </span>
                         <PriceFormatter
-                          amount={item.product.price * item.quantity}
-                          className="font-medium text-lg"
+                          amount={item.product.price}
+                          className="font-medium text-gray-700"
                         />
                       </div>
                     </div>
-                  )
-                )}
-              </div>
-            </CardContent>
-          </Card>
+                    <div className="text-right">
+                      <PriceFormatter
+                        amount={item.product.price * item.quantity}
+                        className="font-bold text-lg text-emerald-600"
+                      />
+                    </div>
+                  </div>
+                )
+              )}
+            </div>
+          </div>
         </div>
 
         {/* Order Summary & Address */}
         <div className="space-y-6">
           {/* Order Summary */}
-          <Card>
-            <CardHeader>
-              <CardTitle>Order Summary</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-3">
-                <div className="flex justify-between">
-                  <span className="text-gray-600">Subtotal</span>
-                  <PriceFormatter amount={currentOrder.subtotal} />
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-gray-600">Tax</span>
-                  <PriceFormatter amount={currentOrder.tax} />
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-gray-600">Shipping</span>
-                  <PriceFormatter amount={currentOrder.shipping} />
-                </div>
-                {currentOrder.amountDiscount > 0 && (
-                  <div className="flex justify-between text-green-600">
-                    <span>Discount</span>
-                    <span>
-                      -<PriceFormatter amount={currentOrder.amountDiscount} />
-                    </span>
-                  </div>
-                )}
-                <Separator />
-                <div className="flex justify-between font-medium text-lg">
-                  <span>Total</span>
-                  <PriceFormatter amount={currentOrder.totalPrice} />
-                </div>
+          <div className="bg-white rounded-2xl p-6 shadow-md border-t-4 border-emerald-500">
+            <h2 className="text-lg font-bold text-gray-900 mb-4">Order Summary</h2>
+            <div className="space-y-3">
+              <div className="flex justify-between">
+                <span className="text-gray-500">Subtotal</span>
+                <PriceFormatter amount={currentOrder.subtotal} className="text-gray-900" />
               </div>
-            </CardContent>
-          </Card>
+              <div className="flex justify-between">
+                <span className="text-gray-500">Tax</span>
+                <PriceFormatter amount={currentOrder.tax} className="text-gray-900" />
+              </div>
+              <div className="flex justify-between">
+                <span className="text-gray-500">Shipping</span>
+                <PriceFormatter amount={currentOrder.shipping} className="text-gray-900" />
+              </div>
+              {currentOrder.amountDiscount > 0 && (
+                <div className="flex justify-between text-emerald-600">
+                  <span>Discount</span>
+                  <span>
+                    -<PriceFormatter amount={currentOrder.amountDiscount} />
+                  </span>
+                </div>
+              )}
+              <div className="my-4 border-t border-dashed border-gray-200"></div>
+              <div className="flex justify-between">
+                <span className="font-bold text-gray-900">Total</span>
+                <PriceFormatter amount={currentOrder.totalPrice} className="text-2xl font-bold text-emerald-600" />
+              </div>
+            </div>
+          </div>
 
           {/* Shipping Address */}
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <MapPin className="w-5 h-5" />
-                Shipping Address
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="text-sm space-y-1">
-                <p className="font-medium">{currentOrder.address.name}</p>
-                <p className="text-gray-600">{currentOrder.address.address}</p>
-                <p className="text-gray-600">
-                  {currentOrder.address.city}, {currentOrder.address.state}{" "}
-                  {currentOrder.address.zip}
-                </p>
+          <div className="bg-white rounded-2xl p-6 shadow-sm">
+            <div className="flex items-center gap-3 mb-4">
+              <div className="p-2 bg-emerald-100 rounded-xl">
+                <MapPin className="w-5 h-5 text-emerald-600" />
               </div>
-            </CardContent>
-          </Card>
+              <h2 className="text-lg font-bold text-gray-900">Shipping Address</h2>
+            </div>
+            <div className="text-sm space-y-1 p-4 bg-gray-50 rounded-xl">
+              <p className="font-semibold text-gray-900">{currentOrder.address.name}</p>
+              <p className="text-gray-600">{currentOrder.address.address}</p>
+              <p className="text-gray-600">
+                {currentOrder.address.city}, {currentOrder.address.state}{" "}
+                {currentOrder.address.zip}
+              </p>
+            </div>
+          </div>
 
           {/* Customer Information */}
-          <Card>
-            <CardHeader>
-              <CardTitle>Customer Information</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="text-sm space-y-2">
-                <div>
-                  <p className="font-medium">{currentOrder.customerName}</p>
-                  <p className="text-gray-600">{currentOrder.email}</p>
-                </div>
-                {currentOrder.paymentCompletedAt && (
-                  <div className="pt-2 border-t">
-                    <p className="text-gray-600">Payment Completed</p>
-                    <p className="font-medium">
-                      {format(new Date(currentOrder.paymentCompletedAt), "PPp")}
-                    </p>
-                  </div>
-                )}
+          <div className="bg-white rounded-2xl p-6 shadow-sm">
+            <h2 className="text-lg font-bold text-gray-900 mb-4">Customer Information</h2>
+            <div className="text-sm space-y-2">
+              <div className="p-4 bg-gray-50 rounded-xl">
+                <p className="font-semibold text-gray-900">{currentOrder.customerName}</p>
+                <p className="text-gray-500">{currentOrder.email}</p>
               </div>
-            </CardContent>
-          </Card>
+              {currentOrder.paymentCompletedAt && (
+                <div className="pt-3 mt-3 border-t border-dashed border-gray-200">
+                  <p className="text-sm text-gray-500">Payment Completed</p>
+                  <p className="font-medium text-gray-900">
+                    {format(new Date(currentOrder.paymentCompletedAt), "PPp")}
+                  </p>
+                </div>
+              )}
+            </div>
+          </div>
         </div>
       </div>
 
