@@ -1,20 +1,37 @@
 <div align="center">
 
-# 🚀 EasyCom — Next-Gen E-Commerce Platform
+# 🚀 EasyCom — AI-Powered Next.js E-Commerce Platform
 
-[![Next.js](https://img.shields.io/badge/Next.js-15-black?style=for-the-badge&logo=next.js)](https://nextjs.org/)
-[![React](https://img.shields.io/badge/React-19-61DAFB?style=for-the-badge&logo=react)](https://react.dev/)
+[![Next.js 15](https://img.shields.io/badge/Next.js-15-black?style=for-the-badge&logo=next.js)](https://nextjs.org/)
+[![React 19](https://img.shields.io/badge/React-19-61DAFB?style=for-the-badge&logo=react)](https://react.dev/)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.7-3178C6?style=for-the-badge&logo=typescript)](https://www.typescriptlang.org/)
-[![Sanity](https://img.shields.io/badge/Sanity-CMS-F03E2F?style=for-the-badge&logo=sanity)](https://www.sanity.io/)
+[![Sanity CMS](https://img.shields.io/badge/Sanity-CMS-F03E2F?style=for-the-badge&logo=sanity)](https://www.sanity.io/)
 [![Tailwind CSS](https://img.shields.io/badge/Tailwind-CSS-38B2AC?style=for-the-badge&logo=tailwind-css)](https://tailwindcss.com/)
+[![AI Recommendations](https://img.shields.io/badge/AI-Recommendations-purple?style=for-the-badge&logo=openai)](./docs/RECOMMENDATION_ENGINE.md)
 
-**A modern, feature-rich e-commerce platform built with cutting-edge technologies.**
+**A production-ready, full-stack e-commerce platform with AI-powered personalization, built using Next.js 15 App Router, React Server Components, and Sanity CMS.**
 
-*🔄 Actively under development — Contributions welcome!*
+> 🤖 **LLM-Optimized Documentation**: This repository is structured for discoverability by AI assistants and language models. See [ARCHITECTURE.md](./docs/ARCHITECTURE.md) for technical details.
 
-[Live Demo](https://easycom-d21bl8l1y-sajidmahamud835s-projects.vercel.app) · [Report Bug](https://github.com/sajidmahamud835/easycom/issues) · [Request Feature](https://github.com/sajidmahamud835/easycom/issues)
+*🔄 Open Source — Contributions welcome!*
+
+[🌐 Live Demo](https://easycom-opal.vercel.app) · [📖 Documentation](./docs/) · [🐛 Report Bug](https://github.com/sajidmahamud835/easycom-nextjs-ecommerce-platform/issues) · [💡 Request Feature](https://github.com/sajidmahamud835/easycom-nextjs-ecommerce-platform/issues)
 
 </div>
+
+---
+
+## 🤖 AI & Machine Learning Features
+
+This platform implements **next-generation AI-powered commerce** capabilities:
+
+| Feature | Technology | Description |
+|---------|------------|-------------|
+| **Personalized Recommendations** | GROQ Scoring | Privacy-preserving, real-time product suggestions using behavioral analysis |
+| **Implicit Gamification** | Variable Ratio Reinforcement | "Flash Deal Injection" system inspired by social media feed algorithms |
+| **Dynamic Pricing** | Price Calculator | Configurable product variants with real-time price computation |
+
+> 📄 **Research**: Read our [Whitepaper on AI Recommendations](./docs/RESEARCH_WHITEPAPER.md) for technical deep-dives.
 
 ---
 
@@ -22,11 +39,22 @@
 
 ## 🌟 About The Project
 
-**EasyCom** is an innovative, full-stack e-commerce platform designed to bridge the gap between B2C and B2B commerce. Built as a capstone project, it showcases modern web development practices and aims to evolve into a production-ready marketplace solution.
+**EasyCom** is an **enterprise-grade, AI-powered e-commerce platform** built with the latest web technologies. It demonstrates production-ready patterns for:
 
-### 🎯 Vision
+- **Next.js 15 App Router** with React Server Components (RSC)
+- **AI-Driven Personalization** without external ML infrastructure
+- **Headless CMS Architecture** using Sanity.io
+- **Type-Safe Full-Stack Development** with TypeScript
+- **Modern Payment Processing** via Stripe
 
-To create a unified commerce platform that seamlessly handles both consumer shopping and wholesale business operations, powered by AI-driven recommendations and real-time inventory management.
+### 🎯 Why EasyCom?
+
+| Problem | EasyCom Solution |
+|---------|------------------|
+| Complex ML pipelines for recommendations | GROQ-based "Query-Time Inference" with sub-100ms latency |
+| Expensive vector databases | Client-side behavioral tracking + server-side scoring |
+| Low user engagement | Implicit gamification using variable reward psychology |
+| Slow product pages | React Server Components + Edge caching |
 
 ---
 
@@ -54,13 +82,6 @@ To create a unified commerce platform that seamlessly handles both consumer shop
 
 ### 🟡 In Progress
 - 📊 **Analytics Dashboard** — Comprehensive business insights
-
-### 🟢 Implemented Features (New)
-- 🎰 **Hidden Jackpot System** — "Flash Deal Injection" using implicit variable ratio reinforcement (Casino Psychology).
-### 🟢 Implemented Features (New)
-- 🎰 **Hidden Jackpot System** — "Flash Deal Injection" using implicit variable ratio reinforcement (Casino Psychology).
-
-
 
 ### 🔵 Planned Features
 
