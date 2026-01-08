@@ -137,8 +137,8 @@ export default function UserLayout({
 
           {/* Sidebar (Desktop & Mobile Drawer) */}
           <aside className={cn(
-            "lg:w-80 lg:block lg:shrink-0 transition-all duration-300 z-50",
-            sidebarOpen ? "fixed inset-0 z-50 lg:static" : "hidden"
+            "lg:w-80 lg:block lg:shrink-0 transition-all duration-300",
+            sidebarOpen ? "fixed inset-0 z-50 lg:static lg:z-auto" : "hidden"
           )}>
             {/* Mobile Overlay */}
             <div
@@ -205,7 +205,7 @@ export default function UserLayout({
                         className={cn(
                           "flex items-center gap-3 px-4 py-3.5 rounded-2xl transition-all duration-300 group relative overflow-hidden",
                           isActive
-                            ? "bg-shop_dark_green text-white shadow-lg shadow-shop_dark_green/25"
+                            ? "bg-emerald-600 text-white shadow-lg shadow-emerald-600/25"
                             : "text-gray-600 hover:bg-gray-50 hover:text-gray-900"
                         )}
                       >
@@ -216,7 +216,7 @@ export default function UserLayout({
 
                         <item.icon className={cn(
                           "w-5 h-5 transition-transform duration-300 group-hover:scale-110",
-                          isActive ? "text-white" : "text-gray-400 group-hover:text-shop_dark_green"
+                          isActive ? "text-white" : "text-gray-400 group-hover:text-emerald-600"
                         )} />
                         <span className="font-medium relative z-10">{item.title}</span>
                         {isActive && (
