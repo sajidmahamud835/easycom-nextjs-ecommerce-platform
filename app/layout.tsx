@@ -8,7 +8,7 @@ import { UserDataProvider } from "@/contexts/UserDataContext";
 
 import "./globals.css";
 
-const GADSENSE_CLIENT_ID = "ca-pub-6542623777003381";
+import "./globals.css";
 
 const poppins = localFont({
   src: "./fonts/Poppins.woff2",
@@ -129,13 +129,6 @@ const RootLayout = async ({ children }: { children: ReactNode }) => {
               },
               className: "sonner-toast",
             }}
-          />
-
-          {/* Optimization: Load AdSense after interactivity to prevent blocking hydration and improve TTI/TBT */}
-          <Script
-            async
-            src={`https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${GADSENSE_CLIENT_ID}`}
-            strategy="afterInteractive"
           />
         </body>
       </html>

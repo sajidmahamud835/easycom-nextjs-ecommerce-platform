@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 
 interface UserInteractions {
     viewedCategories: string[];
@@ -37,13 +37,19 @@ export const useUserInteractions = () => {
         }
     }, [interactions, isLoaded]);
 
-    const trackProductView = (productId: string, categoryId?: string) => {
+    const trackProductView = useCallback((productId: string, categoryId?: string) => {
         setInteractions((prev) => {
+            // Avoid duplicates at the start if it's the same as the most recent one
+            if (prev.viewedProducts[0] === productId) return prev;
+
             const newProducts = [productId, ...prev.viewedProducts.filter((id) => id !== productId)].slice(0, 20); // Keep last 20
 
             let newCategories = prev.viewedCategories;
             if (categoryId) {
-                newCategories = [categoryId, ...prev.viewedCategories.filter((id) => id !== categoryId)].slice(0, 10); // Keep last 10
+                // Avoid duplicates for categories too
+                if (prev.viewedCategories[0] !== categoryId) {
+                    newCategories = [categoryId, ...prev.viewedCategories.filter((id) => id !== categoryId)].slice(0, 10); // Keep last 10
+                }
             }
 
             return {
@@ -51,14 +57,15 @@ export const useUserInteractions = () => {
                 viewedProducts: newProducts,
             };
         });
-    };
+    }, []);
 
-    const trackCategoryView = (categoryId: string) => {
+    const trackCategoryView = useCallback((categoryId: string) => {
         setInteractions((prev) => {
+            if (prev.viewedCategories[0] === categoryId) return prev;
             const newCategories = [categoryId, ...prev.viewedCategories.filter((id) => id !== categoryId)].slice(0, 10);
             return { ...prev, viewedCategories: newCategories };
         });
-    };
+    }, []);
 
     return {
         interactions,
