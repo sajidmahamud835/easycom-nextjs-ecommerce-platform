@@ -85,6 +85,55 @@ export const productType = defineType({
       to: { type: "brand" },
     }),
 
+    // Inventory & Shipping
+    defineField({
+      name: "sku",
+      title: "SKU",
+      type: "string",
+      description: "Stock Keeping Unit",
+      validation: (Rule) => Rule.required(),
+    }),
+    defineField({
+      name: "barcode",
+      title: "Barcode (EAN/UPC)",
+      type: "string",
+    }),
+    defineField({
+      name: "weight",
+      title: "Weight (kg)",
+      type: "number",
+    }),
+    defineField({
+      name: "dimensions",
+      title: "Dimensions (cm)",
+      type: "string",
+      description: "L x W x H",
+    }),
+
+    // SEO & Organization
+    defineField({
+      name: "tags",
+      title: "Tags",
+      type: "array",
+      of: [{ type: "string" }],
+      options: {
+        layout: "tags",
+      },
+      description: "Keywords for search and filtering",
+    }),
+    defineField({
+      name: "seo",
+      title: "SEO Settings",
+      type: "object",
+      group: "seo",
+      fields: [
+        defineField({ name: "metaTitle", title: "Meta Title", type: "string" }),
+        defineField({ name: "metaDescription", title: "Meta Description", type: "text", rows: 3 }),
+        defineField({ name: "keywords", title: "Keywords", type: "array", of: [{ type: "string" }] }),
+      ],
+    }),
+
+    // Existing fields...
     defineField({
       name: "status",
       title: "Product Status",
