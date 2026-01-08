@@ -308,129 +308,131 @@ const ResponsiveOrdersComponent = ({
       {/* Desktop Table View - Hidden on small screens */}
       <div className="hidden lg:block">
         <div className="bg-white rounded-2xl shadow-sm overflow-hidden">
-          <table className="w-full">
-            <thead>
-              <tr className="bg-gray-50">
-                <th className="text-left py-4 px-4 font-semibold text-sm text-gray-700">
-                  Order #
-                </th>
-                <th className="text-left py-4 px-4 font-semibold text-sm text-gray-700">
-                  Date
-                </th>
-                <th className="text-left py-4 px-4 font-semibold text-sm text-gray-700">
-                  Customer
-                </th>
-                <th className="text-left py-4 px-4 font-semibold text-sm text-gray-700">
-                  Email
-                </th>
-                <th className="text-left py-4 px-4 font-semibold text-sm text-gray-700">
-                  Products
-                </th>
-                <th className="text-left py-4 px-4 font-semibold text-sm text-gray-700">
-                  Total
-                </th>
-                <th className="text-left py-4 px-4 font-semibold text-sm text-gray-700">
-                  Status
-                </th>
-                <th className="text-left py-4 px-4 font-semibold text-sm text-gray-700">
-                  Invoice
-                </th>
-                <th className="text-left py-4 px-4 font-semibold text-sm text-gray-700">
-                  Actions
-                </th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-gray-100">
-              {orders.map((order) => (
-                <tr
-                  key={order._id}
-                  className="hover:bg-emerald-50/50 transition-colors"
-                >
-                  <td className="py-4 px-4">
-                    <div className="font-semibold text-gray-900 text-sm">
-                      #{order.orderNumber?.slice(-8) ?? "N/A"}
-                    </div>
-                  </td>
-                  <td className="py-4 px-4 text-sm text-gray-600">
-                    {order?.orderDate &&
-                      format(new Date(order.orderDate), "MMM dd, yyyy")}
-                  </td>
-                  <td className="py-4 px-4">
-                    <div className="font-medium text-sm text-gray-900">
-                      {order.customerName}
-                    </div>
-                  </td>
-                  <td className="py-4 px-4 text-sm text-gray-500">
-                    <div className="truncate max-w-40">{order.email}</div>
-                  </td>
-                  <td className="py-4 px-4">
-                    {renderProductImages(order.products || [])}
-                  </td>
-                  <td className="py-4 px-4">
-                    <PriceFormatter
-                      amount={order?.totalPrice}
-                      className="font-bold text-emerald-600 text-sm"
-                    />
-                  </td>
-                  <td className="py-4 px-4">
-                    <Badge
-                      className={`${getStatusBadgeVariant(
-                        order
-                      )} text-xs font-semibold px-3 py-1.5 rounded-full`}
-                    >
-                      {order?.status
-                        ? order.status.charAt(0).toUpperCase() +
-                        order.status.slice(1)
-                        : "Pending"}
-                    </Badge>
-                  </td>
-                  <td className="py-4 px-4">{renderInvoiceSection(order)}</td>
-                  <td className="py-4 px-2">
-                    <div className="flex items-center justify-start gap-1 xl:gap-2">
-                      <Button
-                        asChild
-                        size="sm"
-                        variant="outline"
-                        className="min-w-[70px] xl:min-w-20"
-                      >
-                        <Link
-                          href={`/user/orders/${order._id}`}
-                          className="flex items-center justify-center"
-                        >
-                          <Eye className="w-3 h-3 xl:mr-1" />
-                          <span className="hidden xl:inline ml-1">View</span>
-                        </Link>
-                      </Button>
-                      {isOrderPayable(order) && (
-                        <Button
-                          onClick={() => handlePayNow(order._id)}
-                          disabled={payingOrderId === order._id}
-                          size="sm"
-                          className="bg-blue-600 hover:bg-blue-700 text-white disabled:opacity-50 disabled:cursor-not-allowed min-w-20 xl:min-w-[100px] touch-manipulation"
-                        >
-                          {payingOrderId === order._id ? (
-                            <>
-                              <div className="animate-spin rounded-full h-3 w-3 xl:mr-1"></div>
-                              <span className="hidden xl:inline ml-1 text-xs">
-                                Paying...
-                              </span>
-                            </>
-                          ) : (
-                            <>
-                              <CreditCard className="w-3 h-3 xl:mr-1 shrink-0" />
-                              <span className="hidden xl:inline ml-1 text-xs font-medium">
-                                Pay Now
-                              </span>
-                            </>
-                          )}
-                        </Button>
-                      )}
-                    </div>
-                  </td>
+          <div className="overflow-x-auto">
+            <table className="w-full min-w-[900px]">
+              <thead>
+                <tr className="bg-gray-50">
+                  <th className="text-left py-4 px-4 font-semibold text-sm text-gray-700">
+                    Order #
+                  </th>
+                  <th className="text-left py-4 px-4 font-semibold text-sm text-gray-700">
+                    Date
+                  </th>
+                  <th className="text-left py-4 px-4 font-semibold text-sm text-gray-700">
+                    Customer
+                  </th>
+                  <th className="text-left py-4 px-4 font-semibold text-sm text-gray-700">
+                    Email
+                  </th>
+                  <th className="text-left py-4 px-4 font-semibold text-sm text-gray-700">
+                    Products
+                  </th>
+                  <th className="text-left py-4 px-4 font-semibold text-sm text-gray-700">
+                    Total
+                  </th>
+                  <th className="text-left py-4 px-4 font-semibold text-sm text-gray-700">
+                    Status
+                  </th>
+                  <th className="text-left py-4 px-4 font-semibold text-sm text-gray-700">
+                    Invoice
+                  </th>
+                  <th className="text-left py-4 px-4 font-semibold text-sm text-gray-700">
+                    Actions
+                  </th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
+              </thead>
+              <tbody className="divide-y divide-gray-100">
+                {orders.map((order) => (
+                  <tr
+                    key={order._id}
+                    className="hover:bg-emerald-50/50 transition-colors"
+                  >
+                    <td className="py-4 px-4">
+                      <div className="font-semibold text-gray-900 text-sm">
+                        #{order.orderNumber?.slice(-8) ?? "N/A"}
+                      </div>
+                    </td>
+                    <td className="py-4 px-4 text-sm text-gray-600">
+                      {order?.orderDate &&
+                        format(new Date(order.orderDate), "MMM dd, yyyy")}
+                    </td>
+                    <td className="py-4 px-4">
+                      <div className="font-medium text-sm text-gray-900">
+                        {order.customerName}
+                      </div>
+                    </td>
+                    <td className="py-4 px-4 text-sm text-gray-500">
+                      <div className="truncate max-w-40">{order.email}</div>
+                    </td>
+                    <td className="py-4 px-4">
+                      {renderProductImages(order.products || [])}
+                    </td>
+                    <td className="py-4 px-4">
+                      <PriceFormatter
+                        amount={order?.totalPrice}
+                        className="font-bold text-emerald-600 text-sm"
+                      />
+                    </td>
+                    <td className="py-4 px-4">
+                      <Badge
+                        className={`${getStatusBadgeVariant(
+                          order
+                        )} text-xs font-semibold px-3 py-1.5 rounded-full`}
+                      >
+                        {order?.status
+                          ? order.status.charAt(0).toUpperCase() +
+                          order.status.slice(1)
+                          : "Pending"}
+                      </Badge>
+                    </td>
+                    <td className="py-4 px-4">{renderInvoiceSection(order)}</td>
+                    <td className="py-4 px-2">
+                      <div className="flex items-center justify-start gap-1 xl:gap-2">
+                        <Button
+                          asChild
+                          size="sm"
+                          variant="outline"
+                          className="min-w-[70px] xl:min-w-20"
+                        >
+                          <Link
+                            href={`/user/orders/${order._id}`}
+                            className="flex items-center justify-center"
+                          >
+                            <Eye className="w-3 h-3 xl:mr-1" />
+                            <span className="hidden xl:inline ml-1">View</span>
+                          </Link>
+                        </Button>
+                        {isOrderPayable(order) && (
+                          <Button
+                            onClick={() => handlePayNow(order._id)}
+                            disabled={payingOrderId === order._id}
+                            size="sm"
+                            className="bg-blue-600 hover:bg-blue-700 text-white disabled:opacity-50 disabled:cursor-not-allowed min-w-20 xl:min-w-[100px] touch-manipulation"
+                          >
+                            {payingOrderId === order._id ? (
+                              <>
+                                <div className="animate-spin rounded-full h-3 w-3 xl:mr-1"></div>
+                                <span className="hidden xl:inline ml-1 text-xs">
+                                  Paying...
+                                </span>
+                              </>
+                            ) : (
+                              <>
+                                <CreditCard className="w-3 h-3 xl:mr-1 shrink-0" />
+                                <span className="hidden xl:inline ml-1 text-xs font-medium">
+                                  Pay Now
+                                </span>
+                              </>
+                            )}
+                          </Button>
+                        )}
+                      </div>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
         </div>
       </div>
     </div>
