@@ -185,22 +185,24 @@ const getAllBlogs = unstable_cache(
  * Get single blog by slug - cached for 30 minutes
  * Individual blog posts don't change often
  */
-const getSingleBlog = unstable_cache(
-  async (slug: string) => {
-    try {
-      const { data } = await sanityFetch({
-        query: SINGLE_BLOG_QUERY,
-        params: { slug },
-      });
-      return data ?? [];
-    } catch (error) {
-      console.log("Error fetching blog:", error);
-      return [];
-    }
-  },
-  ["single-blog-v1"],
-  { revalidate: 1800, tags: ["blogs"] }
-);
+const getSingleBlog = async (slug: string) => {
+  return unstable_cache(
+    async () => {
+      try {
+        const { data } = await sanityFetch({
+          query: SINGLE_BLOG_QUERY,
+          params: { slug },
+        });
+        return data ?? [];
+      } catch (error) {
+        console.log("Error fetching blog:", error);
+        return [];
+      }
+    },
+    ["single-blog-v1", slug],
+    { revalidate: 1800, tags: ["blogs"] }
+  )();
+};
 
 /**
  * Get blog categories - cached for 1 hour
@@ -261,33 +263,35 @@ const getAddresses = async () => {
  * Get categories - cached for 15 minutes
  * Category structure is relatively static
  */
-const getCategories = unstable_cache(
-  async (quantity?: number) => {
-    try {
-      const query = quantity
-        ? `*[_type == 'category'] | order(name asc) [0...$quantity] {
-            ...,
-            "productCount": count(*[_type == "product" && references(^._id)])
-          }`
-        : `*[_type == 'category'] | order(name asc) {
-            ...,
-            "productCount": count(*[_type == "product" && references(^._id)])
-          }`;
+const getCategories = async (quantity?: number) => {
+  return unstable_cache(
+    async () => {
+      try {
+        const query = quantity
+          ? `*[_type == 'category'] | order(name asc) [0...$quantity] {
+              ...,
+              "productCount": count(*[_type == "product" && references(^._id)])
+            }`
+          : `*[_type == 'category'] | order(name asc) {
+              ...,
+              "productCount": count(*[_type == "product" && references(^._id)])
+            }`;
 
-      const { data } = await sanityFetch({
-        query,
-        params: quantity ? { quantity } : {},
-      });
+        const { data } = await sanityFetch({
+          query,
+          params: quantity ? { quantity } : {},
+        });
 
-      return data ?? [];
-    } catch (error) {
-      console.log("Error fetching categories with product count:", error);
-      return [];
-    }
-  },
-  ["categories-list"],
-  { revalidate: 900, tags: ["categories", "navigation"] }
-);
+        return data ?? [];
+      } catch (error) {
+        console.log("Error fetching categories with product count:", error);
+        return [];
+      }
+    },
+    ["categories-list", quantity ? String(quantity) : "all"],
+    { revalidate: 900, tags: ["categories", "navigation"] }
+  )();
+};
 
 /**
  * Get admin categories - not cached (admin data needs to be fresh)
@@ -306,72 +310,82 @@ const getAdminCategories = async () => {
  * Get product by slug - cached for 30 minutes
  * Product details don't change frequently
  */
-const getProductBySlug = unstable_cache(
-  async (slug: string) => {
-    try {
-      const product = await sanityFetch({
-        query: PRODUCT_BY_SLUG_QUERY,
-        params: {
-          slug,
-        },
-      });
-      return product?.data || null;
-    } catch (error) {
-      console.error("Error fetching product by slug:", error);
-      return null;
-    }
-  },
-  ["product-by-slug-v1"],
-  { revalidate: 1800, tags: ["products", "reviews"] }
-);
+const getProductBySlug = async (slug: string) => {
+  return unstable_cache(
+    async () => {
+      try {
+        const product = await sanityFetch({
+          query: PRODUCT_BY_SLUG_QUERY,
+          params: {
+            slug,
+          },
+        });
+        return product?.data || null;
+      } catch (error) {
+        console.error("Error fetching product by slug:", error);
+        return null;
+      }
+    },
+    ["product-by-slug-v1", slug],
+    { revalidate: 1800, tags: ["products", "reviews"] }
+  )();
+};
 
 /**
  * Get brand by slug - cached for 30 minutes
  * Brand info rarely changes
  */
-const getBrand = unstable_cache(
-  async (slug: string) => {
-    try {
-      const product = await sanityFetch({
-        query: BRAND_QUERY,
-        params: {
-          slug,
-        },
-      });
-      return product?.data || null;
-    } catch (error) {
-      console.error("Error fetching brand by slug:", error);
-      return null;
-    }
-  },
-  ["brand-by-slug-v1"],
-  { revalidate: 1800, tags: ["brands"] }
-);
+const getBrand = async (slug: string) => {
+  return unstable_cache(
+    async () => {
+      try {
+        const product = await sanityFetch({
+          query: BRAND_QUERY,
+          params: {
+            slug,
+          },
+        });
+        return product?.data || null;
+      } catch (error) {
+        console.error("Error fetching brand by slug:", error);
+        return null;
+      }
+    },
+    ["brand-by-slug-v1", slug],
+    { revalidate: 1800, tags: ["brands"] }
+  )();
+};
 
 /**
  * Get related products - cached for 15 minutes
  * Related products are dynamic but can be cached briefly
  */
-const getRelatedProducts = unstable_cache(
-  async (categoryIds: string[], currentSlug: string, limit: number = 4) => {
-    try {
-      const { data } = await sanityFetch({
-        query: RELATED_PRODUCTS_QUERY,
-        params: {
-          categoryIds,
-          currentSlug,
-          limit,
-        },
-      });
-      return data ?? [];
-    } catch (error) {
-      console.error("Error fetching related products:", error);
-      return [];
-    }
-  },
-  ["related-products-v1"],
-  { revalidate: 900, tags: ["products"] }
-);
+const getRelatedProducts = async (
+  categoryIds: string[],
+  currentSlug: string,
+  limit: number = 4
+) => {
+  return unstable_cache(
+    async () => {
+      try {
+        const { data } = await sanityFetch({
+          query: RELATED_PRODUCTS_QUERY,
+          params: {
+            categoryIds,
+            currentSlug,
+            limit,
+          },
+        });
+        return data ?? [];
+      } catch (error) {
+        console.error("Error fetching related products:", error);
+        return [];
+      }
+    },
+    ["related-products-v1", currentSlug],
+    { revalidate: 900, tags: ["products"] }
+  )();
+};
 
 export {
   getBanner,
