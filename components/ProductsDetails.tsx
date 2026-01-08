@@ -4,7 +4,7 @@ const ProductsDetails = () => {
   return (
     <div className="w-full space-y-8 mb-10">
       {/* Description Section */}
-      <div className="bg-white rounded-xl border border-gray-200 p-6 shadow-sm">
+      <div className="bg-white rounded-xl p-6 shadow-md">
         <h2 className="text-2xl font-bold text-shop_dark_green mb-4 flex items-center gap-2">
           <span className="w-1 h-6 bg-shop_orange rounded-full"></span>
           Description
@@ -27,7 +27,7 @@ const ProductsDetails = () => {
       </div>
 
       {/* Additional Information Section */}
-      <div className="bg-white rounded-xl border border-gray-200 p-6 shadow-sm">
+      <div className="bg-white rounded-xl p-6 shadow-md">
         <h2 className="text-2xl font-bold text-shop_dark_green mb-4 flex items-center gap-2">
           <span className="w-1 h-6 bg-shop_orange rounded-full"></span>
           Additional Information

@@ -154,7 +154,7 @@ const ProductContent = ({
             </div>
 
             {/* Pricing Section */}
-            <div className="space-y-4 border-t border-b border-gray-200 py-6 bg-white/70 rounded-lg px-4">
+            <div className="space-y-4 shadow-lg border border-gray-100 py-6 bg-white rounded-2xl px-6">
               <PriceView
                 price={product?.price}
                 discount={product?.discount}

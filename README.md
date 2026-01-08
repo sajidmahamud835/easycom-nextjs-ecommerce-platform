@@ -107,8 +107,8 @@ This platform implements **next-generation AI-powered commerce** capabilities:
 
 1. **Clone the repository**
    ```bash
-   git clone https://github.com/sajidmahamud835/easycom.git
-   cd easycom
+   git clone https://github.com/sajidmahamud835/easycom-nextjs-ecommerce-platform.git
+   cd easycom-nextjs-ecommerce-platform
    ```
 
 2. **Install dependencies**
@@ -214,12 +214,12 @@ We welcome contributions from developers of all skill levels! Here's how you can
 
 1. **Fork the repository**
    
-   Click the "Fork" button at [https://github.com/sajidmahamud835/easycom](https://github.com/sajidmahamud835/easycom)
+   Click the "Fork" button at [https://github.com/sajidmahamud835/easycom-nextjs-ecommerce-platform](https://github.com/sajidmahamud835/easycom-nextjs-ecommerce-platform)
 
 2. **Clone your fork**
    ```bash
-   git clone https://github.com/YOUR_USERNAME/easycom.git
-   cd easycom
+   git clone https://github.com/YOUR_USERNAME/easycom-nextjs-ecommerce-platform.git
+   cd easycom-nextjs-ecommerce-platform
    ```
 
 3. **Create a feature branch**

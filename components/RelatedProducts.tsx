@@ -44,7 +44,7 @@ const RelatedProducts = memo(({ relatedProducts }: RelatedProductsProps) => {
           return (
             <Card
               key={product._id}
-              className="group hover:shadow-xl transition-all duration-300 border-2 hover:border-shop_light_green/30"
+              className="group bg-white rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-300 border border-gray-100"
             >
               <CardContent className="p-4">
                 {/* Product Image */}
@@ -105,11 +105,10 @@ const RelatedProducts = memo(({ relatedProducts }: RelatedProductsProps) => {
                         <StarIcon
                           key={index}
                           size={12}
-                          className={`${
-                            index < 4
+                          className={`${index < 4
                               ? "text-shop_light_green fill-shop_light_green"
                               : "text-gray-300"
-                          }`}
+                            }`}
                         />
                       ))}
                     </div>
@@ -131,7 +130,7 @@ const RelatedProducts = memo(({ relatedProducts }: RelatedProductsProps) => {
                   {/* Add to Cart Button */}
                   <AddToCartButton
                     product={product}
-                    className="w-full mt-3 bg-shop_dark_green hover:bg-shop_light_green text-white text-sm py-2 rounded-md"
+                    className="w-full mt-3"
                   />
                 </div>
               </CardContent>
