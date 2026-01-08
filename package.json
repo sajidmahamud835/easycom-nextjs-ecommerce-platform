@@ -7,7 +7,6 @@
   },
   "scripts": {
     "dev": "next dev --turbopack",
-    "prebuild": "npm install --include=dev",
     "build": "cross-env NODE_ENV=production next build",
     "start": "next start",
     "lint": "next lint",

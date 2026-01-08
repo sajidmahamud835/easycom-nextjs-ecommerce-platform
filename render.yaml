@@ -1,5 +1,10 @@
-buildCommand: npm install --include=dev && npm run build
-startCommand: npm start
-envVars:
-  - key: NODE_VERSION
-    value: 20.11.0
+services:
+  - type: web
+    name: easycom
+    env: node
+    plan: starter
+    buildCommand: npm install --include=dev && npm run build
+    startCommand: npm run start
+    envVars:
+      - key: NODE_VERSION
+        value: 20.11.0
