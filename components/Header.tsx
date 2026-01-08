@@ -141,11 +141,15 @@ const Header = ({ categories }: Props) => {
       {/* Bottom Bar - Darker Gray/Blue */}
       <div className="bg-[#232f3e] text-white flex items-center gap-4 px-4 py-1.5 text-sm h-[40px] overflow-x-auto no-scrollbar">
         {/* SideMenu removed as per user request */}
-        {["Today's Deals", "Customer Service", "Track My Product"].map((item) => (
-          <Link key={item} href={item === "Today's Deals" ? "/deal" : "#"} className="whitespace-nowrap hover:ring-1 hover:ring-white px-2 py-1 rounded-sm transition-all">
-            {item}
-          </Link>
-        ))}
+        <Link href="/deal" className="whitespace-nowrap hover:ring-1 hover:ring-white px-2 py-1 rounded-sm transition-all">
+          Today&apos;s Deals
+        </Link>
+        <Link href="/support" className="whitespace-nowrap hover:ring-1 hover:ring-white px-2 py-1 rounded-sm transition-all">
+          Customer Service
+        </Link>
+        <Link href="/track-order" className="whitespace-nowrap hover:ring-1 hover:ring-white px-2 py-1 rounded-sm transition-all">
+          Track My Product
+        </Link>
         <Link href="/gift-cards" className="whitespace-nowrap hover:ring-1 hover:ring-white px-2 py-1 rounded-sm transition-all">
           Gift Cards
         </Link>
