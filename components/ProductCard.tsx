@@ -1,5 +1,4 @@
 import Image from "next/image";
-import Link from "next/link";
 import React, { memo } from "react";
 import PriceView from "./PriceView";
 import AddToCartButton from "./AddToCartButton";
@@ -35,7 +34,7 @@ const ProductCard = memo(({ product, priority = false }: Props) => {
 
       {/* Image Area */}
       <div className="relative w-full aspect-square bg-gradient-to-br from-gray-50 to-gray-100 p-6 flex items-center justify-center overflow-hidden">
-        <Link href={`/product/${product?.slug?.current}`} className="w-full h-full relative group-hover:scale-105 transition-transform duration-500">
+        <a href={`/product/${product?.slug?.current}`} className="w-full h-full relative group-hover:scale-105 transition-transform duration-500">
           {product?.images?.[0] && (
             <Image
               src={urlFor(product.images[0]).url()}
@@ -45,19 +44,19 @@ const ProductCard = memo(({ product, priority = false }: Props) => {
               priority={priority}
             />
           )}
-        </Link>
+        </a>
       </div>
 
       {/* Content Area */}
       <div className="p-4 flex flex-col gap-2">
 
         {/* Title */}
-        <Link
+        <a
           href={`/product/${product?.slug?.current}`}
           className="line-clamp-2 text-sm font-medium text-gray-800 hover:text-indigo-600 transition-colors leading-snug"
         >
           {product?.name}
-        </Link>
+        </a>
 
         {/* Rating */}
         <div className="flex items-center gap-1.5">
