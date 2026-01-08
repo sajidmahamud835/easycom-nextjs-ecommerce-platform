@@ -1,149 +1,65 @@
 "use client";
-import Logo from "./common/Logo";
 import { motion } from "motion/react";
-import { ShoppingBag, Package, Truck, CheckCircle } from "lucide-react";
-import { useState, useEffect } from "react";
+import { Skeleton } from "./ui/skeleton";
 
 const Loading = () => {
-  const [currentStep, setCurrentStep] = useState(0);
-  const [loadingText, setLoadingText] = useState(
-    "Preparing your shopping experience..."
-  );
-
-  const loadingSteps = [
-    {
-      icon: ShoppingBag,
-      text: "Preparing your shopping experience...",
-      color: "text-shop_dark_green",
-    },
-    {
-      icon: Package,
-      text: "Loading products...",
-      color: "text-shop_light_green",
-    },
-    {
-      icon: Truck,
-      text: "Setting up delivery options...",
-      color: "text-shop_orange",
-    },
-    {
-      icon: CheckCircle,
-      text: "Almost ready!",
-      color: "text-shop_light_green",
-    },
-  ];
-
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setCurrentStep((prev) => {
-        const nextStep = (prev + 1) % loadingSteps.length;
-        setLoadingText(loadingSteps[nextStep].text);
-        return nextStep;
-      });
-    }, 1200);
-
-    return () => clearInterval(interval);
-  }, []);
-
-  const CurrentIcon = loadingSteps[currentStep].icon;
-
   return (
-    <div className="fixed min-h-screen w-full bg-shop_light_bg left-0 top-0 flex items-center justify-center z-50">
-      <div className="flex flex-col justify-center items-center gap-8 max-w-md mx-auto px-6">
-        {/* Logo with enhanced animation */}
-        <motion.div
-          initial={{ opacity: 0, y: -20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6 }}
-        >
-          <Logo />
-        </motion.div>
+    <div className="min-h-screen w-full bg-gray-50">
+      {/* Hero Skeleton */}
+      <div className="w-full h-[300px] md:h-[400px] bg-gradient-to-r from-gray-200 via-gray-100 to-gray-200 animate-pulse" />
 
-        {/* Progress Dots */}
-        <div className="flex space-x-3">
-          {loadingSteps.map((_, index) => (
-            <motion.div
-              key={index}
-              className={`w-3 h-3 rounded-full ${
-                index === currentStep
-                  ? "bg-shop_orange shadow-lg"
-                  : index < currentStep
-                  ? "bg-shop_light_green"
-                  : "bg-gray-300"
-              }`}
-              animate={{
-                scale: index === currentStep ? [1, 1.3, 1] : 1,
-                opacity: index <= currentStep ? 1 : 0.5,
-              }}
-              transition={{
-                duration: 0.6,
-                repeat: index === currentStep ? Infinity : 0,
-                repeatDelay: 0.3,
-              }}
-            />
-          ))}
-        </div>
-
-        {/* Main Loading Content */}
-        <div className="text-center space-y-6">
-          {/* Animated Icon */}
-          <motion.div
-            key={currentStep}
-            initial={{ opacity: 0, scale: 0.5, rotate: -10 }}
-            animate={{ opacity: 1, scale: 1, rotate: 0 }}
-            exit={{ opacity: 0, scale: 0.5, rotate: 10 }}
-            transition={{ duration: 0.5 }}
-            className="flex justify-center"
-          >
-            <div
-              className={`p-4 rounded-full bg-white shadow-lg border-2 border-shop_light_green/20`}
-            >
-              <CurrentIcon
-                className={`w-8 h-8 ${loadingSteps[currentStep].color}`}
-                strokeWidth={2}
-              />
-            </div>
-          </motion.div>
-
-          {/* Loading Text */}
-          <motion.div
-            key={loadingText}
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -10 }}
-            transition={{ duration: 0.4 }}
-            className="space-y-2"
-          >
-            <h2 className="text-xl font-semibold text-shop_dark_green">
-              {loadingText}
-            </h2>
-            <p className="text-sm text-gray-600">
-              Please wait while we set up everything for you
-            </p>
-          </motion.div>
-
-          {/* Progress Bar */}
-          <div className="w-64 h-2 bg-gray-200 rounded-full overflow-hidden">
-            <motion.div
-              className="h-full bg-gradient-to-r from-shop_light_green to-shop_orange rounded-full"
-              initial={{ width: "0%" }}
-              animate={{
-                width: `${((currentStep + 1) / loadingSteps.length) * 100}%`,
-              }}
-              transition={{ duration: 0.6, ease: "easeInOut" }}
-            />
+      <div className="max-w-7xl mx-auto px-4 py-8 space-y-8">
+        {/* Section Title Skeleton */}
+        <div className="flex items-center justify-between">
+          <div className="space-y-2">
+            <Skeleton className="h-8 w-48 rounded-lg" />
+            <Skeleton className="h-4 w-32 rounded-lg" />
           </div>
-
-          {/* Percentage */}
-          <motion.p
-            className="text-sm font-medium text-shop_dark_green"
-            animate={{ opacity: [0.7, 1, 0.7] }}
-            transition={{ duration: 1.5, repeat: Infinity }}
-          >
-            {Math.round(((currentStep + 1) / loadingSteps.length) * 100)}%
-            Complete
-          </motion.p>
+          <Skeleton className="h-10 w-28 rounded-xl" />
         </div>
+
+        {/* Product Grid Skeleton */}
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
+          {Array(10)
+            .fill(0)
+            .map((_, index) => (
+              <motion.div
+                key={index}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: index * 0.05, duration: 0.3 }}
+                className="bg-white rounded-2xl overflow-hidden shadow-sm"
+              >
+                {/* Image Skeleton */}
+                <div className="aspect-square bg-gradient-to-br from-gray-100 to-gray-200 animate-pulse" />
+
+                {/* Content Skeleton */}
+                <div className="p-4 space-y-3">
+                  <Skeleton className="h-4 w-full rounded" />
+                  <Skeleton className="h-4 w-3/4 rounded" />
+                  <div className="flex items-center justify-between pt-2">
+                    <Skeleton className="h-6 w-20 rounded" />
+                    <Skeleton className="h-8 w-8 rounded-full" />
+                  </div>
+                </div>
+              </motion.div>
+            ))}
+        </div>
+
+        {/* Bottom Section Skeleton */}
+        <div className="flex justify-center pt-4">
+          <Skeleton className="h-12 w-40 rounded-xl" />
+        </div>
+      </div>
+
+      {/* Subtle Loading Indicator */}
+      <div className="fixed bottom-6 right-6 z-50">
+        <motion.div
+          animate={{ rotate: 360 }}
+          transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
+          className="w-10 h-10 border-3 border-gray-200 border-t-emerald-500 rounded-full"
+          style={{ borderWidth: "3px" }}
+        />
       </div>
     </div>
   );
