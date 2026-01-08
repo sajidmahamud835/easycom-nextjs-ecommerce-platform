@@ -7,8 +7,7 @@ export const contactConfig = {
     phone: process.env.NEXT_PUBLIC_COMPANY_PHONE || "+1 (555) 123-4567",
     address:
       process.env.NEXT_PUBLIC_COMPANY_ADDRESS ||
-      "Capstone Project (Demo Address)",
-    city: process.env.NEXT_PUBLIC_COMPANY_CITY || "",
+      "123 Market Street, Dhaka, Bangladesh",
     description:
       process.env.NEXT_PUBLIC_COMPANY_DESCRIPTION ||
       "EasyCom is a capstone e-commerce project built for learning and demonstration. Not production-grade.",

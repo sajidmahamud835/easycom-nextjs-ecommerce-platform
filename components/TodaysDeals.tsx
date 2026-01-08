@@ -4,13 +4,15 @@ import { Product } from "@/sanity.types";
 import { Loader2, Timer } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { getTodaysDeals } from "@/actions/getTodaysDeals";
 import { Button } from "./ui/button";
 import { Card, CardContent } from "./ui/card";
 import { Badge } from "./ui/badge";
 import { motion } from "motion/react";
 import { urlFor } from "@/sanity/lib/image";
+
+const PLACEHOLDER_IMAGE = "https://placehold.co/400x400/f3f4f6/9ca3af?text=No+Image";
 
 const TodaysDeals = () => {
     const [deals, setDeals] = useState<Product[]>([]);
@@ -60,15 +62,14 @@ const TodaysDeals = () => {
                         >
                             <Card className="border-0 shadow-none hover:shadow-lg transition-shadow rounded-md overflow-hidden h-full flex flex-col">
                                 <CardContent className="p-0">
-                                    <div className="relative bg-gray-100 aspect-square p-4 flex items-center justify-center">
-                                        {product.images?.[0] && (
-                                            <Image
-                                                src={urlFor(product.images[0]).url()}
-                                                alt={product.name || "Deal Product"}
-                                                fill
-                                                className="object-contain mix-blend-multiply p-4 transition-transform group-hover:scale-105"
-                                            />
-                                        )}
+                                    <div className="relative bg-gray-100 h-48 flex items-center justify-center">
+                                        <Image
+                                            src={product.images?.[0] ? urlFor(product.images[0]).url() : PLACEHOLDER_IMAGE}
+                                            alt={product.name || "Deal Product"}
+                                            fill
+                                            className="object-contain mix-blend-multiply p-4 transition-transform group-hover:scale-105"
+                                            onError={(e) => { (e.target as HTMLImageElement).src = PLACEHOLDER_IMAGE; }}
+                                        />
                                     </div>
 
                                     <div className="p-3">

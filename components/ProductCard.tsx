@@ -1,11 +1,15 @@
+"use client";
+
 import Image from "next/image";
 import Link from "next/link";
-import React, { memo } from "react";
+import React, { memo, useState } from "react";
 import PriceView from "./PriceView";
 import AddToCartButton from "./AddToCartButton";
 import { urlFor } from "@/sanity/lib/image";
 import { Star, Heart } from "lucide-react";
 import { Product } from "@/sanity.types";
+
+const PLACEHOLDER_IMAGE = "https://placehold.co/400x400/f3f4f6/9ca3af?text=No+Image";
 
 interface Props {
   product: Product;
@@ -17,9 +21,14 @@ interface Props {
 const ProductCard = memo(({ product, priority = false }: Props) => {
   const rating = product?.averageRating || 4.5;
   const fullStars = Math.floor(rating);
+  const [imgError, setImgError] = useState(false);
+
+  const imageUrl = product?.images?.[0] && !imgError
+    ? urlFor(product.images[0]).url()
+    : PLACEHOLDER_IMAGE;
 
   return (
-    <div className="group relative bg-white rounded-2xl overflow-hidden transition-all duration-300 hover:shadow-xl hover:-translate-y-1 border border-gray-100">
+    <div className="group relative bg-white rounded-2xl overflow-hidden transition-all duration-300 hover:shadow-xl hover:-translate-y-1 border border-gray-100 h-full flex flex-col">
 
       {/* Wishlist Button */}
       <button className="absolute top-3 right-3 z-10 p-2 rounded-full bg-white/80 backdrop-blur-sm opacity-0 group-hover:opacity-100 transition-all duration-300 hover:bg-rose-50 hover:scale-110">
@@ -33,23 +42,22 @@ const ProductCard = memo(({ product, priority = false }: Props) => {
         </div>
       )}
 
-      {/* Image Area */}
-      <div className="relative w-full aspect-square bg-gradient-to-br from-gray-50 to-gray-100 p-6 flex items-center justify-center overflow-hidden">
+      {/* Image Area - Fixed height for grid alignment */}
+      <div className="relative w-full h-48 bg-gradient-to-br from-gray-50 to-gray-100 p-4 flex items-center justify-center overflow-hidden">
         <Link href={`/product/${product?.slug?.current}`} className="w-full h-full relative group-hover:scale-105 transition-transform duration-500">
-          {product?.images?.[0] && (
-            <Image
-              src={urlFor(product.images[0]).url()}
-              alt={product.name || "Product Image"}
-              fill
-              className="object-contain drop-shadow-sm"
-              priority={priority}
-            />
-          )}
+          <Image
+            src={imageUrl}
+            alt={product?.name || "Product Image"}
+            fill
+            className="object-contain drop-shadow-sm"
+            priority={priority}
+            onError={() => setImgError(true)}
+          />
         </Link>
       </div>
 
-      {/* Content Area */}
-      <div className="p-4 flex flex-col gap-2">
+      {/* Content Area - Flex grow to push footer down */}
+      <div className="p-4 flex flex-col gap-2 flex-grow">
 
         {/* Title */}
         <Link
@@ -82,11 +90,11 @@ const ProductCard = memo(({ product, priority = false }: Props) => {
             className="text-lg font-bold text-gray-900"
           />
 
-          {/* Stock Status */}
+          {/* Stock Status - Accessible green */}
           {product?.stock && product.stock > 0 ? (
-            <span className="text-xs text-emerald-600 font-medium">In Stock</span>
+            <span className="text-xs text-green-700 font-medium">In Stock</span>
           ) : (
-            <span className="text-xs text-gray-400">Check availability</span>
+            <span className="text-xs text-gray-500">Check availability</span>
           )}
         </div>
 
