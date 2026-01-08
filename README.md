@@ -53,9 +53,11 @@ To create a unified commerce platform that seamlessly handles both consumer shop
 | **🏪 Sellers** | Seller onboarding and business account application |
 
 ### 🟡 In Progress
-
-- 🤖 **AI-Powered Recommendations** — Personalized product suggestions
 - 📊 **Analytics Dashboard** — Comprehensive business insights
+
+### 🟢 Implemented Features (New)
+- 🎰 **Hidden Jackpot System** — "Flash Deal Injection" using implicit variable ratio reinforcement (Casino Psychology).
+
 
 ### 🔵 Planned Features
 

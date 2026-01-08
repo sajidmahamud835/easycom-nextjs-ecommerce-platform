@@ -54,8 +54,26 @@ export default function RecommendedProducts() {
                 </div>
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-                    {products.map((product) => (
-                        <ProductCard key={product._id} product={product} />
+                    {products.map((product: any) => (
+                        <div key={product._id} className="relative group">
+                            {product.isFlashDeal && (
+                                <div className="absolute -top-2 -right-2 z-20 bg-red-600 text-white text-xs font-bold px-3 py-1 rounded-full animate-pulse shadow-lg">
+                                    🔥 FLASH DEAL
+                                </div>
+                            )}
+
+                            <div className={product.isFlashDeal ? "ring-2 ring-red-500 ring-offset-2 rounded-xl shadow-[0_0_20px_rgba(239,68,68,0.3)] transition-all duration-300 transform hover:scale-[1.02]" : ""}>
+                                <ProductCard product={product} />
+
+                                {product.isFlashDeal && (
+                                    <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-red-600 to-transparent p-2 rounded-b-xl opacity-0 group-hover:opacity-100 transition-opacity flex justify-center">
+                                        <span className="text-white font-bold text-sm">
+                                            Ends in {Math.floor(Math.random() * 50) + 10}m
+                                        </span>
+                                    </div>
+                                )}
+                            </div>
+                        </div>
                     ))}
                 </div>
             </div>

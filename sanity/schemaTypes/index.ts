@@ -37,7 +37,6 @@ export const schema: { types: SchemaTypeDefinition[] } = {
     userAccessRequestType,
     reviewType,
     subscriptionType,
-    ticketType,
     giftCardType,
   ],
 };

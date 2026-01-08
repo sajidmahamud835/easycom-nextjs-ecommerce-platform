@@ -67,6 +67,24 @@ While the current content-based filtering approach is highly efficient for immed
 1.  **Hybrid Filtering**: Incorporating "Collaborative" signals by tracking "Users who bought X also bought Y" in a graph structure.
 2.  **Vector Embeddings**: Migrating to OpenAI's `text-embedding-3-small` for semantic similarity matching of product descriptions to catch nuance beyond static categories.
 
-## 5. Conclusion
 
-The EasyCom recommendation engine demonstrates that high-quality, personalized user experiences can be achieved without complex ML infrastructure. By treating the database query language as a functional programming environment for scoring, we achieve a high reliability-to-complexity ratio.
+## 6. Psychology of Engagement: Variable Ratio Schedules
+
+## 6. Psychology of Engagement: Implicit Variable Ratio Schedules
+
+### 6.1 The "Hidden Jackpot" Methodology
+To increase Daily Active Users (DAU) *without* explicit gamification (which can feel gimmicky), we implemented a **Stochastic Content Injection System**. This models the "Pull-to-Refresh" dopamine loop found in social media feeds.
+
+### 6.2 Implementation Strategy: "Flash Deal Injection"
+The system uses an **Implicit Variable Ratio Schedule**:
+*   **The Trigger**: Every time the user visits the homepage or refreshes recommendations.
+*   **The Variable Reward**: There is a **30% probability** (server-side RNG) that a high-value product (e.g., typically >$500) will be "injected" into the recommendation feed with a **massive, time-limited discount** (e.g., 50% off).
+*   **The Hook**: Because the reward is unpredictable and scarce, users are conditioned to check the app freqently ("hunting" for deals).
+
+### 6.3 Technical Execution
+*   **Server-Side Logic** (`actions/getRecommendations.ts`): The injection logic happens entirely on the server to prevent client-side prediction.
+*   **Virtual Pricing**: The discount is applied dynamically to the data stream, not the database, creating ephemeral "Flash Prices" that exist only for that specific request window.
+*   **UI Integration**: These items are visually distinct (glowing borders, "Flash Deal" badges) to trigger immediate recognition and urgency.
+
+This approach transforms the recommendation engine from a passive utility into an active engagement driver.
+

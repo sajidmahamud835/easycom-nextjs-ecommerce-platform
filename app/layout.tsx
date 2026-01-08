@@ -114,6 +114,7 @@ const RootLayout = async ({ children }: { children: ReactNode }) => {
         >
           <UserDataProvider>{children}</UserDataProvider>
 
+
           <Toaster
             position="bottom-right"
             richColors

@@ -198,7 +198,7 @@ const getSingleBlog = unstable_cache(
       return [];
     }
   },
-  ["single-blog"],
+  ["single-blog-v1"],
   { revalidate: 1800, tags: ["blogs"] }
 );
 
@@ -321,7 +321,7 @@ const getProductBySlug = unstable_cache(
       return null;
     }
   },
-  ["product-by-slug"],
+  ["product-by-slug-v1"],
   { revalidate: 1800, tags: ["products", "reviews"] }
 );
 
@@ -344,7 +344,7 @@ const getBrand = unstable_cache(
       return null;
     }
   },
-  ["brand-by-slug"],
+  ["brand-by-slug-v1"],
   { revalidate: 1800, tags: ["brands"] }
 );
 
@@ -369,7 +369,7 @@ const getRelatedProducts = unstable_cache(
       return [];
     }
   },
-  ["related-products"],
+  ["related-products-v1"],
   { revalidate: 900, tags: ["products"] }
 );
 
