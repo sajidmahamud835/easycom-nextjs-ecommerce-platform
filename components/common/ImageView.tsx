@@ -43,10 +43,9 @@ const ImageView = ({ images = [], isStock }: Props) => {
             alt="productImage"
             width={700}
             height={700}
-            priority
-            className={`w-full h-96 max-h-[550px] min-h-[500px] object-contain group-hover:scale-110 hoverEffect rounded-md ${
-              isStock === 0 ? "opacity-50" : ""
-            }`}
+            priority={active?._key === images[0]?._key}
+            className={`w-full h-96 max-h-[550px] min-h-[500px] object-contain group-hover:scale-110 hoverEffect rounded-md ${isStock === 0 ? "opacity-50" : ""
+              }`}
           />
         </motion.div>
       </AnimatePresence>
@@ -55,9 +54,8 @@ const ImageView = ({ images = [], isStock }: Props) => {
           <button
             key={image._key}
             onClick={() => setActive(image)}
-            className={`border rounded-md overflow-hidden ${
-              active._key === image._key ? "ring-1 ring-dark-color" : ""
-            }`}
+            className={`border rounded-md overflow-hidden ${active._key === image._key ? "ring-1 ring-dark-color" : ""
+              }`}
           >
             <Image
               src={urlFor(image).url()}
