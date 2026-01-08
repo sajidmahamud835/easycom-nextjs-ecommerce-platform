@@ -12,34 +12,33 @@ import {
 } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import { Checkbox } from "@/components/ui/checkbox";
-import { RefreshCw, Trash2, Eye, Package, Plus } from "lucide-react";
-import Link from "next/link";
+import { RefreshCw, Trash2, Eye, Package, Plus, LayoutGrid, List } from "lucide-react";
 import { OrdersSkeleton } from "./SkeletonLoaders";
 import { DeleteConfirmationDialog } from "./DeleteConfirmationDialog";
 import OrderDetailsSidebar from "./OrderDetailsSidebar";
 import { Order } from "./types";
 import { safeApiCall, handleApiError } from "./apiHelpers";
+import OrderStats from "./orders/OrderStats";
+import OrderFilterBar from "./orders/OrderFilterBar";
+import OrderCard from "./orders/OrderCard";
+import Link from "next/link";
 
 const AdminOrders: React.FC = () => {
   const [loading, setLoading] = useState(false);
   const [orders, setOrders] = useState<Order[]>([]);
   const [currentPage, setCurrentPage] = useState(0);
   const [orderStatus, setOrderStatus] = useState("all");
+  const [searchQuery, setSearchQuery] = useState("");
+  const [viewMode, setViewMode] = useState<"list" | "grid">("list");
+
   const [selectedOrders, setSelectedOrders] = useState<string[]>([]);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
   const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [isLoadingOrderDetails, setIsLoadingOrderDetails] = useState(false);
-  const [perPage, setPerPage] = useState(20);
+  const [perPage, setPerPage] = useState("20");
   const [pagination, setPagination] = useState({
     totalCount: 0,
     hasNextPage: false,
@@ -47,7 +46,14 @@ const AdminOrders: React.FC = () => {
   });
   const [isRefreshing, setIsRefreshing] = useState(false);
 
-  const limit = perPage;
+  // Debounced search term
+  const [debouncedSearch, setDebouncedSearch] = useState("");
+  useEffect(() => {
+    const timer = setTimeout(() => setDebouncedSearch(searchQuery), 500);
+    return () => clearTimeout(timer);
+  }, [searchQuery]);
+
+  const limit = parseInt(perPage);
 
   // Utility functions
   const formatCurrency = (amount: number): string => {
@@ -101,8 +107,10 @@ const AdminOrders: React.FC = () => {
       try {
         const statusParam = orderStatus === "all" ? "" : orderStatus;
         const timestamp = Date.now(); // Add timestamp to bust cache
+        const searchParam = debouncedSearch ? `&search=${encodeURIComponent(debouncedSearch)}` : "";
+
         const url = `/api/admin/orders?limit=${limit}&offset=${page * limit
-          }&status=${statusParam}&_t=${timestamp}`;
+          }&status=${statusParam}${searchParam}&_t=${timestamp}`;
 
         const data = await safeApiCall(url);
 
@@ -119,8 +127,19 @@ const AdminOrders: React.FC = () => {
         setLoading(false);
       }
     },
-    [orderStatus, limit]
+    [orderStatus, limit, debouncedSearch]
   );
+
+  // Fetch orders when dependencies change
+  useEffect(() => {
+    fetchOrders(currentPage);
+  }, [fetchOrders, currentPage]);
+
+  // Reset page when filters change
+  useEffect(() => {
+    setCurrentPage(0);
+    setSelectedOrders([]);
+  }, [orderStatus, perPage, debouncedSearch]);
 
   // Selection functions
   const toggleOrderSelection = useCallback((orderId: string) => {
@@ -208,12 +227,6 @@ const AdminOrders: React.FC = () => {
     setSelectedOrders([]); // Clear selections when changing page
   };
 
-  const handlePerPageChange = (newPerPage: string) => {
-    setPerPage(parseInt(newPerPage));
-    setCurrentPage(0); // Reset to first page
-    setSelectedOrders([]);
-  };
-
   // Delete functions
   const openDeleteDialog = () => {
     setIsDeleteDialogOpen(true);
@@ -229,34 +242,20 @@ const AdminOrders: React.FC = () => {
         body: JSON.stringify({ orderIds: selectedOrders }),
       });
 
-      // Close dialog and clear selections first
       setIsDeleteDialogOpen(false);
       setSelectedOrders([]);
 
-      // Immediately update local state to remove deleted orders
-      setOrders((prevOrders) =>
-        prevOrders.filter((order) => !selectedOrders.includes(order._id))
-      );
+      const newTotal = Math.max(0, pagination.totalCount - selectedOrders.length);
+      const newTotalPages = Math.ceil(newTotal / limit);
 
-      // Update pagination count
-      setPagination((prev) => ({
-        ...prev,
-        totalCount: Math.max(0, prev.totalCount - selectedOrders.length),
-      }));
-
-      // If all orders on current page were deleted, go back to page 0
-      const willBeEmpty = selectedOrders.length === orders.length;
-      const pageToFetch = willBeEmpty && currentPage > 0 ? 0 : currentPage;
-
-      if (pageToFetch !== currentPage) {
-        setCurrentPage(0);
+      // If we deleted everything on the current page, go back one page if possible
+      if (currentPage >= newTotalPages && currentPage > 0) {
+        setCurrentPage(Math.max(0, currentPage - 1));
+      } else {
+        // Just refresh current page
+        await fetchOrders(currentPage);
       }
 
-      // Wait a moment for Sanity to propagate changes
-      await new Promise((resolve) => setTimeout(resolve, 200));
-
-      // Refresh the orders list to ensure consistency
-      await fetchOrders(pageToFetch);
     } catch (error) {
       handleApiError(error, "Orders delete");
     } finally {
@@ -268,254 +267,243 @@ const AdminOrders: React.FC = () => {
   const handleRefresh = useCallback(async () => {
     setIsRefreshing(true);
     try {
-      await fetchOrders(currentPage);
+      setDebouncedSearch(""); // optional: clear search on hard refresh
+      setSearchQuery("");
+      await fetchOrders(0);
+      setCurrentPage(0);
     } finally {
       setIsRefreshing(false);
     }
-  }, [fetchOrders, currentPage]);
+  }, [fetchOrders]);
 
-  // Effects - Combined to avoid multiple re-renders
-  useEffect(() => {
-    fetchOrders(currentPage);
-  }, [fetchOrders, currentPage]);
-
-  // Reset page when filters change - Combined effect
-  useEffect(() => {
-    setCurrentPage(0);
-    setSelectedOrders([]);
-  }, [orderStatus, perPage]);
 
   return (
     <>
-      <div className="space-y-4 p-4">
-        {/* Header */}
-        <div className="flex items-center justify-between">
-          <h3 className="text-lg font-semibold">Orders Management</h3>
-          <div className="flex items-center gap-2">
+      <div className="space-y-6 p-6 bg-gray-50/50 min-h-screen">
+        {/* Header Section */}
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+          <div>
+            <h1 className="text-2xl font-bold text-gray-900">Orders Management</h1>
+            <p className="text-sm text-gray-500">View and manage all customer orders</p>
+          </div>
+          <div className="flex items-center gap-3">
+            <div className="bg-white border rounded-lg p-1 flex items-center shadow-sm">
+              <Button
+                variant="ghost"
+                size="sm"
+                className={`h-8 px-2 ${viewMode === 'list' ? 'bg-gray-100 text-gray-900' : 'text-gray-500'}`}
+                onClick={() => setViewMode('list')}
+              >
+                <List className="w-4 h-4 mr-1" /> List
+              </Button>
+              <Button
+                variant="ghost"
+                size="sm"
+                className={`h-8 px-2 ${viewMode === 'grid' ? 'bg-gray-100 text-gray-900' : 'text-gray-500'}`}
+                onClick={() => setViewMode('grid')}
+              >
+                <LayoutGrid className="w-4 h-4 mr-1" /> Grid
+              </Button>
+            </div>
             <Link href="/admin/orders/create">
-              <Button size="sm" className="bg-emerald-600 hover:bg-emerald-700">
+              <Button className="bg-emerald-600 hover:bg-emerald-700 shadow-sm">
                 <Plus className="h-4 w-4 mr-2" /> Create Order
               </Button>
             </Link>
-            <div className="border-l h-6 mx-1"></div>
-            <Select
-              value={perPage.toString()}
-              onValueChange={handlePerPageChange}
-            >
-              <SelectTrigger className="w-20">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="20">20</SelectItem>
-                <SelectItem value="30">30</SelectItem>
-                <SelectItem value="40">40</SelectItem>
-                <SelectItem value="50">50</SelectItem>
-                <SelectItem value="100">100</SelectItem>
-              </SelectContent>
-            </Select>
-            <Select value={orderStatus} onValueChange={setOrderStatus}>
-              <SelectTrigger className="w-40">
-                <SelectValue placeholder="Status" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">All Status</SelectItem>
-                <SelectItem value="pending">Pending</SelectItem>
-                <SelectItem value="address_confirmed">
-                  Address Confirmed
-                </SelectItem>
-                <SelectItem value="order_confirmed">Order Confirmed</SelectItem>
-                <SelectItem value="packed">Packed</SelectItem>
-                <SelectItem value="ready_for_delivery">
-                  Ready for Delivery
-                </SelectItem>
-                <SelectItem value="out_for_delivery">
-                  Out for Delivery
-                </SelectItem>
-                <SelectItem value="delivered">Delivered</SelectItem>
-                <SelectItem value="completed">Completed</SelectItem>
-                <SelectItem value="cancelled">Cancelled</SelectItem>
-                <SelectItem value="rescheduled">Rescheduled</SelectItem>
-                <SelectItem value="failed_delivery">Failed Delivery</SelectItem>
-              </SelectContent>
-            </Select>
-            <Button
-              onClick={handleRefresh}
-              size="sm"
-              disabled={loading || isRefreshing}
-            >
-              <RefreshCw
-                className={`h-4 w-4 ${loading || isRefreshing ? "animate-spin" : ""
-                  }`}
-              />
-            </Button>
           </div>
         </div>
 
-        {loading ? (
-          <OrdersSkeleton />
-        ) : (
-          <>
-            {selectedOrders.length > 0 && (
-              <div className="flex items-center justify-between bg-blue-50 p-3 rounded-lg border">
-                <span className="text-sm font-medium">
-                  {selectedOrders.length} order
-                  {selectedOrders.length > 1 ? "s" : ""} selected
-                </span>
-                <Button
-                  onClick={openDeleteDialog}
-                  variant="destructive"
-                  size="sm"
-                  className="gap-2"
-                >
-                  <Trash2 className="h-4 w-4" />
-                  Delete Selected
-                </Button>
-              </div>
-            )}
+        {/* Stats Cards */}
+        <OrderStats />
 
-            <Card>
+        {/* Filter Bar */}
+        <OrderFilterBar
+          status={orderStatus}
+          onStatusChange={setOrderStatus}
+          searchQuery={searchQuery}
+          onSearchChange={setSearchQuery}
+          perPage={perPage}
+          onPerPageChange={setPerPage}
+          onRefresh={handleRefresh}
+          isRefreshing={isRefreshing}
+          onReset={() => {
+            setOrderStatus("all");
+            setSearchQuery("");
+            setPerPage("20");
+          }}
+        />
+
+        {/* Main Content */}
+        <div className="space-y-4">
+          {/* Selection Toolbar */}
+          {selectedOrders.length > 0 && (
+            <div className="flex items-center justify-between bg-blue-50 p-3 rounded-xl border border-blue-100 shadow-sm animate-in fade-in slide-in-from-top-2">
+              <span className="text-sm font-medium text-blue-900 px-2">
+                {selectedOrders.length} order{selectedOrders.length > 1 ? "s" : ""} selected
+              </span>
+              <Button
+                onClick={openDeleteDialog}
+                variant="destructive"
+                size="sm"
+                className="gap-2 shadow-sm"
+              >
+                <Trash2 className="h-4 w-4" />
+                Delete Selection
+              </Button>
+            </div>
+          )}
+
+          {loading ? (
+            <OrdersSkeleton />
+          ) : orders.length === 0 ? (
+            <div className="bg-white rounded-xl border border-dashed border-gray-300 p-12 flex flex-col items-center justify-center text-center">
+              <div className="bg-gray-50 p-4 rounded-full mb-4">
+                <Package className="h-8 w-8 text-gray-400" />
+              </div>
+              <h3 className="text-lg font-semibold text-gray-900">No orders found</h3>
+              <p className="text-gray-500 max-w-sm mt-1 mb-6">
+                {orderStatus !== "all" || searchQuery
+                  ? "No orders match your current filters. Try resetting them."
+                  : "There are no orders in the system yet."}
+              </p>
+              {(orderStatus !== "all" || searchQuery) && (
+                <Button variant="outline" onClick={() => { setOrderStatus("all"); setSearchQuery(""); }}>
+                  Clear Filters
+                </Button>
+              )}
+            </div>
+          ) : viewMode === "list" ? (
+            <Card className="rounded-xl overflow-hidden shadow-sm border-gray-200">
               <Table>
-                <TableHeader>
+                <TableHeader className="bg-gray-50/50">
                   <TableRow>
-                    <TableHead className="w-12">
+                    <TableHead className="w-12 py-4">
                       <Checkbox
-                        checked={
-                          selectedOrders.length === orders.length &&
-                          orders.length > 0
-                        }
+                        checked={selectedOrders.length === orders.length && orders.length > 0}
                         onCheckedChange={toggleSelectAll}
                       />
                     </TableHead>
-                    <TableHead>Order #</TableHead>
-                    <TableHead>Customer</TableHead>
-                    <TableHead>Amount</TableHead>
-                    <TableHead>Status</TableHead>
-                    <TableHead>Payment</TableHead>
-                    <TableHead>Date</TableHead>
-                    <TableHead>Actions</TableHead>
+                    <TableHead className="py-4 font-semibold text-gray-700">Order #</TableHead>
+                    <TableHead className="py-4 font-semibold text-gray-700">Customer</TableHead>
+                    <TableHead className="py-4 font-semibold text-gray-700">Amount</TableHead>
+                    <TableHead className="py-4 font-semibold text-gray-700">Status</TableHead>
+                    <TableHead className="py-4 font-semibold text-gray-700">Payment</TableHead>
+                    <TableHead className="py-4 font-semibold text-gray-700">Date</TableHead>
+                    <TableHead className="text-right py-4 font-semibold text-gray-700">Actions</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {orders.length === 0 ? (
-                    <TableRow>
-                      <TableCell colSpan={8} className="text-center py-12">
-                        <div className="flex flex-col items-center gap-2">
-                          <Package className="h-12 w-12 text-gray-400" />
-                          <p className="text-lg font-medium text-gray-900">
-                            No orders found
-                          </p>
-                          <p className="text-sm text-gray-500">
-                            {orderStatus !== "all"
-                              ? `No orders with status "${orderStatus}". Try selecting "All Status".`
-                              : "There are no orders in the system yet."}
-                          </p>
-                          <p className="text-xs text-gray-400 mt-2">
-                            Total orders in database: {pagination.totalCount}
-                          </p>
+                  {orders.map((order) => (
+                    <TableRow key={order._id} className="hover:bg-gray-50/50 transition-colors">
+                      <TableCell>
+                        <Checkbox
+                          checked={selectedOrders.includes(order._id)}
+                          onCheckedChange={() => toggleOrderSelection(order._id)}
+                        />
+                      </TableCell>
+                      <TableCell className="font-medium text-gray-900">
+                        {order.orderNumber}
+                      </TableCell>
+                      <TableCell>
+                        <div className="flex flex-col">
+                          <span className="font-medium text-gray-900">{order.customerName}</span>
+                          <span className="text-xs text-gray-500">{order.email}</span>
                         </div>
                       </TableCell>
-                    </TableRow>
-                  ) : (
-                    orders.map((order) => (
-                      <TableRow key={order._id}>
-                        <TableCell>
-                          <Checkbox
-                            checked={selectedOrders.includes(order._id)}
-                            onCheckedChange={() =>
-                              toggleOrderSelection(order._id)
-                            }
-                          />
-                        </TableCell>
-                        <TableCell className="font-medium">
-                          {order.orderNumber}
-                        </TableCell>
-                        <TableCell>
-                          <div>
-                            <div>{order.customerName}</div>
-                            <div className="text-sm text-muted-foreground">
-                              {order.email}
-                            </div>
-                          </div>
-                        </TableCell>
-                        <TableCell>
-                          {formatCurrency(order.totalPrice)}
-                        </TableCell>
-                        <TableCell>
-                          <div className="flex items-center gap-2">
-                            <Badge className={getStatusColor(order.status)}>
-                              {order.status}
+                      <TableCell>
+                        <span className="font-semibold text-gray-900">{formatCurrency(order.totalPrice)}</span>
+                      </TableCell>
+                      <TableCell>
+                        <div className="flex items-center gap-2">
+                          <Badge className={`${getStatusColor(order.status)} border-0 font-normal`}>
+                            {order.status.replace(/_/g, " ")}
+                          </Badge>
+                          {(order as any).cancellationRequested && (
+                            <Badge className="bg-red-50 text-red-600 border-red-100 text-[10px] px-1.5 py-0.5 animate-pulse">
+                              Cancellation
                             </Badge>
-                            {(order as any).cancellationRequested && (
-                              <Badge className="bg-orange-100 text-orange-800 text-xs">
-                                ⏳ Cancellation Pending
-                              </Badge>
-                            )}
-                          </div>
-                        </TableCell>
-                        <TableCell className="capitalize">
-                          {order.paymentMethod}
-                        </TableCell>
-                        <TableCell>{formatDate(order.orderDate)}</TableCell>
-                        <TableCell>
-                          <div className="flex items-center gap-1">
-                            <Button
-                              size="sm"
-                              variant="ghost"
-                              onClick={() => handleShowOrderDetails(order)}
-                              title="Show Details"
-                            >
-                              <Eye className="h-4 w-4" />
-                            </Button>
-                          </div>
-                        </TableCell>
-                      </TableRow>
-                    ))
-                  )}
+                          )}
+                        </div>
+                      </TableCell>
+                      <TableCell className="capitalize text-gray-600 text-sm">
+                        {order.paymentMethod.replace(/_/g, " ")}
+                      </TableCell>
+                      <TableCell className="text-gray-600 text-sm">{formatDate(order.orderDate)}</TableCell>
+                      <TableCell className="text-right">
+                        <Button
+                          size="sm"
+                          variant="ghost"
+                          onClick={() => handleShowOrderDetails(order)}
+                          className="hover:text-emerald-600 hover:bg-emerald-50"
+                        >
+                          <Eye className="h-4 w-4" /> <span className="sr-only">View</span>
+                        </Button>
+                      </TableCell>
+                    </TableRow>
+                  ))}
                 </TableBody>
               </Table>
             </Card>
+          ) : (
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+              {orders.map(order => (
+                <OrderCard
+                  key={order._id}
+                  order={order}
+                  selected={selectedOrders.includes(order._id)}
+                  onSelect={toggleOrderSelection}
+                  onViewDetails={handleShowOrderDetails}
+                  getStatusColor={getStatusColor}
+                />
+              ))}
+            </div>
+          )}
 
-            <div className="flex items-center justify-between">
-              <div className="text-sm text-gray-600">
-                Showing {orders.length} of {pagination.totalCount} orders
-                {currentPage > 0 &&
-                  ` (Page ${currentPage + 1} of ${pagination.totalPages})`}
+          {/* Pagination */}
+          {orders.length > 0 && (
+            <div className="flex flex-col sm:flex-row items-center justify-between gap-4 pt-4 border-t">
+              <div className="text-sm text-gray-500">
+                Showing <span className="font-medium text-gray-900">{orders.length}</span> of <span className="font-medium text-gray-900">{pagination.totalCount}</span> orders
               </div>
-              <div className="flex justify-center gap-2">
+              <div className="flex gap-2">
                 <Button
                   onClick={() => handlePageChange(Math.max(0, currentPage - 1))}
                   disabled={currentPage === 0}
                   variant="outline"
+                  size="sm"
+                  className="h-8"
                 >
                   Previous
                 </Button>
+                <div className="flex items-center justify-center px-4 text-sm font-medium">
+                  Page {currentPage + 1}
+                </div>
                 <Button
                   onClick={() => handlePageChange(currentPage + 1)}
                   disabled={!pagination.hasNextPage}
                   variant="outline"
+                  size="sm"
+                  className="h-8"
                 >
                   Next
                 </Button>
               </div>
             </div>
-          </>
-        )}
+          )}
+        </div>
       </div>
 
-      {/* Delete Confirmation Dialog */}
+      {/* Dialogs & Sidebar */}
       <DeleteConfirmationDialog
         isOpen={isDeleteDialogOpen}
         onClose={() => setIsDeleteDialogOpen(false)}
         onConfirm={handleDeleteOrders}
         title="Delete Orders"
-        description={`Are you sure you want to delete ${selectedOrders.length
-          } order${selectedOrders.length > 1 ? "s" : ""
-          }? This action cannot be undone.`}
+        description={`Are you sure you want to delete ${selectedOrders.length} order${selectedOrders.length > 1 ? "s" : ""}?`}
         itemCount={selectedOrders.length}
         isLoading={isDeleting}
       />
 
-      {/* Order Details Sidebar */}
       <OrderDetailsSidebar
         isOpen={isSidebarOpen}
         onClose={handleCloseSidebar}
