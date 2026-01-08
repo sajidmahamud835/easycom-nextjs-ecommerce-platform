@@ -24,7 +24,11 @@ import {
 import { useIsAdmin } from "@/lib/adminUtils";
 import { useUserData } from "@/contexts/UserDataContext";
 
-const UserDropdown = () => {
+interface Props {
+  trigger?: React.ReactNode;
+}
+
+const UserDropdown = ({ trigger }: Props) => {
   const { user } = useUser();
   const { signOut } = useClerk();
   const [open, setOpen] = useState(false);
@@ -52,25 +56,29 @@ const UserDropdown = () => {
   return (
     <Popover open={open} onOpenChange={setOpen}>
       <PopoverTrigger asChild>
-        <button className="flex items-center gap-2 py-1 px-2 rounded-lg hover:bg-shop_light_bg group border border-shop_dark_green/20 hover:border-shop_dark_green hoverEffect">
-          <div className="relative">
-            {user.imageUrl ? (
-              <img
-                src={user.imageUrl}
-                alt={user.fullName || "User"}
-                className="w-8 h-8 rounded-full object-cover border-2 border-shop_light_green/20 group-hover:border-shop_light_green/40 transition-colors"
-              />
-            ) : (
-              <UserCircle className="w-8 h-8 text-gray-500 group-hover:text-shop_light_green transition-colors" />
-            )}
-            <div className="absolute -bottom-1 -right-1 w-3 h-3 bg-green-500 rounded-full border-2 border-white shadow-sm"></div>
-          </div>
-          <div className="hidden lg:flex flex-col items-start">
-            <span className="text-sm font-medium text-gray-800 group-hover:text-shop_light_green transition-colors">
-              {user.firstName || "User"}
-            </span>
-          </div>
-        </button>
+        {trigger ? (
+          trigger
+        ) : (
+          <button className="flex items-center gap-2 py-1 px-2 rounded-lg hover:bg-shop_light_bg group border border-shop_dark_green/20 hover:border-shop_dark_green hoverEffect">
+            <div className="relative">
+              {user.imageUrl ? (
+                <img
+                  src={user.imageUrl}
+                  alt={user.fullName || "User"}
+                  className="w-8 h-8 rounded-full object-cover border-2 border-shop_light_green/20 group-hover:border-shop_light_green/40 transition-colors"
+                />
+              ) : (
+                <UserCircle className="w-8 h-8 text-gray-500 group-hover:text-shop_light_green transition-colors" />
+              )}
+              <div className="absolute -bottom-1 -right-1 w-3 h-3 bg-green-500 rounded-full border-2 border-white shadow-sm"></div>
+            </div>
+            <div className="hidden lg:flex flex-col items-start">
+              <span className="text-sm font-medium text-gray-800 group-hover:text-shop_light_green transition-colors">
+                {user.firstName || "User"}
+              </span>
+            </div>
+          </button>
+        )}
       </PopoverTrigger>
 
       <PopoverContent className="w-72 p-0" align="end" sideOffset={5}>

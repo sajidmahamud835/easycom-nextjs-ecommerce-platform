@@ -16,6 +16,8 @@ import { Category } from "@/sanity.types";
 import SideMenu from "./SideMenu";
 import LocationModal from "./LocationModal";
 import GoogleTranslate from "./GoogleTranslate";
+import { SignInButton, useUser } from "@clerk/nextjs";
+import UserDropdown from "./UserDropdown";
 
 
 interface Props {
@@ -26,6 +28,7 @@ const Header = ({ categories }: Props) => {
   const [category, setCategory] = useState("All");
   const { location, loading, updateLocation } = useLocation();
   const [isLocationModalOpen, setIsLocationModalOpen] = useState(false);
+  const { user } = useUser();
 
   return (
     <header className="sticky top-0 z-50 w-full shadow-md">
@@ -77,8 +80,7 @@ const Header = ({ categories }: Props) => {
           </div>
           <input
             type="text"
-            placeholder="Search for products"
-            className="flex-1 px-3 text-black outline-none placeholder:text-gray-500 h-full"
+            className="flex-1 px-3 text-white outline-none placeholder:text-gray-400 h-full bg-transparent"
           />
           <button className="bg-[#febd69] hover:bg-[#f3a847] px-4 flex items-center justify-center transition-colors">
             <Search className="w-5 h-5 text-gray-800" />
@@ -91,18 +93,38 @@ const Header = ({ categories }: Props) => {
         </div>
 
         {/* Account */}
-        <div className="hidden md:flex flex-col leading-tight hover:ring-1 hover:ring-white p-2 rounded-sm cursor-pointer text-xs transition-all">
-          <span className="text-white">Hello, sign in</span>
-          <span className="font-bold text-sm flex items-center">
-            Account & Lists <ChevronDown className="w-3 h-3 ml-1 opacity-70" />
-          </span>
-        </div>
+        {user ? (
+          <div className="hidden md:flex items-center">
+            <UserDropdown
+              trigger={
+                <div className="flex flex-col leading-tight hover:ring-1 hover:ring-white p-2 rounded-sm cursor-pointer text-xs transition-all">
+                  <span className="text-white">Hello, {user.firstName}</span>
+                  <span className="font-bold text-sm flex items-center">
+                    Account & Lists <ChevronDown className="w-3 h-3 ml-1 opacity-70" />
+                  </span>
+                </div>
+              }
+            />
+          </div>
+        ) : (
+          <SignInButton mode="modal">
+            <div className="hidden md:flex flex-col leading-tight hover:ring-1 hover:ring-white p-2 rounded-sm cursor-pointer text-xs transition-all">
+              <span className="text-white">Hello, sign in</span>
+              <span className="font-bold text-sm flex items-center">
+                Account & Lists <ChevronDown className="w-3 h-3 ml-1 opacity-70" />
+              </span>
+            </div>
+          </SignInButton>
+        )}
 
         {/* Orders */}
-        <div className="hidden md:flex flex-col leading-tight hover:ring-1 hover:ring-white p-2 rounded-sm cursor-pointer text-xs transition-all">
+        <Link
+          href={user ? "/user/orders" : "/sign-in"}
+          className="hidden md:flex flex-col leading-tight hover:ring-1 hover:ring-white p-2 rounded-sm cursor-pointer text-xs transition-all"
+        >
           <span className="text-white">Returns</span>
           <span className="font-bold text-sm">& Orders</span>
-        </div>
+        </Link>
 
         {/* Cart */}
         <Link href="/cart" className="flex items-end font-bold hover:ring-1 hover:ring-white p-2 rounded-sm relative transition-all">
