@@ -403,7 +403,6 @@ export {
   getCategories,
   getAdminCategories,
   getProductBySlug,
-  getBrand,
   getRelatedProducts,
   getOrderById,
 };

@@ -3,7 +3,6 @@ import ProductPageSkeleton from "@/components/ProductPageSkeleton";
 import {
   getProductBySlug,
   getRelatedProducts,
-  getBrand,
 } from "@/sanity/queries";
 import { notFound } from "next/navigation";
 import ProductContent from "@/components/ProductContent";
@@ -14,6 +13,7 @@ import {
   generateProductSchema,
   generateBreadcrumbSchema,
 } from "@/lib/seo";
+import { validateProduct } from "@/lib/productValidation";
 
 type Props = {
   params: Promise<{ slug: string }>;
@@ -21,20 +21,17 @@ type Props = {
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params;
-  const product = await getProductBySlug(slug);
+  const rawProduct = await getProductBySlug(slug);
 
-  if (!product) {
+  if (!rawProduct) {
     return {
       title: "Product Not Found",
       description: "The product you're looking for could not be found.",
     };
   }
 
-  // Fetch brand data if needed
-  const brand = await getBrand(slug);
-  const productWithBrand = { ...product, brand };
-
-  return generateProductMetadata(productWithBrand);
+  // Brand is now included inline in the query
+  return generateProductMetadata(rawProduct as any);
 }
 
 const ProductPage = async ({
@@ -54,37 +51,29 @@ const ProductPage = async ({
 };
 
 const ProductPageContent = async ({ slug }: { slug: string }) => {
-  const product = await getProductBySlug(slug);
+  const rawProduct = await getProductBySlug(slug);
 
-  if (!product) {
+  // Validate product data
+  const validatedProduct = rawProduct ? validateProduct(rawProduct) : null;
+
+  if (!validatedProduct) {
     return notFound();
   }
 
-  // Fetch related data on the server side
-  const categoryIds =
-    product?.categories?.map(
-      (cat: { _ref: string; _type: string; _key: string }) => cat._ref
-    ) || [];
-  const [relatedProducts, brand] = await Promise.all([
-    getRelatedProducts(categoryIds, product?.slug?.current || "", 4),
-    getBrand(product?.slug?.current as string),
-  ]);
-
-  // Convert null values to undefined for TypeScript compatibility
-  const productWithReviews = {
-    ...product,
-    averageRating: product.averageRating ?? undefined,
-    totalReviews: product.totalReviews ?? undefined,
-  };
-
-  const productWithBrand = { ...productWithReviews, brand };
+  // Fetch related products (categories are now resolved in main query)
+  const categoryIds = rawProduct?.categories?.map((cat: any) => cat._id) || [];
+  const relatedProducts = await getRelatedProducts(
+    categoryIds,
+    validatedProduct.slug,
+    4
+  );
 
   // Generate structured data
-  const productSchema = generateProductSchema(productWithBrand);
+  const productSchema = generateProductSchema(rawProduct as any);
   const breadcrumbSchema = generateBreadcrumbSchema([
     { name: "Home", url: "/" },
     { name: "Shop", url: "/shop" },
-    { name: productWithReviews.name || "Product", url: `/product/${slug}` },
+    { name: validatedProduct.name, url: `/product/${slug}` },
   ]);
 
   return (
@@ -104,9 +93,9 @@ const ProductPageContent = async ({ slug }: { slug: string }) => {
       />
 
       <ProductContent
-        product={productWithReviews}
+        product={rawProduct as any}
         relatedProducts={(relatedProducts || []) as unknown as Product[]}
-        brand={brand}
+        brand={rawProduct?.brand || null}
       />
     </>
   );

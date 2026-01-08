@@ -172,6 +172,87 @@ export const productType = defineType({
         }),
       ],
     }),
+    // Product Variants (Inspired by shopping-cost-calculator-js)
+    defineField({
+      name: "variants",
+      title: "Product Variants (Configurable Options)",
+      type: "array",
+      description: "Add configurable options like Memory, Storage, Color, etc.",
+      of: [
+        {
+          type: "object",
+          name: "productVariant",
+          title: "Variant",
+          fields: [
+            defineField({
+              name: "name",
+              type: "string",
+              title: "Option Name",
+              description: "e.g., Memory, Storage, Color",
+              validation: (Rule) => Rule.required(),
+            }),
+            defineField({
+              name: "options",
+              type: "array",
+              title: "Available Options",
+              of: [
+                {
+                  type: "object",
+                  name: "variantOption",
+                  title: "Option",
+                  fields: [
+                    defineField({
+                      name: "label",
+                      type: "string",
+                      title: "Label",
+                      description: "e.g., 8GB, 256GB, Red",
+                      validation: (Rule) => Rule.required(),
+                    }),
+                    defineField({
+                      name: "priceModifier",
+                      type: "number",
+                      title: "Price Change (+/-)",
+                      description: "How much this option adds/subtracts from base price",
+                      initialValue: 0,
+                    }),
+                    defineField({
+                      name: "isDefault",
+                      type: "boolean",
+                      title: "Default Option",
+                      initialValue: false,
+                    }),
+                  ],
+                  preview: {
+                    select: {
+                      title: "label",
+                      subtitle: "priceModifier",
+                    },
+                    prepare({ title, subtitle }) {
+                      return {
+                        title,
+                        subtitle: subtitle ? `+$${subtitle}` : "No extra cost",
+                      };
+                    },
+                  },
+                },
+              ],
+            }),
+          ],
+          preview: {
+            select: {
+              title: "name",
+              options: "options",
+            },
+            prepare({ title, options }) {
+              return {
+                title,
+                subtitle: `${options?.length || 0} options`,
+              };
+            },
+          },
+        },
+      ],
+    }),
   ],
   preview: {
     select: {
