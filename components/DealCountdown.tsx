@@ -38,7 +38,7 @@ const DealCountdown = () => {
 
   const TimeUnit = ({ value, label }: { value: number; label: string }) => (
     <div className="flex flex-col items-center bg-white rounded-lg p-2 sm:p-3 shadow-md border">
-      <span className="text-lg sm:text-2xl md:text-3xl font-bold text-shop_dark_green">
+      <span className="text-lg sm:text-2xl md:text-3xl font-bold text-gray-900">
         {value.toString().padStart(2, "0")}
       </span>
       <span className="text-xs sm:text-sm text-gray-600 font-medium">
@@ -49,7 +49,7 @@ const DealCountdown = () => {
 
   return (
     <div className="flex items-center gap-2 sm:gap-4">
-      <div className="flex items-center gap-1 sm:gap-2 text-red-600">
+      <div className="flex items-center gap-1 sm:gap-2 text-red-700">
         <Timer className="w-4 h-4 sm:w-5 sm:h-5" />
         <span className="text-sm sm:text-base font-semibold">
           Deal Ends In:
