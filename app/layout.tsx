@@ -8,24 +8,27 @@ import { UserDataProvider } from "@/contexts/UserDataContext";
 
 import "./globals.css";
 
-import "./globals.css";
-
 const poppins = localFont({
   src: "./fonts/Poppins.woff2",
   variable: "--font-poppins",
   weight: "400",
-  preload: false,
+  display: "swap",
+  preload: true,
 });
 const raleway = localFont({
   src: "./fonts/Raleway.woff2",
   variable: "--font-raleway",
   weight: "100 900",
+  display: "swap",
+  preload: true,
 });
 
 const opensans = localFont({
   src: "./fonts/Open Sans.woff2",
   variable: "--font-open-sans",
   weight: "100 800",
+  display: "swap",
+  preload: true,
 });
 
 export const metadata: Metadata = {

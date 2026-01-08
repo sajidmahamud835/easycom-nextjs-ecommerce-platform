@@ -67,7 +67,9 @@ const TodaysDeals = () => {
                                             src={product.images?.[0] ? urlFor(product.images[0]).url() : PLACEHOLDER_IMAGE}
                                             alt={product.name || "Deal Product"}
                                             fill
+                                            sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 20vw"
                                             className="object-contain mix-blend-multiply p-4 transition-transform group-hover:scale-105"
+                                            loading="lazy"
                                             onError={(e) => { (e.target as HTMLImageElement).src = PLACEHOLDER_IMAGE; }}
                                         />
                                     </div>

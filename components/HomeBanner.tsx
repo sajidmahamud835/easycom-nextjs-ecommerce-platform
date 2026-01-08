@@ -93,10 +93,11 @@ const HomeBanner = () => {
                   src={banner.image}
                   alt={banner.title}
                   fill
+                  sizes="(max-width: 768px) 100vw, (max-width: 1200px) 80vw, 1200px"
                   className="object-cover"
-                  // Prioritize only the first image (visible in viewport) to improve LCP
-                  // Lazy load subsequent images (default behavior) to save bandwidth
                   priority={index === 0}
+                  loading={index === 0 ? "eager" : "lazy"}
+                  fetchPriority={index === 0 ? "high" : "auto"}
                 />
                 {/* Gradient Overlay */}
                 <div className={`absolute inset-0 bg-gradient-to-r ${banner.gradient}`} />

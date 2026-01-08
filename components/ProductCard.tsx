@@ -49,8 +49,10 @@ const ProductCard = memo(({ product, priority = false }: Props) => {
             src={imageUrl}
             alt={product?.name || "Product Image"}
             fill
+            sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 20vw"
             className="object-contain drop-shadow-sm"
             priority={priority}
+            loading={priority ? "eager" : "lazy"}
             onError={() => setImgError(true)}
           />
         </Link>
