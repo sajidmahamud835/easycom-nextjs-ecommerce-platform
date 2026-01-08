@@ -61,6 +61,7 @@ To create a unified commerce platform that seamlessly handles both consumer shop
 - 🎰 **Hidden Jackpot System** — "Flash Deal Injection" using implicit variable ratio reinforcement (Casino Psychology).
 
 
+
 ### 🔵 Planned Features
 
 - 📝 Review moderation tools
