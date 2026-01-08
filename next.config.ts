@@ -29,12 +29,16 @@ const nextConfig: NextConfig = {
 
   // Experimental performance features
   experimental: {
+    // ✅ Enable Partial Prerendering for faster page loads
+    ppr: "incremental",
     // Enable package optimization
     optimizePackageImports: [
       "lucide-react",
       "@radix-ui/react-icons",
       "framer-motion",
       "motion",
+      "recharts",
+      "date-fns",
     ],
   },
 
