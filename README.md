@@ -265,6 +265,8 @@ We believe in documenting not just the code, but the engineering philosophy behi
 
 | Date | Description | Status |
 |------|-------------|--------|
+| 2026-01-08 | **Hidden Jackpot**: Gamification system with "Flash Deal Injection". | ✅ Released |
+| 2026-01-08 | **Bug Fix**: Resolved critical 404 error on Single Product Pages (Cache Collision). | ✅ Fixed |
 | 2026-01-08 | **Gift Card System**: Full purchase and redemption flow with Stripe integration. | ✅ Released |
 | 2026-01-08 | **Seller Onboarding**: Dedicated page for new sellers to apply (`/sell`). | ✅ Released |
 | 2026-01-07 | **Customer Service**: Ticketing system for support inquiries. | ✅ Released |
