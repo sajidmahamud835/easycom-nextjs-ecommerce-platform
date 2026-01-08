@@ -142,8 +142,7 @@ const RelatedProducts = memo(({ relatedProducts }: RelatedProductsProps) => {
       {/* View More Button */}
       <div className="text-center mt-8">
         <Button
-          variant="outline"
-          className="border-shop_dark_green text-shop_dark_green hover:bg-shop_dark_green hover:text-white transition-colors duration-300"
+          className="bg-emerald-600 hover:bg-emerald-700 text-white shadow-md hover:shadow-lg px-8 py-3 rounded-xl font-semibold"
           asChild
         >
           <Link href="/shop">View More Products</Link>
