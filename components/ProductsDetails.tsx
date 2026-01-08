@@ -9,22 +9,19 @@ const ProductsDetails = () => {
           <span className="w-1 h-6 bg-shop_orange rounded-full"></span>
           Description
         </h2>
-        <div className="prose prose-sm max-w-none text-gray-600">
+        <div className="prose prose-sm max-w-none text-gray-700">
           <p className="mb-4">
-            In ducimus quod sed eum repellendus ea fugiat. Pariatur et illo at
-            iure harum. Molestiae a itaque voluptas explicabo praesentium.
-            Possimus omnis aut architecto et. Repellendus ab ipsa in non
-            doloremque tenetur est doloremque.
+            Experience premium quality with this exceptional product designed for modern lifestyles.
+            Built with durable materials and precision engineering, it delivers reliable performance
+            for everyday use.
           </p>
           <p className="mb-4">
-            Quam in facere soluta consequatur voluptatem beatae asperiores. Qui
-            quia itaque illo eos quibusdam voluptatem et. Est aut deserunt iste.
-            Et ipsum eius ut odit deleniti.
+            Key features include advanced technology integration, ergonomic design, and energy-efficient
+            operation. Whether for work or leisure, this product adapts seamlessly to your needs.
           </p>
           <p>
-            Officia praesentium ipsam perferendis possimus ex culpa voluptatem
-            dolore. Aut id sit et vitae. Quis unde doloremque quisquam facere.
-            In qui eos est voluptatem repudiandae blanditiis consequatur.
+            Backed by our comprehensive warranty and dedicated customer support, you can purchase with
+            confidence. Join thousands of satisfied customers who have made this their product of choice.
           </p>
         </div>
       </div>

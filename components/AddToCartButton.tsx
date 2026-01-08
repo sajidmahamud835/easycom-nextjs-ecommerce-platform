@@ -89,7 +89,8 @@ const AddToCartButton = memo(({ product, className }: Props) => {
           onClick={handleAddToCart}
           disabled={isOutOfStock}
           className={cn(
-            "w-full bg-shop_dark_green/80 text-light-bg shadow-none border border-shop_dark_green/80 font-semibold tracking-wide hover:text-white hover:bg-shop_dark_green hover:border-shop_dark_green hoverEffect",
+            "w-full bg-[#F79F1F] text-black font-bold shadow-lg border-none hover:bg-[#e8920f] focus:ring-2 focus:ring-[#F79F1F] focus:ring-offset-2 transition-all",
+            isOutOfStock && "bg-gray-300 text-gray-500 cursor-not-allowed",
             className
           )}
         >

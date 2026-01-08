@@ -180,11 +180,10 @@ const ProductReviews = React.memo(
                       <StarIcon
                         key={index}
                         size={20}
-                        className={`${
-                          index < Math.floor(averageRating)
+                        className={`${index < Math.floor(averageRating)
                             ? "text-shop_light_green fill-shop_light_green"
                             : "text-gray-300"
-                        }`}
+                          }`}
                       />
                     ))}
                   </div>
@@ -192,9 +191,8 @@ const ProductReviews = React.memo(
                 <p className="text-gray-600">
                   {totalReviews === 0
                     ? "No reviews yet"
-                    : `Based on ${totalReviews} ${
-                        totalReviews === 1 ? "review" : "reviews"
-                      }`}
+                    : `Based on ${totalReviews} ${totalReviews === 1 ? "review" : "reviews"
+                    }`}
                 </p>
                 {isSignedIn ? (
                   canReview ? (
@@ -217,27 +215,29 @@ const ProductReviews = React.memo(
                 )}
               </div>
 
-              {/* Rating Distribution */}
-              <div className="space-y-2">
-                {ratingData.map((rating) => {
-                  const percentage =
-                    totalReviews > 0 ? (rating.count / totalReviews) * 100 : 0;
-                  return (
-                    <div key={rating.stars} className="flex items-center gap-2">
-                      <span className="text-sm w-8">{rating.stars}★</span>
-                      <div className="flex-1 h-2 bg-gray-200 rounded-full overflow-hidden">
-                        <div
-                          className="h-full bg-shop_light_green rounded-full transition-all duration-300"
-                          style={{ width: `${percentage}%` }}
-                        />
+              {/* Rating Distribution - Only show when reviews exist */}
+              {totalReviews > 0 && (
+                <div className="space-y-2">
+                  {ratingData.map((rating) => {
+                    const percentage =
+                      totalReviews > 0 ? (rating.count / totalReviews) * 100 : 0;
+                    return (
+                      <div key={rating.stars} className="flex items-center gap-2">
+                        <span className="text-sm w-8">{rating.stars}★</span>
+                        <div className="flex-1 h-2 bg-gray-200 rounded-full overflow-hidden">
+                          <div
+                            className="h-full bg-shop_light_green rounded-full transition-all duration-300"
+                            style={{ width: `${percentage}%` }}
+                          />
+                        </div>
+                        <span className="text-sm text-gray-600 w-8">
+                          {rating.count}
+                        </span>
                       </div>
-                      <span className="text-sm text-gray-600 w-8">
-                        {rating.count}
-                      </span>
-                    </div>
-                  );
-                })}
-              </div>
+                    );
+                  })}
+                </div>
+              )}
             </div>
 
             {/* Individual Reviews */}
@@ -293,11 +293,10 @@ const ProductReviews = React.memo(
                               <StarIcon
                                 key={index}
                                 size={14}
-                                className={`${
-                                  index < review.rating
+                                className={`${index < review.rating
                                     ? "text-shop_light_green fill-shop_light_green"
                                     : "text-gray-300"
-                                }`}
+                                  }`}
                               />
                             ))}
                           </div>
