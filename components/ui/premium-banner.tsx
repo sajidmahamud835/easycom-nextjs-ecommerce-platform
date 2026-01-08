@@ -48,7 +48,7 @@ export default function PremiumBanner({
   };
 
   return (
-    <div className="relative bg-gradient-to-r from-shop_light_green to-shop_dark_green text-white rounded-lg p-4 mb-6 shadow-lg">
+    <div className="relative bg-gradient-to-r from-emerald-500 to-emerald-800 text-white rounded-lg p-4 mb-6 shadow-lg">
       {onDismiss && (
         <button
           onClick={onDismiss}
@@ -98,7 +98,7 @@ export default function PremiumBanner({
           <Button
             onClick={handleRegister}
             disabled={isRegistering}
-            className="bg-white text-shop_dark_green hover:bg-white/90 font-semibold"
+            className="bg-white text-emerald-800 hover:bg-white/90 font-semibold"
           >
             {isRegistering ? "Registering..." : "Apply for Premium Services"}
           </Button>
