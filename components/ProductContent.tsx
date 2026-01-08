@@ -69,8 +69,10 @@ const ProductContent = ({
       // Personalization
       trackInteraction(product._id);
       if (product.categories) {
-        product.categories.forEach((cat) => {
-          if (cat._ref) trackCategoryView(cat._ref);
+        product.categories.forEach((cat: any) => {
+          // Handle both resolved categories (_id) and references (_ref)
+          const categoryId = cat._id || cat._ref;
+          if (categoryId) trackCategoryView(categoryId);
         });
       }
     }
