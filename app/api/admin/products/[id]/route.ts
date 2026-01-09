@@ -1,8 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { auth, clerkClient } from "@clerk/nextjs/server";
 import { isUserAdmin } from "@/lib/adminUtils";
-import { writeClient } from "@/sanity/lib/writeClient";
-import { client } from "@/sanity/lib/client";
+import { writeClient, client } from "@/sanity/lib/client";
 
 interface RouteParams {
     params: Promise<{ id: string }>;
