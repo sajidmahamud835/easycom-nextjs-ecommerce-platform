@@ -251,7 +251,11 @@ const AdminProducts: React.FC<AdminProductsProps> = ({
           </div>
           <div className="flex flex-wrap items-center gap-3">
             <Button
-              onClick={() => window.open('/studio/structure/product', '_blank')}
+              onClick={() => {
+                setSelectedProduct({} as Product);
+                setIsEditMode(true);
+                setIsProductDetailsOpen(true);
+              }}
               className="bg-white/20 hover:bg-white/30 text-white border-0 rounded-xl"
             >
               <Package className="h-4 w-4 mr-2" />
