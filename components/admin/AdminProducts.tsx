@@ -320,7 +320,21 @@ const AdminProducts: React.FC<AdminProductsProps> = ({
                           colSpan={7}
                           className="text-center py-12 text-gray-400"
                         >
-                          No products found.
+                          <div className="flex flex-col items-center gap-3">
+                            <span>No products found.</span>
+                            <Button
+                              variant="outline"
+                              onClick={() => {
+                                setSelectedProduct({} as Product);
+                                setIsEditMode(true);
+                                setIsProductDetailsOpen(true);
+                              }}
+                              className="border-dashed"
+                            >
+                              <Plus className="h-4 w-4 mr-2" />
+                              Add Product
+                            </Button>
+                          </div>
                         </TableCell>
                       </TableRow>
                     ) : (
@@ -410,8 +424,20 @@ const AdminProducts: React.FC<AdminProductsProps> = ({
           <div className="md:hidden space-y-4">
             {products.length === 0 ? (
               <Card className="border-0 shadow-lg rounded-2xl">
-                <div className="p-12 text-center text-gray-400">
-                  No products found.
+                <div className="p-12 text-center text-gray-400 flex flex-col items-center gap-3">
+                  <span>No products found.</span>
+                  <Button
+                    variant="outline"
+                    onClick={() => {
+                      setSelectedProduct({} as Product);
+                      setIsEditMode(true);
+                      setIsProductDetailsOpen(true);
+                    }}
+                    className="border-dashed"
+                  >
+                    <Plus className="h-4 w-4 mr-2" />
+                    Add Product
+                  </Button>
                 </div>
               </Card>
             ) : (
