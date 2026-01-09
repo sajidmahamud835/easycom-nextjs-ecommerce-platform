@@ -338,22 +338,7 @@ export const UsersSkeleton = () => (
 // Products Page Skeleton
 export const ProductsSkeleton = () => (
   <div className="space-y-6">
-    {/* Modern Gradient Header Skeleton */}
-    <div className="bg-gradient-to-r from-violet-600 via-purple-600 to-fuchsia-500 rounded-2xl p-6 shadow-xl">
-      <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
-        <div className="flex items-center gap-4">
-          <Skeleton className="w-14 h-14 rounded-xl bg-white/20" />
-          <div className="space-y-2">
-            <Skeleton className="h-7 w-48 bg-white/20" />
-            <Skeleton className="h-4 w-64 bg-white/20" />
-          </div>
-        </div>
-        <div className="flex gap-3">
-          <Skeleton className="h-10 w-32 rounded-xl bg-white/20" />
-          <Skeleton className="h-10 w-12 rounded-xl bg-white/20" />
-        </div>
-      </div>
-    </div>
+
 
     {/* Search and Filters Bar Skeleton */}
     <div className="bg-white p-4 rounded-2xl shadow-lg border border-gray-100">
