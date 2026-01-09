@@ -31,6 +31,8 @@ const AdminOrders: React.FC = () => {
   const [orderStatus, setOrderStatus] = useState("all");
   const [searchQuery, setSearchQuery] = useState("");
   const [viewMode, setViewMode] = useState<"list" | "grid">("list");
+  const [startDate, setStartDate] = useState("");
+  const [endDate, setEndDate] = useState("");
 
   const [selectedOrders, setSelectedOrders] = useState<string[]>([]);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
@@ -102,32 +104,41 @@ const AdminOrders: React.FC = () => {
 
   // Fetch orders
   const fetchOrders = useCallback(
-    async (page = 0) => {
+    async (page: number) => {
       setLoading(true);
       try {
-        const statusParam = orderStatus === "all" ? "" : orderStatus;
-        const timestamp = Date.now(); // Add timestamp to bust cache
-        const searchParam = debouncedSearch ? `&search=${encodeURIComponent(debouncedSearch)}` : "";
-
-        const url = `/api/admin/orders?limit=${limit}&offset=${page * limit
-          }&status=${statusParam}${searchParam}&_t=${timestamp}`;
-
-        const data = await safeApiCall(url);
-
-        setOrders(data.orders);
-        setPagination({
-          totalCount: data.totalCount,
-          hasNextPage: data.hasNextPage,
-          totalPages: data.pagination.totalPages,
+        const queryParams = new URLSearchParams({
+          limit: perPage,
+          offset: (page * parseInt(perPage)).toString(),
+          status: orderStatus === "all" ? "" : orderStatus,
+          startDate,
+          endDate,
         });
+
+        const response = await fetch(`/api/admin/orders?${queryParams}`);
+        const data = await response.json();
+
+        if (response.ok) {
+          if (searchQuery) {
+            const filtered = data.orders.filter((order: Order) =>
+              order.orderNumber.toLowerCase().includes(searchQuery.toLowerCase()) ||
+              order.customerName.toLowerCase().includes(searchQuery.toLowerCase()) ||
+              order.email.toLowerCase().includes(searchQuery.toLowerCase())
+            );
+            setOrders(filtered);
+            setPagination({ ...data.pagination, totalCount: filtered.length });
+          } else {
+            setOrders(data.orders);
+            setPagination(data.pagination);
+          }
+        }
       } catch (error) {
-        console.error("Error in fetchOrders:", error);
-        handleApiError(error, "Orders fetch");
+        console.error("Failed to fetch orders", error);
       } finally {
         setLoading(false);
       }
     },
-    [orderStatus, limit, debouncedSearch]
+    [perPage, orderStatus, startDate, endDate, searchQuery]
   );
 
   // Fetch orders when dependencies change
@@ -136,493 +147,442 @@ const AdminOrders: React.FC = () => {
   }, [fetchOrders, currentPage]);
 
   // Reset page when filters change
+  // Reset page when filters change
   useEffect(() => {
     setCurrentPage(0);
-    const [startDate, setStartDate] = useState("");
-    const [endDate, setEndDate] = useState("");
+    setSelectedOrders([]);
+  }, [orderStatus, perPage, debouncedSearch, startDate, endDate]);
 
-    const fetchOrders = useCallback(
-      async (page: number) => {
-        setLoading(true);
+
+
+  const handleDateChange = (start: string, end: string) => {
+    setStartDate(start);
+    setEndDate(end);
+  };
+
+  const handleExportCSV = () => {
+    const ordersToExport = orders.filter(o => selectedOrders.includes(o._id));
+    if (ordersToExport.length === 0) return;
+
+    const headers = ["Order Number", "Date", "Customer", "Email", "Status", "Total", "Payment Method"];
+    const csvContent = [
+      headers.join(","),
+      ...ordersToExport.map(order => [
+        order.orderNumber,
+        new Date(order.orderDate).toLocaleDateString(),
+        `"${order.customerName}"`,
+        order.email,
+        order.status,
+        order.totalPrice,
+        order.paymentMethod
+      ].join(","))
+    ].join("\n");
+
+    const blob = new Blob([csvContent], { type: "text/csv" });
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `orders_export_${new Date().toISOString().split('T')[0]}.csv`;
+    a.click();
+    window.URL.revokeObjectURL(url);
+  };
+
+  // Selection functions
+  const toggleOrderSelection = useCallback((orderId: string) => {
+    setSelectedOrders((prev) =>
+      prev.includes(orderId)
+        ? prev.filter((id) => id !== orderId)
+        : [...prev, orderId]
+    );
+  }, []);
+
+  const toggleSelectAll = useCallback(() => {
+    if (selectedOrders.length === orders.length && orders.length > 0) {
+      setSelectedOrders([]);
+    } else {
+      setSelectedOrders(orders.map((order) => order._id));
+    }
+  }, [selectedOrders.length, orders]);
+
+  // Order details functions
+  const handleShowOrderDetails = async (order: Order) => {
+    setIsSidebarOpen(true);
+    setIsLoadingOrderDetails(true);
+    setSelectedOrder(null); // Clear previous order
+
+    try {
+      // Fetch complete order details from the individual order API
+      const response = await fetch(`/api/admin/orders/${order._id}`);
+      if (!response.ok) {
+        throw new Error("Failed to fetch order details");
+      }
+
+      const data = await response.json();
+      setSelectedOrder(data.order);
+    } catch (error) {
+      console.error("Error fetching order details:", error);
+      handleApiError(error, "Order details fetch");
+      // Fall back to the basic order data from the list
+      setSelectedOrder(order);
+    } finally {
+      setIsLoadingOrderDetails(false);
+    }
+  };
+
+  const handleCloseSidebar = () => {
+    setIsSidebarOpen(false);
+    setSelectedOrder(null);
+    setIsLoadingOrderDetails(false);
+    // Fetch latest orders when sidebar closes to reflect any updates
+    fetchOrders(currentPage);
+  };
+
+  const handleOrderUpdate = async (updatedOrderId?: string) => {
+    setIsRefreshing(true);
+    try {
+      // Small delay to ensure Sanity has processed the update
+      await new Promise((resolve) => setTimeout(resolve, 200));
+
+      // Refresh orders list from server to ensure consistency
+      await fetchOrders(currentPage);
+
+      // Also refresh the selected order details if sidebar is still open
+      if (selectedOrder && isSidebarOpen && updatedOrderId) {
         try {
-          const queryParams = new URLSearchParams({
-            limit: perPage,
-            offset: (page * parseInt(perPage)).toString(),
-            status: orderStatus === "all" ? "" : orderStatus,
-            startDate,
-            endDate,
-          });
-
-          const response = await fetch(`/api/admin/orders?${queryParams}`);
-          const data = await response.json();
-
-          if (response.ok) {
-            if (searchQuery) {
-              // Client-side search filtering (since Sanity search is complex to combine with filters efficiently in one go without advanced GROQ)
-              // Or ideally, we should pass search to API. Let's assume API doesn't handle search text yet for simplicity in this prompt context, 
-              // but for "Modern Dashboard" we should probably do it. 
-              // The existing code didn't send search to API? 
-              // Looking at previous fetchOrders... it wasn't shown fully. 
-              // But let's assume we filter on client for search if API doesn't support it, or push it later.
-              // Actually, let's keep it simple and just update the params we know.
-              const filtered = data.orders.filter((order: Order) =>
-                order.orderNumber.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                order.customerName.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                order.email.toLowerCase().includes(searchQuery.toLowerCase())
-              );
-              setOrders(filtered);
-              setPagination({ ...data.pagination, totalCount: filtered.length });
-            } else {
-              setOrders(data.orders);
-              setPagination(data.pagination);
-            }
+          const timestamp = Date.now();
+          const updatedOrderData = await safeApiCall(
+            `/api/admin/orders/${updatedOrderId}?_t=${timestamp}`
+          );
+          if (updatedOrderData?.order) {
+            setSelectedOrder(updatedOrderData.order);
           }
         } catch (error) {
-          console.error("Failed to fetch orders", error);
-        } finally {
-          setLoading(false);
+          console.error("Error refreshing order details:", error);
         }
-      },
-      [perPage, orderStatus, startDate, endDate, searchQuery]
-    );
+      }
+    } catch (error) {
+      console.error("Error updating orders:", error);
+    } finally {
+      setIsRefreshing(false);
+    }
+  };
 
-    useEffect(() => {
-      fetchOrders(currentPage);
-    }, [fetchOrders, currentPage]);
+  // Pagination functions
+  const handlePageChange = (newPage: number) => {
+    setCurrentPage(newPage);
+    setSelectedOrders([]); // Clear selections when changing page
+  };
 
-    useEffect(() => {
-      setCurrentPage(0);
+  // Delete functions
+  const openDeleteDialog = () => {
+    setIsDeleteDialogOpen(true);
+  };
+
+  const handleDeleteOrders = async () => {
+    setIsDeleting(true);
+    try {
+      const timestamp = Date.now();
+      await safeApiCall(`/api/admin/orders?_t=${timestamp}`, {
+        method: "DELETE",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ orderIds: selectedOrders }),
+      });
+
+      setIsDeleteDialogOpen(false);
       setSelectedOrders([]);
-    }, [orderStatus, perPage, debouncedSearch, startDate, endDate]);
 
-    const handleDateChange = (start: string, end: string) => {
-      setStartDate(start);
-      setEndDate(end);
-    };
+      const newTotal = Math.max(0, pagination.totalCount - selectedOrders.length);
+      const newTotalPages = Math.ceil(newTotal / limit);
 
-    const handleExportCSV = () => {
-      const ordersToExport = orders.filter(o => selectedOrders.includes(o._id));
-      if (ordersToExport.length === 0) return;
-
-      const headers = ["Order Number", "Date", "Customer", "Email", "Status", "Total", "Payment Method"];
-      const csvContent = [
-        headers.join(","),
-        ...ordersToExport.map(order => [
-          order.orderNumber,
-          new Date(order.orderDate).toLocaleDateString(),
-          `"${order.customerName}"`,
-          order.email,
-          order.status,
-          order.totalPrice,
-          order.paymentMethod
-        ].join(","))
-      ].join("\n");
-
-      const blob = new Blob([csvContent], { type: "text/csv" });
-      const url = window.URL.createObjectURL(blob);
-      const a = document.createElement("a");
-      a.href = url;
-      a.download = `orders_export_${new Date().toISOString().split('T')[0]}.csv`;
-      a.click();
-      window.URL.revokeObjectURL(url);
-    };
-
-    // Selection functions
-    const toggleOrderSelection = useCallback((orderId: string) => {
-      setSelectedOrders((prev) =>
-        prev.includes(orderId)
-          ? prev.filter((id) => id !== orderId)
-          : [...prev, orderId]
-      );
-    }, []);
-
-    const toggleSelectAll = useCallback(() => {
-      if (selectedOrders.length === orders.length && orders.length > 0) {
-        setSelectedOrders([]);
+      // If we deleted everything on the current page, go back one page if possible
+      if (currentPage >= newTotalPages && currentPage > 0) {
+        setCurrentPage(Math.max(0, currentPage - 1));
       } else {
-        setSelectedOrders(orders.map((order) => order._id));
-      }
-    }, [selectedOrders.length, orders]);
-
-    // Order details functions
-    const handleShowOrderDetails = async (order: Order) => {
-      setIsSidebarOpen(true);
-      setIsLoadingOrderDetails(true);
-      setSelectedOrder(null); // Clear previous order
-
-      try {
-        // Fetch complete order details from the individual order API
-        const response = await fetch(`/api/admin/orders/${order._id}`);
-        if (!response.ok) {
-          throw new Error("Failed to fetch order details");
-        }
-
-        const data = await response.json();
-        setSelectedOrder(data.order);
-      } catch (error) {
-        console.error("Error fetching order details:", error);
-        handleApiError(error, "Order details fetch");
-        // Fall back to the basic order data from the list
-        setSelectedOrder(order);
-      } finally {
-        setIsLoadingOrderDetails(false);
-      }
-    };
-
-    const handleCloseSidebar = () => {
-      setIsSidebarOpen(false);
-      setSelectedOrder(null);
-      setIsLoadingOrderDetails(false);
-      // Fetch latest orders when sidebar closes to reflect any updates
-      fetchOrders(currentPage);
-    };
-
-    const handleOrderUpdate = async (updatedOrderId?: string) => {
-      setIsRefreshing(true);
-      try {
-        // Small delay to ensure Sanity has processed the update
-        await new Promise((resolve) => setTimeout(resolve, 200));
-
-        // Refresh orders list from server to ensure consistency
+        // Just refresh current page
         await fetchOrders(currentPage);
-
-        // Also refresh the selected order details if sidebar is still open
-        if (selectedOrder && isSidebarOpen && updatedOrderId) {
-          try {
-            const timestamp = Date.now();
-            const updatedOrderData = await safeApiCall(
-              `/api/admin/orders/${updatedOrderId}?_t=${timestamp}`
-            );
-            if (updatedOrderData?.order) {
-              setSelectedOrder(updatedOrderData.order);
-            }
-          } catch (error) {
-            console.error("Error refreshing order details:", error);
-          }
-        }
-      } catch (error) {
-        console.error("Error updating orders:", error);
-      } finally {
-        setIsRefreshing(false);
       }
-    };
 
-    // Pagination functions
-    const handlePageChange = (newPage: number) => {
-      setCurrentPage(newPage);
-      setSelectedOrders([]); // Clear selections when changing page
-    };
+    } catch (error) {
+      handleApiError(error, "Orders delete");
+    } finally {
+      setIsDeleting(false);
+    }
+  };
 
-    // Delete functions
-    const openDeleteDialog = () => {
-      setIsDeleteDialogOpen(true);
-    };
-
-    const handleDeleteOrders = async () => {
-      setIsDeleting(true);
-      try {
-        const timestamp = Date.now();
-        await safeApiCall(`/api/admin/orders?_t=${timestamp}`, {
-          method: "DELETE",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ orderIds: selectedOrders }),
-        });
-
-        setIsDeleteDialogOpen(false);
-        setSelectedOrders([]);
-
-        const newTotal = Math.max(0, pagination.totalCount - selectedOrders.length);
-        const newTotalPages = Math.ceil(newTotal / limit);
-
-        // If we deleted everything on the current page, go back one page if possible
-        if (currentPage >= newTotalPages && currentPage > 0) {
-          setCurrentPage(Math.max(0, currentPage - 1));
-        } else {
-          // Just refresh current page
-          await fetchOrders(currentPage);
-        }
-
-      } catch (error) {
-        handleApiError(error, "Orders delete");
-      } finally {
-        setIsDeleting(false);
-      }
-    };
-
-    // Manual refresh handler
-    const handleRefresh = useCallback(async () => {
-      setIsRefreshing(true);
-      try {
-        setDebouncedSearch(""); // optional: clear search on hard refresh
-        setSearchQuery("");
-        await fetchOrders(0);
-        setCurrentPage(0);
-      } finally {
-        setIsRefreshing(false);
-      }
-    }, [fetchOrders]);
+  // Manual refresh handler
+  const handleRefresh = useCallback(async () => {
+    setIsRefreshing(true);
+    try {
+      setDebouncedSearch(""); // optional: clear search on hard refresh
+      setSearchQuery("");
+      await fetchOrders(0);
+      setCurrentPage(0);
+    } finally {
+      setIsRefreshing(false);
+    }
+  }, [fetchOrders]);
 
 
-    return (
-      <>
-        <div className="space-y-6 p-6 bg-gray-50/50 min-h-screen">
-          {/* Header Section */}
-          <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-            <div>
-              <h1 className="text-2xl font-bold text-gray-900">Orders Management</h1>
-              <p className="text-sm text-gray-500">View and manage all customer orders</p>
-            </div>
-            <div className="flex items-center gap-3">
-              <div className="bg-white border rounded-lg p-1 flex items-center shadow-sm">
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  className={`h-8 px-2 ${viewMode === 'list' ? 'bg-gray-100 text-gray-900' : 'text-gray-500'}`}
-                  onClick={() => setViewMode('list')}
-                >
-                  <List className="w-4 h-4 mr-1" /> List
-                </Button>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  className={`h-8 px-2 ${viewMode === 'grid' ? 'bg-gray-100 text-gray-900' : 'text-gray-500'}`}
-                  onClick={() => setViewMode('grid')}
-                >
-                  <LayoutGrid className="w-4 h-4 mr-1" /> Grid
-                </Button>
-              </div>
-              <Link href="/admin/orders/create">
-                <Button className="bg-emerald-600 hover:bg-emerald-700 shadow-sm">
-                  <Plus className="h-4 w-4 mr-2" /> Create Order
-                </Button>
-              </Link>
-            </div>
+  return (
+    <>
+      <div className="space-y-6 p-6 bg-gray-50/50 min-h-screen">
+        {/* Header Section */}
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+          <div>
+            <h1 className="text-2xl font-bold text-gray-900">Orders Management</h1>
+            <p className="text-sm text-gray-500">View and manage all customer orders</p>
           </div>
-
-          {/* Stats Cards */}
-          <OrderStats />
-
-          {/* Filter Bar */}
-          <OrderFilterBar
-            status={orderStatus}
-            onStatusChange={setOrderStatus}
-            searchQuery={searchQuery}
-            onSearchChange={setSearchQuery}
-            perPage={perPage}
-            onPerPageChange={setPerPage}
-            onRefresh={handleRefresh}
-            isRefreshing={isRefreshing}
-            startDate={startDate}
-            endDate={endDate}
-            onDateChange={handleDateChange}
-            onReset={() => {
-              setOrderStatus("all");
-              setSearchQuery("");
-              setPerPage("20");
-              setStartDate("");
-              setEndDate("");
-            }}
-          />
-
-          {/* Main Content */}
-          <div className="space-y-4">
-            {/* Selection Toolbar */}
-            {selectedOrders.length > 0 && (
-              <div className="flex items-center justify-between bg-blue-50 p-3 rounded-xl border border-blue-100 shadow-sm animate-in fade-in slide-in-from-top-2">
-                <span className="text-sm font-medium text-blue-900 px-2">
-                  {selectedOrders.length} order{selectedOrders.length > 1 ? "s" : ""} selected
-                </span>
-                <div className="flex items-center gap-2">
-                  <Button
-                    onClick={handleExportCSV}
-                    variant="outline"
-                    size="sm"
-                    className="gap-2 shadow-sm bg-white hover:bg-gray-50 border-blue-200 text-blue-700 hover:text-blue-800"
-                  >
-                    <Download className="h-4 w-4" />
-                    Export CSV
-                  </Button>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    className="gap-2 shadow-sm bg-white hover:bg-gray-50 border-blue-200 text-blue-700 hover:text-blue-800"
-                  >
-                    <Printer className="h-4 w-4" />
-                    Print
-                  </Button>
-                  <Button
-                    onClick={openDeleteDialog}
-                    variant="destructive"
-                    size="sm"
-                    className="gap-2 shadow-sm"
-                  >
-                    <Trash2 className="h-4 w-4" />
-                    Delete
-                  </Button>
-                </div>
-              </div>
-            )}
-
-            {loading ? (
-              <OrdersSkeleton />
-            ) : orders.length === 0 ? (
-              <div className="bg-white rounded-xl border border-dashed border-gray-300 p-12 flex flex-col items-center justify-center text-center">
-                <div className="bg-gray-50 p-4 rounded-full mb-4">
-                  <Package className="h-8 w-8 text-gray-400" />
-                </div>
-                <h3 className="text-lg font-semibold text-gray-900">No orders found</h3>
-                <p className="text-gray-500 max-w-sm mt-1 mb-6">
-                  {orderStatus !== "all" || searchQuery
-                    ? "No orders match your current filters. Try resetting them."
-                    : "There are no orders in the system yet."}
-                </p>
-                {(orderStatus !== "all" || searchQuery) && (
-                  <Button variant="outline" onClick={() => { setOrderStatus("all"); setSearchQuery(""); }}>
-                    Clear Filters
-                  </Button>
-                )}
-              </div>
-            ) : viewMode === "list" ? (
-              <Card className="rounded-xl overflow-hidden shadow-sm border-gray-200">
-                <Table>
-                  <TableHeader className="bg-gray-50/50">
-                    <TableRow>
-                      <TableHead className="w-12 py-4">
-                        <Checkbox
-                          checked={selectedOrders.length === orders.length && orders.length > 0}
-                          onCheckedChange={toggleSelectAll}
-                        />
-                      </TableHead>
-                      <TableHead className="py-4 font-semibold text-gray-700">Order #</TableHead>
-                      <TableHead className="py-4 font-semibold text-gray-700">Customer</TableHead>
-                      <TableHead className="py-4 font-semibold text-gray-700">Amount</TableHead>
-                      <TableHead className="py-4 font-semibold text-gray-700">Status</TableHead>
-                      <TableHead className="py-4 font-semibold text-gray-700">Payment</TableHead>
-                      <TableHead className="py-4 font-semibold text-gray-700">Date</TableHead>
-                      <TableHead className="text-right py-4 font-semibold text-gray-700">Actions</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {orders.map((order) => (
-                      <TableRow key={order._id} className="hover:bg-gray-50/50 transition-colors">
-                        <TableCell>
-                          <Checkbox
-                            checked={selectedOrders.includes(order._id)}
-                            onCheckedChange={() => toggleOrderSelection(order._id)}
-                          />
-                        </TableCell>
-                        <TableCell className="font-medium text-gray-900">
-                          {order.orderNumber}
-                        </TableCell>
-                        <TableCell>
-                          <div className="flex flex-col">
-                            <span className="font-medium text-gray-900">{order.customerName}</span>
-                            <span className="text-xs text-gray-500">{order.email}</span>
-                          </div>
-                        </TableCell>
-                        <TableCell>
-                          <span className="font-semibold text-gray-900">{formatCurrency(order.totalPrice)}</span>
-                        </TableCell>
-                        <TableCell>
-                          <div className="flex items-center gap-2">
-                            <Badge className={`${getStatusColor(order.status)} border-0 font-normal`}>
-                              {order.status.replace(/_/g, " ")}
-                            </Badge>
-                            {(order as any).cancellationRequested && (
-                              <Badge className="bg-red-50 text-red-600 border-red-100 text-[10px] px-1.5 py-0.5 animate-pulse">
-                                Cancellation
-                              </Badge>
-                            )}
-                          </div>
-                        </TableCell>
-                        <TableCell className="capitalize text-gray-600 text-sm">
-                          {order.paymentMethod.replace(/_/g, " ")}
-                        </TableCell>
-                        <TableCell className="text-gray-600 text-sm">{formatDate(order.orderDate)}</TableCell>
-                        <TableCell className="text-right">
-                          <Button
-                            size="sm"
-                            variant="ghost"
-                            onClick={() => handleShowOrderDetails(order)}
-                            className="hover:text-emerald-600 hover:bg-emerald-50"
-                          >
-                            <Eye className="h-4 w-4" /> <span className="sr-only">View</span>
-                          </Button>
-                        </TableCell>
-                      </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
-              </Card>
-            ) : (
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                {orders.map(order => (
-                  <OrderCard
-                    key={order._id}
-                    order={order}
-                    selected={selectedOrders.includes(order._id)}
-                    onSelect={toggleOrderSelection}
-                    onViewDetails={handleShowOrderDetails}
-                    getStatusColor={getStatusColor}
-                  />
-                ))}
-              </div>
-            )}
-
-            {/* Pagination */}
-            {orders.length > 0 && (
-              <div className="flex flex-col sm:flex-row items-center justify-between gap-4 pt-4 border-t">
-                <div className="text-sm text-gray-500">
-                  Showing <span className="font-medium text-gray-900">{orders.length}</span> of <span className="font-medium text-gray-900">{pagination.totalCount}</span> orders
-                </div>
-                <div className="flex gap-2">
-                  <Button
-                    onClick={() => handlePageChange(Math.max(0, currentPage - 1))}
-                    disabled={currentPage === 0}
-                    variant="outline"
-                    size="sm"
-                    className="h-8"
-                  >
-                    Previous
-                  </Button>
-                  <div className="flex items-center justify-center px-4 text-sm font-medium">
-                    Page {currentPage + 1}
-                  </div>
-                  <Button
-                    onClick={() => handlePageChange(currentPage + 1)}
-                    disabled={!pagination.hasNextPage}
-                    variant="outline"
-                    size="sm"
-                    className="h-8"
-                  >
-                    Next
-                  </Button>
-                </div>
-              </div>
-            )}
+          <div className="flex items-center gap-3">
+            <div className="bg-white border rounded-lg p-1 flex items-center shadow-sm">
+              <Button
+                variant="ghost"
+                size="sm"
+                className={`h-8 px-2 ${viewMode === 'list' ? 'bg-gray-100 text-gray-900' : 'text-gray-500'}`}
+                onClick={() => setViewMode('list')}
+              >
+                <List className="w-4 h-4 mr-1" /> List
+              </Button>
+              <Button
+                variant="ghost"
+                size="sm"
+                className={`h-8 px-2 ${viewMode === 'grid' ? 'bg-gray-100 text-gray-900' : 'text-gray-500'}`}
+                onClick={() => setViewMode('grid')}
+              >
+                <LayoutGrid className="w-4 h-4 mr-1" /> Grid
+              </Button>
+            </div>
+            <Link href="/admin/orders/create">
+              <Button className="bg-emerald-600 hover:bg-emerald-700 shadow-sm">
+                <Plus className="h-4 w-4 mr-2" /> Create Order
+              </Button>
+            </Link>
           </div>
         </div>
 
-        {/* Dialogs & Sidebar */}
-        <DeleteConfirmationDialog
-          isOpen={isDeleteDialogOpen}
-          onClose={() => setIsDeleteDialogOpen(false)}
-          onConfirm={handleDeleteOrders}
-          title="Delete Orders"
-          description={`Are you sure you want to delete ${selectedOrders.length} order${selectedOrders.length > 1 ? "s" : ""}?`}
-          itemCount={selectedOrders.length}
-          isLoading={isDeleting}
+        {/* Stats Cards */}
+        <OrderStats />
+
+        {/* Filter Bar */}
+        <OrderFilterBar
+          status={orderStatus}
+          onStatusChange={setOrderStatus}
+          searchQuery={searchQuery}
+          onSearchChange={setSearchQuery}
+          perPage={perPage}
+          onPerPageChange={setPerPage}
+          onRefresh={handleRefresh}
+          isRefreshing={isRefreshing}
+          startDate={startDate}
+          endDate={endDate}
+          onDateChange={handleDateChange}
+          onReset={() => {
+            setOrderStatus("all");
+            setSearchQuery("");
+            setPerPage("20");
+            setStartDate("");
+            setEndDate("");
+          }}
         />
 
-        <OrderDetailsSidebar
-          isOpen={isSidebarOpen}
-          onClose={handleCloseSidebar}
-          order={selectedOrder}
-          onOrderUpdate={handleOrderUpdate}
-          isLoading={isLoadingOrderDetails}
-        />
-      </>
-    );
-  };
+        {/* Main Content */}
+        <div className="space-y-4">
+          {/* Selection Toolbar */}
+          {selectedOrders.length > 0 && (
+            <div className="flex items-center justify-between bg-blue-50 p-3 rounded-xl border border-blue-100 shadow-sm animate-in fade-in slide-in-from-top-2">
+              <span className="text-sm font-medium text-blue-900 px-2">
+                {selectedOrders.length} order{selectedOrders.length > 1 ? "s" : ""} selected
+              </span>
+              <div className="flex items-center gap-2">
+                <Button
+                  onClick={handleExportCSV}
+                  variant="outline"
+                  size="sm"
+                  className="gap-2 shadow-sm bg-white hover:bg-gray-50 border-blue-200 text-blue-700 hover:text-blue-800"
+                >
+                  <Download className="h-4 w-4" />
+                  Export CSV
+                </Button>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="gap-2 shadow-sm bg-white hover:bg-gray-50 border-blue-200 text-blue-700 hover:text-blue-800"
+                >
+                  <Printer className="h-4 w-4" />
+                  Print
+                </Button>
+                <Button
+                  onClick={openDeleteDialog}
+                  variant="destructive"
+                  size="sm"
+                  className="gap-2 shadow-sm"
+                >
+                  <Trash2 className="h-4 w-4" />
+                  Delete
+                </Button>
+              </div>
+            </div>
+          )}
 
-  export default AdminOrders;
+          {loading ? (
+            <OrdersSkeleton />
+          ) : orders.length === 0 ? (
+            <div className="bg-white rounded-xl border border-dashed border-gray-300 p-12 flex flex-col items-center justify-center text-center">
+              <div className="bg-gray-50 p-4 rounded-full mb-4">
+                <Package className="h-8 w-8 text-gray-400" />
+              </div>
+              <h3 className="text-lg font-semibold text-gray-900">No orders found</h3>
+              <p className="text-gray-500 max-w-sm mt-1 mb-6">
+                {orderStatus !== "all" || searchQuery
+                  ? "No orders match your current filters. Try resetting them."
+                  : "There are no orders in the system yet."}
+              </p>
+              {(orderStatus !== "all" || searchQuery) && (
+                <Button variant="outline" onClick={() => { setOrderStatus("all"); setSearchQuery(""); }}>
+                  Clear Filters
+                </Button>
+              )}
+            </div>
+          ) : viewMode === "list" ? (
+            <Card className="rounded-xl overflow-hidden shadow-sm border-gray-200">
+              <Table>
+                <TableHeader className="bg-gray-50/50">
+                  <TableRow>
+                    <TableHead className="w-12 py-4">
+                      <Checkbox
+                        checked={selectedOrders.length === orders.length && orders.length > 0}
+                        onCheckedChange={toggleSelectAll}
+                      />
+                    </TableHead>
+                    <TableHead className="py-4 font-semibold text-gray-700">Order #</TableHead>
+                    <TableHead className="py-4 font-semibold text-gray-700">Customer</TableHead>
+                    <TableHead className="py-4 font-semibold text-gray-700">Amount</TableHead>
+                    <TableHead className="py-4 font-semibold text-gray-700">Status</TableHead>
+                    <TableHead className="py-4 font-semibold text-gray-700">Payment</TableHead>
+                    <TableHead className="py-4 font-semibold text-gray-700">Date</TableHead>
+                    <TableHead className="text-right py-4 font-semibold text-gray-700">Actions</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {orders.map((order) => (
+                    <TableRow key={order._id} className="hover:bg-gray-50/50 transition-colors">
+                      <TableCell>
+                        <Checkbox
+                          checked={selectedOrders.includes(order._id)}
+                          onCheckedChange={() => toggleOrderSelection(order._id)}
+                        />
+                      </TableCell>
+                      <TableCell className="font-medium text-gray-900">
+                        {order.orderNumber}
+                      </TableCell>
+                      <TableCell>
+                        <div className="flex flex-col">
+                          <span className="font-medium text-gray-900">{order.customerName}</span>
+                          <span className="text-xs text-gray-500">{order.email}</span>
+                        </div>
+                      </TableCell>
+                      <TableCell>
+                        <span className="font-semibold text-gray-900">{formatCurrency(order.totalPrice)}</span>
+                      </TableCell>
+                      <TableCell>
+                        <div className="flex items-center gap-2">
+                          <Badge className={`${getStatusColor(order.status)} border-0 font-normal`}>
+                            {order.status.replace(/_/g, " ")}
+                          </Badge>
+                          {(order as any).cancellationRequested && (
+                            <Badge className="bg-red-50 text-red-600 border-red-100 text-[10px] px-1.5 py-0.5 animate-pulse">
+                              Cancellation
+                            </Badge>
+                          )}
+                        </div>
+                      </TableCell>
+                      <TableCell className="capitalize text-gray-600 text-sm">
+                        {order.paymentMethod.replace(/_/g, " ")}
+                      </TableCell>
+                      <TableCell className="text-gray-600 text-sm">{formatDate(order.orderDate)}</TableCell>
+                      <TableCell className="text-right">
+                        <Button
+                          size="sm"
+                          variant="ghost"
+                          onClick={() => handleShowOrderDetails(order)}
+                          className="hover:text-emerald-600 hover:bg-emerald-50"
+                        >
+                          <Eye className="h-4 w-4" /> <span className="sr-only">View</span>
+                        </Button>
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </Card>
+          ) : (
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+              {orders.map(order => (
+                <OrderCard
+                  key={order._id}
+                  order={order}
+                  selected={selectedOrders.includes(order._id)}
+                  onSelect={toggleOrderSelection}
+                  onViewDetails={handleShowOrderDetails}
+                  getStatusColor={getStatusColor}
+                />
+              ))}
+            </div>
+          )}
+
+          {/* Pagination */}
+          {orders.length > 0 && (
+            <div className="flex flex-col sm:flex-row items-center justify-between gap-4 pt-4 border-t">
+              <div className="text-sm text-gray-500">
+                Showing <span className="font-medium text-gray-900">{orders.length}</span> of <span className="font-medium text-gray-900">{pagination.totalCount}</span> orders
+              </div>
+              <div className="flex gap-2">
+                <Button
+                  onClick={() => handlePageChange(Math.max(0, currentPage - 1))}
+                  disabled={currentPage === 0}
+                  variant="outline"
+                  size="sm"
+                  className="h-8"
+                >
+                  Previous
+                </Button>
+                <div className="flex items-center justify-center px-4 text-sm font-medium">
+                  Page {currentPage + 1}
+                </div>
+                <Button
+                  onClick={() => handlePageChange(currentPage + 1)}
+                  disabled={!pagination.hasNextPage}
+                  variant="outline"
+                  size="sm"
+                  className="h-8"
+                >
+                  Next
+                </Button>
+              </div>
+            </div>
+          )}
+        </div>
+      </div>
+
+      {/* Dialogs & Sidebar */}
+      <DeleteConfirmationDialog
+        isOpen={isDeleteDialogOpen}
+        onClose={() => setIsDeleteDialogOpen(false)}
+        onConfirm={handleDeleteOrders}
+        title="Delete Orders"
+        description={`Are you sure you want to delete ${selectedOrders.length} order${selectedOrders.length > 1 ? "s" : ""}?`}
+        itemCount={selectedOrders.length}
+        isLoading={isDeleting}
+      />
+
+      <OrderDetailsSidebar
+        isOpen={isSidebarOpen}
+        onClose={handleCloseSidebar}
+        order={selectedOrder}
+        onOrderUpdate={handleOrderUpdate}
+        isLoading={isLoadingOrderDetails}
+      />
+    </>
+  );
+};
+
+export default AdminOrders;
