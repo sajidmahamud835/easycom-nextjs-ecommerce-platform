@@ -88,13 +88,15 @@ const ApprovedAccountsTable = ({
 
   if (allApprovedAccounts.length === 0) {
     return (
-      <Card>
-        <CardContent className="flex flex-col items-center justify-center py-12">
-          <CheckCircle className="w-12 h-12 text-gray-400 mb-4" />
+      <Card className="border-0 shadow-xl rounded-2xl overflow-hidden">
+        <CardContent className="flex flex-col items-center justify-center py-16">
+          <div className="p-4 bg-gradient-to-br from-emerald-100 to-teal-100 rounded-2xl mb-4">
+            <CheckCircle className="w-12 h-12 text-emerald-500" />
+          </div>
           <h3 className="text-lg font-semibold text-gray-900 mb-2">
             No Approved Accounts
           </h3>
-          <p className="text-gray-600 text-center">
+          <p className="text-gray-500 text-center">
             There are currently no approved accounts to manage.
           </p>
         </CardContent>
@@ -103,7 +105,7 @@ const ApprovedAccountsTable = ({
   }
 
   return (
-    <Card className="overflow-hidden">
+    <Card className="overflow-hidden border-0 shadow-xl rounded-2xl">
       <CardHeader className="bg-gradient-to-r from-green-50 to-emerald-100 pb-4">
         <CardTitle className="flex items-center gap-2 text-lg">
           <CheckCircle className="w-5 h-5 text-green-600" />
@@ -140,11 +142,10 @@ const ApprovedAccountsTable = ({
                     <TableCell className="py-4">
                       <div className="flex items-center gap-3">
                         <div
-                          className={`p-2 rounded-lg ${
-                            account.accountType === "premium"
-                              ? "bg-amber-100"
-                              : "bg-blue-100"
-                          }`}
+                          className={`p-2 rounded-lg ${account.accountType === "premium"
+                            ? "bg-amber-100"
+                            : "bg-blue-100"
+                            }`}
                         >
                           {account.accountType === "premium" ? (
                             <Crown className="w-4 h-4 text-amber-600" />
@@ -244,11 +245,10 @@ const ApprovedAccountsTable = ({
                 <CardContent className="p-4 space-y-3">
                   <div className="flex items-center gap-3">
                     <div
-                      className={`p-2 rounded-lg ${
-                        account.accountType === "premium"
-                          ? "bg-amber-100"
-                          : "bg-blue-100"
-                      }`}
+                      className={`p-2 rounded-lg ${account.accountType === "premium"
+                        ? "bg-amber-100"
+                        : "bg-blue-100"
+                        }`}
                     >
                       {account.accountType === "premium" ? (
                         <Crown className="w-4 h-4 text-amber-600" />
@@ -354,14 +354,19 @@ const RequestTable = ({
 }) => {
   if (users.length === 0) {
     const Icon = type === "premium" ? Crown : Building2;
+    const gradientFrom = type === "premium" ? "from-amber-100" : "from-blue-100";
+    const gradientTo = type === "premium" ? "to-orange-100" : "to-indigo-100";
+    const iconColor = type === "premium" ? "text-amber-500" : "text-blue-500";
     return (
-      <Card>
-        <CardContent className="flex flex-col items-center justify-center py-12">
-          <Icon className="w-12 h-12 text-gray-400 mb-4" />
+      <Card className="border-0 shadow-xl rounded-2xl overflow-hidden">
+        <CardContent className="flex flex-col items-center justify-center py-16">
+          <div className={`p-4 bg-gradient-to-br ${gradientFrom} ${gradientTo} rounded-2xl mb-4`}>
+            <Icon className={`w-12 h-12 ${iconColor}`} />
+          </div>
           <h3 className="text-lg font-semibold text-gray-900 mb-2">
             No {type === "premium" ? "Premium" : "Business"} Requests
           </h3>
-          <p className="text-gray-600 text-center">
+          <p className="text-gray-500 text-center">
             There are currently no {type} account requests to review.
           </p>
         </CardContent>
@@ -370,14 +375,16 @@ const RequestTable = ({
   }
 
   return (
-    <Card className="overflow-hidden">
-      <CardHeader className="bg-gradient-to-r from-gray-50 to-gray-100 pb-4">
-        <CardTitle className="flex items-center gap-2 text-lg">
-          {type === "premium" ? (
-            <Crown className="w-5 h-5 text-amber-600" />
-          ) : (
-            <Building2 className="w-5 h-5 text-blue-600" />
-          )}
+    <Card className="overflow-hidden border-0 shadow-xl rounded-2xl">
+      <CardHeader className={`bg-gradient-to-r pb-4 ${type === "premium" ? "from-amber-50 via-orange-50 to-amber-50" : "from-blue-50 via-indigo-50 to-blue-50"}`}>
+        <CardTitle className="flex items-center gap-3 text-lg">
+          <div className={`p-2 ${type === "premium" ? "bg-gradient-to-br from-amber-500 to-orange-500" : "bg-gradient-to-br from-blue-500 to-indigo-500"} rounded-xl shadow-lg`}>
+            {type === "premium" ? (
+              <Crown className="w-5 h-5 text-white" />
+            ) : (
+              <Building2 className="w-5 h-5 text-white" />
+            )}
+          </div>
           {type === "premium" ? "Premium" : "Business"} Account Requests
         </CardTitle>
       </CardHeader>
@@ -412,9 +419,8 @@ const RequestTable = ({
                     <TableCell className="py-4">
                       <div className="flex items-center gap-3">
                         <div
-                          className={`p-2 rounded-lg ${
-                            type === "premium" ? "bg-amber-100" : "bg-blue-100"
-                          }`}
+                          className={`p-2 rounded-lg ${type === "premium" ? "bg-amber-100" : "bg-blue-100"
+                            }`}
                         >
                           {type === "premium" ? (
                             <Crown className="w-4 h-4 text-amber-600" />
@@ -517,9 +523,8 @@ const RequestTable = ({
                 <CardContent className="p-4 space-y-3">
                   <div className="flex items-center gap-3">
                     <div
-                      className={`p-2 rounded-lg ${
-                        type === "premium" ? "bg-amber-100" : "bg-blue-100"
-                      }`}
+                      className={`p-2 rounded-lg ${type === "premium" ? "bg-amber-100" : "bg-blue-100"
+                        }`}
                     >
                       {type === "premium" ? (
                         <Crown className="w-4 h-4 text-amber-600" />
@@ -899,44 +904,48 @@ export default function AccountRequestsClient() {
   };
 
   return (
-    <div className="p-6 space-y-8 max-w-7xl mx-auto">
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-3xl font-bold text-gray-900">Account Requests</h1>
-          <p className="text-gray-600 mt-1">
-            Manage premium and business account applications
-          </p>
+    <div className="space-y-6">
+      {/* Modern Gradient Header */}
+      <div className="bg-gradient-to-r from-amber-500 via-orange-500 to-pink-500 rounded-2xl p-6 text-white shadow-xl">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-4">
+            <div className="p-3 bg-white/20 backdrop-blur-sm rounded-xl">
+              <Crown className="w-7 h-7 text-white" />
+            </div>
+            <div>
+              <h1 className="text-2xl font-bold">Account Requests</h1>
+              <p className="text-white/70 text-sm">Manage premium and business applications</p>
+            </div>
+          </div>
+          <Button
+            onClick={fetchRequests}
+            className="bg-white/20 hover:bg-white/30 text-white border-0 rounded-xl"
+            disabled={loading || refreshing}
+          >
+            <RefreshCw
+              className={`w-4 h-4 mr-2 ${loading || refreshing ? "animate-spin" : ""
+                }`}
+            />
+            {refreshing ? "Updating..." : "Refresh"}
+          </Button>
         </div>
-        <Button
-          onClick={fetchRequests}
-          variant="outline"
-          disabled={loading || refreshing}
-        >
-          <RefreshCw
-            className={`w-4 h-4 mr-2 ${
-              loading || refreshing ? "animate-spin" : ""
-            }`}
-          />
-          {refreshing ? "Updating..." : "Refresh"}
-        </Button>
       </div>
 
       <AccountRequestsOverview stats={stats} />
 
       <Tabs defaultValue="premium" className="space-y-6">
-        <TabsList className="grid w-full max-w-4xl grid-cols-3">
-          <TabsTrigger value="premium" className="flex items-center gap-2">
+        <TabsList className="grid w-full max-w-4xl grid-cols-3 bg-white p-1.5 rounded-2xl shadow-lg border border-gray-100">
+          <TabsTrigger value="premium" className="flex items-center gap-2 rounded-xl data-[state=active]:bg-gradient-to-r data-[state=active]:from-amber-500 data-[state=active]:to-orange-500 data-[state=active]:text-white data-[state=active]:shadow-lg">
             <Crown className="w-4 h-4" />
-            Premium Requests ({premiumRequests.length})
+            Premium ({premiumRequests.length})
           </TabsTrigger>
-          <TabsTrigger value="business" className="flex items-center gap-2">
+          <TabsTrigger value="business" className="flex items-center gap-2 rounded-xl data-[state=active]:bg-gradient-to-r data-[state=active]:from-blue-500 data-[state=active]:to-indigo-500 data-[state=active]:text-white data-[state=active]:shadow-lg">
             <Building2 className="w-4 h-4" />
-            Business Requests ({businessRequests.length})
+            Business ({businessRequests.length})
           </TabsTrigger>
-          <TabsTrigger value="approved" className="flex items-center gap-2">
+          <TabsTrigger value="approved" className="flex items-center gap-2 rounded-xl data-[state=active]:bg-gradient-to-r data-[state=active]:from-emerald-500 data-[state=active]:to-teal-500 data-[state=active]:text-white data-[state=active]:shadow-lg">
             <CheckCircle className="w-4 h-4" />
-            Approved Accounts (
-            {approvedPremiumAccounts.length + approvedBusinessAccounts.length})
+            Approved ({approvedPremiumAccounts.length + approvedBusinessAccounts.length})
           </TabsTrigger>
         </TabsList>
 

@@ -8,6 +8,7 @@ import Container from "@/components/Container";
 import AdminTopNavigation from "@/components/admin/AdminTopNavigation";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
+import AdminSidebar from "@/components/admin/AdminSidebar";
 
 interface AdminLayoutProps {
   children: React.ReactNode;
@@ -43,20 +44,26 @@ const AdminLayout = ({ children }: AdminLayoutProps) => {
   }
 
   return (
-    <div className="min-h-screen">
+    <div className="min-h-screen pb-10 bg-gradient-to-br from-gray-50 via-white to-gray-50 selection:bg-shop_light_green/20">
       <Header />
-      <Container className="py-6">
-        <div className="flex flex-col gap-6">
-          {/* Top Navigation */}
-          <AdminTopNavigation currentPath={pathname} user={user} />
+      <Container>
+        <div className="flex flex-col lg:flex-row gap-8 mt-8">
+          {/* Sidebar */}
+          <AdminSidebar />
 
-          {/* Main Content */}
-          <div className="admin-content-push bg-white rounded-2xl shadow-xl border border-shop_light_green/10 overflow-hidden">
-            {children}
-          </div>
+          {/* Main Content Area */}
+          <main className="flex-1 min-w-0">
+            <div className="bg-white rounded-3xl shadow-xl shadow-gray-100/50 border border-gray-100 min-h-[600px] overflow-hidden">
+              <div className="p-6 lg:p-10 animate-fade-in">
+                {children}
+              </div>
+            </div>
+          </main>
         </div>
       </Container>
-      <Footer />
+      <div className="mt-12">
+        <Footer />
+      </div>
     </div>
   );
 };

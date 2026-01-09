@@ -19,10 +19,10 @@ import useCartStore from "@/store";
 
 
 interface Props {
-  categories: Category[];
+  categories?: Category[];
 }
 
-const Header = ({ categories }: Props) => {
+const Header = ({ categories = [] }: Props) => {
   const [category, setCategory] = useState("All");
   const { location, loading, updateLocation } = useLocation();
   const [isLocationModalOpen, setIsLocationModalOpen] = useState(false);

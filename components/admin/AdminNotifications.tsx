@@ -583,378 +583,391 @@ const AdminNotifications: React.FC<AdminNotificationsProps> = ({
   };
 
   return (
-    <div className="space-y-6 p-6">
-      {/* Header */}
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-2xl font-bold">Notification Management</h1>
-          <p className="text-muted-foreground">
-            Send and manage notifications to users
-          </p>
-        </div>
-        <Sheet open={isSidebarOpen} onOpenChange={setIsSidebarOpen}>
-          <SheetTrigger asChild>
-            <Button>
-              <Plus className="w-4 h-4 mr-2" />
-              Send Notification
-            </Button>
-          </SheetTrigger>
-          <SheetContent className="w-[600px] sm:w-[600px] p-6" side="right">
-            <SheetHeader className="px-0">
-              <SheetTitle>Send New Notification</SheetTitle>
-            </SheetHeader>
-            <div className="space-y-4 mt-6 overflow-y-auto max-h-[calc(100vh-120px)] px-1">
-              {/* Notification Form */}
-              <div className="space-y-4">
-                <div>
-                  <label className="text-sm font-medium">Title *</label>
-                  <Input
-                    value={notificationForm.title}
-                    onChange={(e) => {
-                      setNotificationForm((prev) => ({
-                        ...prev,
-                        title: e.target.value,
-                      }));
-                      // Clear error when user starts typing
-                      if (validationErrors.title) {
-                        setValidationErrors((prev) => ({
-                          ...prev,
-                          title: "",
-                        }));
-                      }
-                    }}
-                    placeholder="Notification title"
-                    className={validationErrors.title ? "border-red-500" : ""}
-                  />
-                  {validationErrors.title && (
-                    <p className="text-red-500 text-sm mt-1">
-                      {validationErrors.title}
-                    </p>
-                  )}
-                </div>
-                <div>
-                  <label className="text-sm font-medium">Type</label>
-                  <Select
-                    value={notificationForm.type}
-                    onValueChange={(value: string) =>
-                      setNotificationForm((prev) => ({ ...prev, type: value }))
-                    }
-                  >
-                    <SelectTrigger>
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="general">General</SelectItem>
-                      <SelectItem value="promo">Promo</SelectItem>
-                      <SelectItem value="order">Order Update</SelectItem>
-                      <SelectItem value="system">System</SelectItem>
-                      <SelectItem value="marketing">Marketing</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-
-                <div>
-                  <label className="text-sm font-medium">Priority</label>
-                  <Select
-                    value={notificationForm.priority}
-                    onValueChange={(value: string) =>
-                      setNotificationForm((prev) => ({
-                        ...prev,
-                        priority: value,
-                      }))
-                    }
-                  >
-                    <SelectTrigger>
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="low">Low</SelectItem>
-                      <SelectItem value="medium">Medium</SelectItem>
-                      <SelectItem value="high">High</SelectItem>
-                      <SelectItem value="urgent">Urgent</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-                <div>
-                  <label className="text-sm font-medium">
-                    Action URL (Optional)
-                  </label>
-                  <Input
-                    value={notificationForm.actionUrl}
-                    onChange={(e) =>
-                      setNotificationForm((prev) => ({
-                        ...prev,
-                        actionUrl: e.target.value,
-                      }))
-                    }
-                    placeholder="https://example.com"
-                  />
-                </div>
-              </div>
-
-              <div>
-                <label className="text-sm font-medium">Message *</label>
-                <Textarea
-                  value={notificationForm.message}
-                  onChange={(e) => {
-                    setNotificationForm((prev) => ({
-                      ...prev,
-                      message: e.target.value,
-                    }));
-                    // Clear error when user starts typing
-                    if (validationErrors.message) {
-                      setValidationErrors((prev) => ({
-                        ...prev,
-                        message: "",
-                      }));
-                    }
-                  }}
-                  placeholder="Notification message"
-                  rows={3}
-                  className={validationErrors.message ? "border-red-500" : ""}
-                />
-                {validationErrors.message && (
-                  <p className="text-red-500 text-sm mt-1">
-                    {validationErrors.message}
-                  </p>
-                )}
-              </div>
-
-              {/* User Selection */}
-              <div>
-                <label className="text-sm font-medium">
-                  Select Recipients *
-                </label>
-                <div className="mt-2">
-                  <div className="flex items-center gap-2 mb-3">
-                    <Search className="w-4 h-4 text-gray-400" />
+    <div className="space-y-6">
+      {/* Modern Gradient Header */}
+      <div className="bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-500 rounded-2xl p-6 text-white shadow-xl">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-4">
+            <div className="p-3 bg-white/20 backdrop-blur-sm rounded-xl">
+              <Bell className="w-7 h-7 text-white" />
+            </div>
+            <div>
+              <h1 className="text-2xl font-bold">Notification Center</h1>
+              <p className="text-white/70 text-sm">Send and manage user notifications</p>
+            </div>
+          </div>
+          <Sheet open={isSidebarOpen} onOpenChange={setIsSidebarOpen}>
+            <SheetTrigger asChild>
+              <Button className="bg-white/20 hover:bg-white/30 text-white border-0 rounded-xl">
+                <Plus className="w-4 h-4 mr-2" />
+                New Notification
+              </Button>
+            </SheetTrigger>
+            <SheetContent className="w-[600px] sm:w-[600px] p-6" side="right">
+              <SheetHeader className="px-0">
+                <SheetTitle>Send New Notification</SheetTitle>
+              </SheetHeader>
+              <div className="space-y-4 mt-6 overflow-y-auto max-h-[calc(100vh-120px)] px-1">
+                {/* Notification Form */}
+                <div className="space-y-4">
+                  <div>
+                    <label className="text-sm font-medium">Title *</label>
                     <Input
-                      placeholder="Search users..."
-                      value={userSearch}
-                      onChange={(e) => setUserSearch(e.target.value)}
-                      className="flex-1"
-                    />
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => {
-                        if (selectedUsers.length === filteredUsers.length) {
-                          setSelectedUsers([]);
-                        } else {
-                          setSelectedUsers(
-                            filteredUsers.map((u) => u.clerkUserId)
-                          );
-                        }
-                        // Clear recipients error when bulk selecting/deselecting
-                        if (validationErrors.recipients) {
+                      value={notificationForm.title}
+                      onChange={(e) => {
+                        setNotificationForm((prev) => ({
+                          ...prev,
+                          title: e.target.value,
+                        }));
+                        // Clear error when user starts typing
+                        if (validationErrors.title) {
                           setValidationErrors((prev) => ({
                             ...prev,
-                            recipients: "",
+                            title: "",
                           }));
                         }
                       }}
+                      placeholder="Notification title"
+                      className={validationErrors.title ? "border-red-500" : ""}
+                    />
+                    {validationErrors.title && (
+                      <p className="text-red-500 text-sm mt-1">
+                        {validationErrors.title}
+                      </p>
+                    )}
+                  </div>
+                  <div>
+                    <label className="text-sm font-medium">Type</label>
+                    <Select
+                      value={notificationForm.type}
+                      onValueChange={(value: string) =>
+                        setNotificationForm((prev) => ({ ...prev, type: value }))
+                      }
                     >
-                      {selectedUsers.length === filteredUsers.length
-                        ? "Deselect All"
-                        : "Select All"}
-                    </Button>
+                      <SelectTrigger>
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="general">General</SelectItem>
+                        <SelectItem value="promo">Promo</SelectItem>
+                        <SelectItem value="order">Order Update</SelectItem>
+                        <SelectItem value="system">System</SelectItem>
+                        <SelectItem value="marketing">Marketing</SelectItem>
+                      </SelectContent>
+                    </Select>
                   </div>
 
-                  <div className="border rounded-lg max-h-60 overflow-y-auto">
-                    {filteredUsers.map((user, index) => (
-                      <div
-                        key={index.toString()}
-                        className="flex items-center p-3 border-b last:border-b-0 hover:bg-gray-50"
-                      >
-                        <input
-                          key={`checkbox-${user._id}`}
-                          type="checkbox"
-                          checked={selectedUsers.includes(user.clerkUserId)}
-                          onChange={(e) => {
-                            if (e.target.checked) {
-                              setSelectedUsers((prev) => [
-                                ...prev,
-                                user.clerkUserId,
-                              ]);
-                            } else {
-                              setSelectedUsers((prev) =>
-                                prev.filter((id) => id !== user.clerkUserId)
-                              );
-                            }
-                            // Clear recipients error when user selects/deselects
-                            if (validationErrors.recipients) {
-                              setValidationErrors((prev) => ({
-                                ...prev,
-                                recipients: "",
-                              }));
-                            }
-                          }}
-                          className="mr-3"
-                        />
-                        <div className="flex-1">
-                          <div className="font-medium">
-                            {user.firstName} {user.lastName}
-                          </div>
-                          <div className="text-sm text-gray-500">
-                            {user.email}
-                          </div>
-                          {user.inSanity && user.activatedAt && (
-                            <div className="text-xs text-green-600 mt-1">
-                              Activated:{" "}
-                              {new Date(user.activatedAt).toLocaleDateString()}
-                              {user.activatedBy && ` by ${user.activatedBy}`}
-                            </div>
-                          )}
-                        </div>
-                        <div className="flex flex-col gap-1">
-                          <Badge
-                            variant={user.isActive ? "default" : "secondary"}
-                          >
-                            {user.isActive ? "Active" : "Inactive"}
-                          </Badge>
-                          <Badge
-                            variant={user.inSanity ? "default" : "outline"}
-                            className="text-xs"
-                          >
-                            {user.inSanity ? "In Sanity" : "Clerk Only"}
-                          </Badge>
-                        </div>
-                      </div>
-                    ))}
+                  <div>
+                    <label className="text-sm font-medium">Priority</label>
+                    <Select
+                      value={notificationForm.priority}
+                      onValueChange={(value: string) =>
+                        setNotificationForm((prev) => ({
+                          ...prev,
+                          priority: value,
+                        }))
+                      }
+                    >
+                      <SelectTrigger>
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="low">Low</SelectItem>
+                        <SelectItem value="medium">Medium</SelectItem>
+                        <SelectItem value="high">High</SelectItem>
+                        <SelectItem value="urgent">Urgent</SelectItem>
+                      </SelectContent>
+                    </Select>
                   </div>
+                  <div>
+                    <label className="text-sm font-medium">
+                      Action URL (Optional)
+                    </label>
+                    <Input
+                      value={notificationForm.actionUrl}
+                      onChange={(e) =>
+                        setNotificationForm((prev) => ({
+                          ...prev,
+                          actionUrl: e.target.value,
+                        }))
+                      }
+                      placeholder="https://example.com"
+                    />
+                  </div>
+                </div>
 
-                  {selectedUsers.length > 0 && (
-                    <div className="mt-2 p-2 bg-blue-50 rounded text-sm">
-                      <div className="text-gray-600">
-                        {selectedUsers.length} user(s) selected
-                      </div>
-                      {syncingUsers && (
-                        <div className="text-blue-600 mt-1 flex items-center gap-2">
-                          <Clock className="w-3 h-3 animate-spin" />
-                          Syncing users to Sanity...
-                        </div>
-                      )}
-                      {(() => {
-                        const usersToSync = selectedUsers.filter((userId) => {
-                          const user = users.find(
-                            (u) => u.clerkUserId === userId
-                          );
-                          return !user?.isActive || !user?.inSanity;
-                        });
-
-                        if (usersToSync.length > 0) {
-                          return (
-                            <div className="text-orange-600 mt-1 text-xs">
-                              {usersToSync.length} user(s) will be automatically
-                              activated in Sanity
-                            </div>
-                          );
-                        }
-                        return null;
-                      })()}
-                    </div>
-                  )}
-                  {validationErrors.recipients && (
+                <div>
+                  <label className="text-sm font-medium">Message *</label>
+                  <Textarea
+                    value={notificationForm.message}
+                    onChange={(e) => {
+                      setNotificationForm((prev) => ({
+                        ...prev,
+                        message: e.target.value,
+                      }));
+                      // Clear error when user starts typing
+                      if (validationErrors.message) {
+                        setValidationErrors((prev) => ({
+                          ...prev,
+                          message: "",
+                        }));
+                      }
+                    }}
+                    placeholder="Notification message"
+                    rows={3}
+                    className={validationErrors.message ? "border-red-500" : ""}
+                  />
+                  {validationErrors.message && (
                     <p className="text-red-500 text-sm mt-1">
-                      {validationErrors.recipients}
+                      {validationErrors.message}
                     </p>
                   )}
                 </div>
-              </div>
 
-              <div className="flex justify-end gap-2 pt-4">
-                <Button
-                  variant="outline"
-                  onClick={() => setIsSidebarOpen(false)}
-                >
-                  Cancel
-                </Button>
-                <Button
-                  onClick={handleSendNotification}
-                  disabled={sendingNotification || syncingUsers}
-                >
-                  {syncingUsers ? (
-                    <>
-                      <Clock className="w-4 h-4 mr-2 animate-spin" />
-                      Syncing Users...
-                    </>
-                  ) : sendingNotification ? (
-                    <>
-                      <Clock className="w-4 h-4 mr-2 animate-spin" />
-                      Sending...
-                    </>
-                  ) : (
-                    <>
-                      <Send className="w-4 h-4 mr-2" />
-                      Send Notification
-                    </>
-                  )}
-                </Button>
+                {/* User Selection */}
+                <div>
+                  <label className="text-sm font-medium">
+                    Select Recipients *
+                  </label>
+                  <div className="mt-2">
+                    <div className="flex items-center gap-2 mb-3">
+                      <Search className="w-4 h-4 text-gray-400" />
+                      <Input
+                        placeholder="Search users..."
+                        value={userSearch}
+                        onChange={(e) => setUserSearch(e.target.value)}
+                        className="flex-1"
+                      />
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => {
+                          if (selectedUsers.length === filteredUsers.length) {
+                            setSelectedUsers([]);
+                          } else {
+                            setSelectedUsers(
+                              filteredUsers.map((u) => u.clerkUserId)
+                            );
+                          }
+                          // Clear recipients error when bulk selecting/deselecting
+                          if (validationErrors.recipients) {
+                            setValidationErrors((prev) => ({
+                              ...prev,
+                              recipients: "",
+                            }));
+                          }
+                        }}
+                      >
+                        {selectedUsers.length === filteredUsers.length
+                          ? "Deselect All"
+                          : "Select All"}
+                      </Button>
+                    </div>
+
+                    <div className="border rounded-lg max-h-60 overflow-y-auto">
+                      {filteredUsers.map((user, index) => (
+                        <div
+                          key={index.toString()}
+                          className="flex items-center p-3 border-b last:border-b-0 hover:bg-gray-50"
+                        >
+                          <input
+                            key={`checkbox-${user._id}`}
+                            type="checkbox"
+                            checked={selectedUsers.includes(user.clerkUserId)}
+                            onChange={(e) => {
+                              if (e.target.checked) {
+                                setSelectedUsers((prev) => [
+                                  ...prev,
+                                  user.clerkUserId,
+                                ]);
+                              } else {
+                                setSelectedUsers((prev) =>
+                                  prev.filter((id) => id !== user.clerkUserId)
+                                );
+                              }
+                              // Clear recipients error when user selects/deselects
+                              if (validationErrors.recipients) {
+                                setValidationErrors((prev) => ({
+                                  ...prev,
+                                  recipients: "",
+                                }));
+                              }
+                            }}
+                            className="mr-3"
+                          />
+                          <div className="flex-1">
+                            <div className="font-medium">
+                              {user.firstName} {user.lastName}
+                            </div>
+                            <div className="text-sm text-gray-500">
+                              {user.email}
+                            </div>
+                            {user.inSanity && user.activatedAt && (
+                              <div className="text-xs text-green-600 mt-1">
+                                Activated:{" "}
+                                {new Date(user.activatedAt).toLocaleDateString()}
+                                {user.activatedBy && ` by ${user.activatedBy}`}
+                              </div>
+                            )}
+                          </div>
+                          <div className="flex flex-col gap-1">
+                            <Badge
+                              variant={user.isActive ? "default" : "secondary"}
+                            >
+                              {user.isActive ? "Active" : "Inactive"}
+                            </Badge>
+                            <Badge
+                              variant={user.inSanity ? "default" : "outline"}
+                              className="text-xs"
+                            >
+                              {user.inSanity ? "In Sanity" : "Clerk Only"}
+                            </Badge>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+
+                    {selectedUsers.length > 0 && (
+                      <div className="mt-2 p-2 bg-blue-50 rounded text-sm">
+                        <div className="text-gray-600">
+                          {selectedUsers.length} user(s) selected
+                        </div>
+                        {syncingUsers && (
+                          <div className="text-blue-600 mt-1 flex items-center gap-2">
+                            <Clock className="w-3 h-3 animate-spin" />
+                            Syncing users to Sanity...
+                          </div>
+                        )}
+                        {(() => {
+                          const usersToSync = selectedUsers.filter((userId) => {
+                            const user = users.find(
+                              (u) => u.clerkUserId === userId
+                            );
+                            return !user?.isActive || !user?.inSanity;
+                          });
+
+                          if (usersToSync.length > 0) {
+                            return (
+                              <div className="text-orange-600 mt-1 text-xs">
+                                {usersToSync.length} user(s) will be automatically
+                                activated in Sanity
+                              </div>
+                            );
+                          }
+                          return null;
+                        })()}
+                      </div>
+                    )}
+                    {validationErrors.recipients && (
+                      <p className="text-red-500 text-sm mt-1">
+                        {validationErrors.recipients}
+                      </p>
+                    )}
+                  </div>
+                </div>
+
+                <div className="flex justify-end gap-2 pt-4">
+                  <Button
+                    variant="outline"
+                    onClick={() => setIsSidebarOpen(false)}
+                  >
+                    Cancel
+                  </Button>
+                  <Button
+                    onClick={handleSendNotification}
+                    disabled={sendingNotification || syncingUsers}
+                  >
+                    {syncingUsers ? (
+                      <>
+                        <Clock className="w-4 h-4 mr-2 animate-spin" />
+                        Syncing Users...
+                      </>
+                    ) : sendingNotification ? (
+                      <>
+                        <Clock className="w-4 h-4 mr-2 animate-spin" />
+                        Sending...
+                      </>
+                    ) : (
+                      <>
+                        <Send className="w-4 h-4 mr-2" />
+                        Send Notification
+                      </>
+                    )}
+                  </Button>
+                </div>
               </div>
-            </div>
-          </SheetContent>
-        </Sheet>
+            </SheetContent>
+          </Sheet>
+        </div>
       </div>
 
-      {/* Stats Cards */}
+      {/* Modern Stats Cards */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-        <Card>
-          <CardContent className="p-4">
-            <div className="flex items-center gap-2">
-              <Users className="w-5 h-5 text-blue-500" />
+        <Card className="border-0 shadow-lg rounded-2xl overflow-hidden bg-gradient-to-br from-blue-50 to-indigo-50">
+          <CardContent className="p-5">
+            <div className="flex items-center gap-4">
+              <div className="p-3 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-xl shadow-lg shadow-blue-500/25">
+                <Users className="w-6 h-6 text-white" />
+              </div>
               <div>
-                <div className="text-2xl font-bold">{users.length}</div>
-                <div className="text-sm text-muted-foreground">Total Users</div>
+                <div className="text-3xl font-bold text-gray-900">{users.length}</div>
+                <div className="text-sm font-medium text-gray-500">Total Users</div>
               </div>
             </div>
           </CardContent>
         </Card>
-        <Card>
-          <CardContent className="p-4">
-            <div className="flex items-center gap-2">
-              <Bell className="w-5 h-5 text-green-500" />
+        <Card className="border-0 shadow-lg rounded-2xl overflow-hidden bg-gradient-to-br from-emerald-50 to-teal-50">
+          <CardContent className="p-5">
+            <div className="flex items-center gap-4">
+              <div className="p-3 bg-gradient-to-br from-emerald-500 to-teal-600 rounded-xl shadow-lg shadow-emerald-500/25">
+                <Bell className="w-6 h-6 text-white" />
+              </div>
               <div>
-                <div className="text-2xl font-bold">
+                <div className="text-3xl font-bold text-gray-900">
                   {sentNotifications.length}
                 </div>
-                <div className="text-sm text-muted-foreground">
+                <div className="text-sm font-medium text-gray-500">
                   Sent Notifications
                 </div>
               </div>
             </div>
           </CardContent>
         </Card>
-        <Card>
-          <CardContent className="p-4">
-            <div className="flex items-center gap-2">
-              <MessageSquare className="w-5 h-5 text-orange-500" />
+        <Card className="border-0 shadow-lg rounded-2xl overflow-hidden bg-gradient-to-br from-orange-50 to-amber-50">
+          <CardContent className="p-5">
+            <div className="flex items-center gap-4">
+              <div className="p-3 bg-gradient-to-br from-orange-500 to-amber-600 rounded-xl shadow-lg shadow-orange-500/25">
+                <MessageSquare className="w-6 h-6 text-white" />
+              </div>
               <div>
-                <div className="text-2xl font-bold">
+                <div className="text-3xl font-bold text-gray-900">
                   {sentNotifications.reduce(
                     (total, notif) => total + notif.recipientCount,
                     0
                   )}
                 </div>
-                <div className="text-sm text-muted-foreground">
+                <div className="text-sm font-medium text-gray-500">
                   Total Recipients
                 </div>
               </div>
             </div>
           </CardContent>
         </Card>
-        <Card>
-          <CardContent className="p-4">
-            <div className="flex items-center gap-2">
-              <CheckCircle className="w-5 h-5 text-purple-500" />
+        <Card className="border-0 shadow-lg rounded-2xl overflow-hidden bg-gradient-to-br from-purple-50 to-fuchsia-50">
+          <CardContent className="p-5">
+            <div className="flex items-center gap-4">
+              <div className="p-3 bg-gradient-to-br from-purple-500 to-fuchsia-600 rounded-xl shadow-lg shadow-purple-500/25">
+                <CheckCircle className="w-6 h-6 text-white" />
+              </div>
               <div>
-                <div className="text-2xl font-bold">
+                <div className="text-3xl font-bold text-gray-900">
                   {sentNotifications.reduce(
                     (total, notif) =>
                       total + notif.recipients.filter((r) => r.read).length,
                     0
                   )}
                 </div>
-                <div className="text-sm text-muted-foreground">
+                <div className="text-sm font-medium text-gray-500">
                   Read Notifications
                 </div>
               </div>
@@ -963,11 +976,16 @@ const AdminNotifications: React.FC<AdminNotificationsProps> = ({
         </Card>
       </div>
 
-      {/* Sent Notifications */}
-      <Card>
-        <CardHeader>
+      {/* Sent Notifications - Modern Card */}
+      <Card className="border-0 shadow-xl rounded-2xl overflow-hidden">
+        <CardHeader className="bg-gradient-to-r from-gray-50 via-white to-gray-50 border-b border-gray-100">
           <div className="flex items-center justify-between">
-            <CardTitle>Sent Notifications</CardTitle>
+            <div className="flex items-center gap-3">
+              <div className="p-2 bg-gradient-to-br from-gray-700 to-gray-900 rounded-xl shadow-lg">
+                <Send className="w-5 h-5 text-white" />
+              </div>
+              <CardTitle className="text-lg font-bold text-gray-900">Sent Notifications</CardTitle>
+            </div>
             <div className="flex items-center gap-2">
               {/* Refresh Button */}
               <Button
@@ -975,7 +993,7 @@ const AdminNotifications: React.FC<AdminNotificationsProps> = ({
                 size="sm"
                 onClick={handleRefreshNotifications}
                 disabled={refreshingNotifications}
-                className="p-2"
+                className="p-2 rounded-lg hover:bg-gray-100"
               >
                 <RefreshCw
                   className={cn(
@@ -990,10 +1008,10 @@ const AdminNotifications: React.FC<AdminNotificationsProps> = ({
                 value={notificationTypeFilter}
                 onValueChange={handleTypeFilterChange}
               >
-                <SelectTrigger className="w-32">
+                <SelectTrigger className="w-32 rounded-lg">
                   <SelectValue placeholder="Type" />
                 </SelectTrigger>
-                <SelectContent>
+                <SelectContent className="rounded-xl">
                   <SelectItem value="all">All Types</SelectItem>
                   <SelectItem value="general">General</SelectItem>
                   <SelectItem value="promo">Promo</SelectItem>
@@ -1179,9 +1197,9 @@ const AdminNotifications: React.FC<AdminNotificationsProps> = ({
                   onClick={() => handlePageChange(sentNotificationsPage + 1)}
                   disabled={
                     sentNotificationsPage >=
-                      Math.ceil(
-                        sentNotificationsTotal / sentNotificationsLimit
-                      ) || loading
+                    Math.ceil(
+                      sentNotificationsTotal / sentNotificationsLimit
+                    ) || loading
                   }
                   className="p-2"
                 >
@@ -1354,7 +1372,7 @@ const AdminNotifications: React.FC<AdminNotificationsProps> = ({
                       (selectedNotification.recipients.filter((r) => r.read)
                         .length /
                         selectedNotification.recipientCount) *
-                        100
+                      100
                     )}
                     %
                   </div>

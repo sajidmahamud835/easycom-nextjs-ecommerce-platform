@@ -334,8 +334,7 @@ const AdminUsers: React.FC = () => {
         // Add cache-busting parameter for fresh data
         const cacheBuster = forceFresh ? `&_t=${Date.now()}` : "";
         const data = await safeApiCall(
-          `/api/admin/users/combined?limit=${perPage}&offset=${
-            page * perPage
+          `/api/admin/users/combined?limit=${perPage}&offset=${page * perPage
           }&query=${debouncedSearchTerm}${cacheBuster}`
         );
         setUsers(data.users);
@@ -399,64 +398,75 @@ const AdminUsers: React.FC = () => {
 
   return (
     <>
-      <div className="space-y-4 p-4">
-        {/* Header */}
-        <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
-          <div className="flex flex-col sm:flex-row sm:items-center gap-3">
-            <h3 className="text-lg font-semibold">Users Management</h3>
-            <div className="flex flex-wrap gap-2">
-              <div className="px-2 py-1 bg-blue-100 text-blue-800 text-xs sm:text-sm rounded-full font-medium whitespace-nowrap">
-                Total: {totalUsersCount}
+      <div className="space-y-6">
+        {/* Modern Gradient Header */}
+        <div className="bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-500 rounded-2xl p-6 text-white shadow-xl">
+          <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
+            <div className="flex items-center gap-4">
+              <div className="p-3 bg-white/20 backdrop-blur-sm rounded-xl">
+                <UserCheck className="w-7 h-7 text-white" />
               </div>
-              <div className="px-2 py-1 bg-green-100 text-green-800 text-xs sm:text-sm rounded-full font-medium whitespace-nowrap">
-                <Database className="h-3 w-3 inline mr-1" />
-                Sanity: {sanityUsersCount}
+              <div>
+                <h1 className="text-2xl font-bold">Users Management</h1>
+                <p className="text-white/70 text-sm">Manage and monitor user accounts</p>
               </div>
-              <div className="px-2 py-1 bg-emerald-100 text-emerald-800 text-xs sm:text-sm rounded-full font-medium whitespace-nowrap">
-                <UserCheck className="h-3 w-3 inline mr-1" />
-                Active: {activeUsersCount}
+            </div>
+            <div className="flex flex-wrap gap-3">
+              <div className="flex items-center gap-2 px-4 py-2 bg-white/20 backdrop-blur-sm rounded-xl">
+                <span className="text-sm text-white/70">Total</span>
+                <span className="text-xl font-bold">{totalUsersCount}</span>
+              </div>
+              <div className="flex items-center gap-2 px-4 py-2 bg-emerald-500/30 backdrop-blur-sm rounded-xl border border-emerald-400/30">
+                <Database className="h-4 w-4" />
+                <span className="text-sm text-white/70">Sanity</span>
+                <span className="text-xl font-bold">{sanityUsersCount}</span>
+              </div>
+              <div className="flex items-center gap-2 px-4 py-2 bg-green-500/30 backdrop-blur-sm rounded-xl border border-green-400/30">
+                <UserCheck className="h-4 w-4" />
+                <span className="text-sm text-white/70">Active</span>
+                <span className="text-xl font-bold">{activeUsersCount}</span>
               </div>
             </div>
           </div>
-          <div className="flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-2">
-            <div className="flex items-center gap-2">
-              <span className="text-sm text-muted-foreground whitespace-nowrap">
-                Show:
-              </span>
-              <Select
-                value={perPage.toString()}
-                onValueChange={(value) => setPerPage(Number(value))}
-              >
-                <SelectTrigger className="w-20">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  {perPageOptions.map((option) => (
-                    <SelectItem key={option} value={option.toString()}>
-                      {option}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-            <div className="flex gap-2">
-              <Input
-                placeholder="Search users..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-full sm:w-64"
+        </div>
+
+        {/* Search and Controls Bar */}
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-white p-4 rounded-2xl shadow-lg border border-gray-100">
+          <div className="flex items-center gap-3">
+            <span className="text-sm text-gray-500 font-medium">Show:</span>
+            <Select
+              value={perPage.toString()}
+              onValueChange={(value) => setPerPage(Number(value))}
+            >
+              <SelectTrigger className="w-20 rounded-xl">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent className="rounded-xl">
+                {perPageOptions.map((option) => (
+                  <SelectItem key={option} value={option.toString()}>
+                    {option}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+          <div className="flex gap-3">
+            <Input
+              placeholder="Search users..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="w-full sm:w-64 rounded-xl"
+            />
+            <Button
+              onClick={() => fetchUsers(currentPage)}
+              size="sm"
+              className="shrink-0 rounded-xl bg-gradient-to-r from-indigo-500 to-purple-600 hover:from-indigo-600 hover:to-purple-700"
+              disabled={tableLoading}
+            >
+              <RefreshCw
+                className={cn("h-4 w-4", tableLoading && "animate-spin")}
               />
-              <Button
-                onClick={() => fetchUsers(currentPage)}
-                size="sm"
-                className="shrink-0"
-                disabled={tableLoading}
-              >
-                <RefreshCw
-                  className={cn("h-4 w-4", tableLoading && "animate-spin")}
-                />
-              </Button>
-            </div>
+            </Button>
           </div>
         </div>
 
@@ -465,16 +475,15 @@ const AdminUsers: React.FC = () => {
         ) : (
           <>
             {selectedUsers.length > 0 && (
-              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 sm:gap-0 bg-blue-50 p-3 rounded-lg border">
-                <span className="text-sm font-medium text-center sm:text-left">
-                  {selectedUsers.length} user
-                  {selectedUsers.length > 1 ? "s" : ""} selected
+              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 sm:gap-0 bg-gradient-to-r from-blue-50 to-indigo-50 p-4 rounded-2xl border border-blue-100 shadow-md">
+                <span className="text-sm font-semibold text-blue-900 text-center sm:text-left">
+                  ✓ {selectedUsers.length} user{selectedUsers.length > 1 ? "s" : ""} selected
                 </span>
                 <Button
                   onClick={openDeleteDialog}
                   variant="destructive"
                   size="sm"
-                  className="gap-2 w-full sm:w-auto"
+                  className="gap-2 w-full sm:w-auto rounded-xl"
                 >
                   <Trash2 className="h-4 w-4" />
                   Delete Selected
@@ -482,17 +491,17 @@ const AdminUsers: React.FC = () => {
               </div>
             )}
 
-            <Card className="relative">
+            <Card className="relative border-0 shadow-xl rounded-2xl overflow-hidden">
               {tableLoading && (
-                <div className="absolute inset-0 bg-background/50 flex items-center justify-center z-10 rounded-lg">
-                  <RefreshCw className="h-6 w-6 animate-spin" />
+                <div className="absolute inset-0 bg-background/50 flex items-center justify-center z-10 rounded-2xl">
+                  <RefreshCw className="h-6 w-6 animate-spin text-purple-600" />
                 </div>
               )}
-              <div className="hidden md:block responsive-table-container">
-                <Table>
+              <div className="hidden md:block responsive-table-container overflow-x-auto">
+                <Table className="border-separate border-spacing-0">
                   <TableHeader>
-                    <TableRow>
-                      <TableHead className="w-12">
+                    <TableRow className="bg-gradient-to-r from-gray-50 via-gray-100 to-gray-50 border-none">
+                      <TableHead className="w-12 border-b border-gray-200/60 text-gray-600 font-semibold">
                         <Checkbox
                           checked={
                             selectedUsers.length === users.length &&
@@ -501,31 +510,31 @@ const AdminUsers: React.FC = () => {
                           onCheckedChange={selectAllUsers}
                         />
                       </TableHead>
-                      <TableHead className="min-w-[200px]">User</TableHead>
-                      <TableHead className="hidden lg:table-cell min-w-[200px]">
+                      <TableHead className="min-w-[200px] border-b border-gray-200/60 text-gray-600 font-semibold">User</TableHead>
+                      <TableHead className="hidden lg:table-cell min-w-[200px] border-b border-gray-200/60 text-gray-600 font-semibold">
                         Email
                       </TableHead>
-                      <TableHead className="hidden xl:table-cell min-w-[120px]">
+                      <TableHead className="hidden xl:table-cell min-w-[120px] border-b border-gray-200/60 text-gray-600 font-semibold">
                         Joined
                       </TableHead>
-                      <TableHead className="hidden xl:table-cell min-w-[120px]">
+                      <TableHead className="hidden xl:table-cell min-w-[120px] border-b border-gray-200/60 text-gray-600 font-semibold">
                         Last Sign In
                       </TableHead>
-                      <TableHead className="hidden lg:table-cell min-w-[120px]">
+                      <TableHead className="hidden lg:table-cell min-w-[120px] border-b border-gray-200/60 text-gray-600 font-semibold">
                         Status
                       </TableHead>
-                      <TableHead className="min-w-[140px]">
+                      <TableHead className="min-w-[140px] border-b border-gray-200/60 text-gray-600 font-semibold">
                         Sanity Status
                       </TableHead>
-                      <TableHead className="min-w-[120px]">Actions</TableHead>
+                      <TableHead className="min-w-[120px] border-b border-gray-200/60 text-gray-600 font-semibold">Actions</TableHead>
                     </TableRow>
                   </TableHeader>
-                  <TableBody>
+                  <TableBody className="divide-y divide-gray-100">
                     {users.length === 0 ? (
-                      <TableRow>
+                      <TableRow className="border-none">
                         <TableCell
                           colSpan={8}
-                          className="text-center py-8 text-muted-foreground"
+                          className="text-center py-12 text-gray-400"
                         >
                           No users found.{" "}
                           {totalUsersCount > 0
@@ -534,8 +543,8 @@ const AdminUsers: React.FC = () => {
                         </TableCell>
                       </TableRow>
                     ) : (
-                      users.map((user) => (
-                        <TableRow key={user.id}>
+                      users.map((user, index) => (
+                        <TableRow key={user.id} className="hover:bg-gradient-to-r hover:from-purple-50/30 hover:to-pink-50/30 transition-all duration-200 border-none group">
                           <TableCell>
                             <Checkbox
                               checked={selectedUsers.includes(user.id)}
@@ -934,11 +943,9 @@ const AdminUsers: React.FC = () => {
         onClose={() => setIsDeleteDialogOpen(false)}
         onConfirm={handleDeleteUsers}
         title="Delete Users"
-        description={`Are you sure you want to delete ${
-          selectedUsers.length
-        } user${
-          selectedUsers.length > 1 ? "s" : ""
-        }? This action cannot be undone.`}
+        description={`Are you sure you want to delete ${selectedUsers.length
+          } user${selectedUsers.length > 1 ? "s" : ""
+          }? This action cannot be undone.`}
         itemCount={selectedUsers.length}
         isLoading={isDeleting}
       />
@@ -951,13 +958,13 @@ const AdminUsers: React.FC = () => {
         user={
           actionModal.user
             ? {
-                firstName: actionModal.user.firstName,
-                lastName: actionModal.user.lastName,
-                email: actionModal.user.email,
-                isActive: actionModal.user.isActive,
-                inSanity: actionModal.user.inSanity,
-                notificationCount: actionModal.user.notificationCount,
-              }
+              firstName: actionModal.user.firstName,
+              lastName: actionModal.user.lastName,
+              email: actionModal.user.email,
+              isActive: actionModal.user.isActive,
+              inSanity: actionModal.user.inSanity,
+              notificationCount: actionModal.user.notificationCount,
+            }
             : null
         }
         action={actionModal.action}

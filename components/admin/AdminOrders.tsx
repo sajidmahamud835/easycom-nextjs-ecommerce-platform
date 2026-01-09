@@ -1,7 +1,26 @@
 "use client";
 
-import React, { useState, useEffect, useCallback } from "react";
-import { Card } from "@/components/ui/card";
+import { useEffect, useState, useCallback } from "react";
+import { format } from "date-fns";
+import {
+  RefreshCw,
+  List,
+  LayoutGrid,
+  Download,
+  Package,
+  Eye,
+  ChevronLeft,
+  ChevronRight,
+  Printer,
+  Sparkles,
+  TrendingUp,
+  ArrowUpRight,
+  Search,
+} from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import OrderDetailsSidebar from "./OrderDetailsSidebar";
+import { Order } from "./types";
 import {
   Table,
   TableBody,
@@ -10,95 +29,70 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
 import { Checkbox } from "@/components/ui/checkbox";
-import { RefreshCw, Trash2, Eye, Package, Plus, LayoutGrid, List, Download, Printer } from "lucide-react";
-import { OrdersSkeleton } from "./SkeletonLoaders";
-import { DeleteConfirmationDialog } from "./DeleteConfirmationDialog";
-import OrderDetailsSidebar from "./OrderDetailsSidebar";
-import { Order } from "./types";
-import { safeApiCall, handleApiError } from "./apiHelpers";
+import OrderCard from "./orders/OrderCard";
 import OrderStats from "./orders/OrderStats";
 import OrderFilterBar from "./orders/OrderFilterBar";
-import OrderCard from "./orders/OrderCard";
-import Link from "next/link";
+import { Skeleton } from "@/components/ui/skeleton";
 
-const AdminOrders: React.FC = () => {
-  const [loading, setLoading] = useState(false);
+interface Pagination {
+  limit: number;
+  offset: number;
+  total: number;
+  currentPage: number;
+  totalPages: number;
+}
+
+export default function AdminOrders() {
+  // State
   const [orders, setOrders] = useState<Order[]>([]);
-  const [currentPage, setCurrentPage] = useState(0);
+  const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
+  const [loading, setLoading] = useState(true);
   const [orderStatus, setOrderStatus] = useState("all");
   const [searchQuery, setSearchQuery] = useState("");
+  const [debouncedSearch, setDebouncedSearch] = useState("");
+  const [pagination, setPagination] = useState<Pagination>({
+    limit: 10,
+    offset: 0,
+    total: 0,
+    currentPage: 1,
+    totalPages: 1,
+  });
+  const [currentPage, setCurrentPage] = useState(0);
+  const [perPage, setPerPage] = useState("10");
   const [viewMode, setViewMode] = useState<"list" | "grid">("list");
+  const [selectedOrders, setSelectedOrders] = useState<string[]>([]);
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
 
-  const [selectedOrders, setSelectedOrders] = useState<string[]>([]);
-  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
-  const [isDeleting, setIsDeleting] = useState(false);
-  const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
-  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
-  const [isLoadingOrderDetails, setIsLoadingOrderDetails] = useState(false);
-  const [perPage, setPerPage] = useState("20");
-  const [pagination, setPagination] = useState({
-    totalCount: 0,
-    hasNextPage: false,
-    totalPages: 0,
-  });
-  const [isRefreshing, setIsRefreshing] = useState(false);
-
-  // Debounced search term
-  const [debouncedSearch, setDebouncedSearch] = useState("");
+  // Debounce search
   useEffect(() => {
-    const timer = setTimeout(() => setDebouncedSearch(searchQuery), 500);
+    const timer = setTimeout(() => {
+      setDebouncedSearch(searchQuery);
+    }, 500);
     return () => clearTimeout(timer);
   }, [searchQuery]);
 
-  const limit = parseInt(perPage);
-
-  // Utility functions
-  const formatCurrency = (amount: number): string => {
-    return new Intl.NumberFormat("en-US", {
-      style: "currency",
-      currency: "USD",
-    }).format(amount);
-  };
-
-  const formatDate = (dateString: string): string => {
-    return new Date(dateString).toLocaleDateString("en-US", {
-      year: "numeric",
-      month: "short",
-      day: "numeric",
-    });
-  };
-
-  const getStatusColor = (status: string): string => {
-    switch (status.toLowerCase()) {
-      case "completed":
-        return "bg-green-100 text-green-800";
-      case "delivered":
-        return "bg-green-100 text-green-800";
-      case "out_for_delivery":
-        return "bg-blue-100 text-blue-800";
-      case "ready_for_delivery":
-        return "bg-cyan-100 text-cyan-800";
-      case "packed":
-        return "bg-purple-100 text-purple-800";
-      case "order_confirmed":
-        return "bg-emerald-100 text-emerald-800";
-      case "address_confirmed":
-        return "bg-yellow-100 text-yellow-800";
+  // Status color and gradient mapping
+  const getStatusStyle = (status: string) => {
+    switch (status) {
       case "pending":
-        return "bg-orange-100 text-orange-800";
+        return { bg: "bg-amber-100", text: "text-amber-700", gradient: "from-amber-500 to-orange-500" };
+      case "processing":
+      case "order_confirmed":
+      case "packed":
+        return { bg: "bg-blue-100", text: "text-blue-700", gradient: "from-blue-500 to-indigo-500" };
+      case "shipped":
+      case "ready_for_delivery":
+      case "out_for_delivery":
+        return { bg: "bg-violet-100", text: "text-violet-700", gradient: "from-violet-500 to-purple-500" };
+      case "delivered":
+      case "completed":
+        return { bg: "bg-emerald-100", text: "text-emerald-700", gradient: "from-emerald-500 to-teal-500" };
       case "cancelled":
-        return "bg-red-100 text-red-800";
-      case "failed_delivery":
-        return "bg-red-100 text-red-800";
-      case "rescheduled":
-        return "bg-amber-100 text-amber-800";
+        return { bg: "bg-red-100", text: "text-red-700", gradient: "from-red-500 to-rose-500" };
       default:
-        return "bg-gray-100 text-gray-800";
+        return { bg: "bg-gray-100", text: "text-gray-700", gradient: "from-gray-400 to-gray-500" };
     }
   };
 
@@ -147,13 +141,10 @@ const AdminOrders: React.FC = () => {
   }, [fetchOrders, currentPage]);
 
   // Reset page when filters change
-  // Reset page when filters change
   useEffect(() => {
     setCurrentPage(0);
     setSelectedOrders([]);
   }, [orderStatus, perPage, debouncedSearch, startDate, endDate]);
-
-
 
   const handleDateChange = (start: string, end: string) => {
     setStartDate(start);
@@ -200,389 +191,471 @@ const AdminOrders: React.FC = () => {
     if (selectedOrders.length === orders.length && orders.length > 0) {
       setSelectedOrders([]);
     } else {
-      setSelectedOrders(orders.map((order) => order._id));
+      setSelectedOrders(orders.map((o) => o._id));
     }
-  }, [selectedOrders.length, orders]);
-
-  // Order details functions
-  const handleShowOrderDetails = async (order: Order) => {
-    setIsSidebarOpen(true);
-    setIsLoadingOrderDetails(true);
-    setSelectedOrder(null); // Clear previous order
-
-    try {
-      // Fetch complete order details from the individual order API
-      const response = await fetch(`/api/admin/orders/${order._id}`);
-      if (!response.ok) {
-        throw new Error("Failed to fetch order details");
-      }
-
-      const data = await response.json();
-      setSelectedOrder(data.order);
-    } catch (error) {
-      console.error("Error fetching order details:", error);
-      handleApiError(error, "Order details fetch");
-      // Fall back to the basic order data from the list
-      setSelectedOrder(order);
-    } finally {
-      setIsLoadingOrderDetails(false);
-    }
-  };
-
-  const handleCloseSidebar = () => {
-    setIsSidebarOpen(false);
-    setSelectedOrder(null);
-    setIsLoadingOrderDetails(false);
-    // Fetch latest orders when sidebar closes to reflect any updates
-    fetchOrders(currentPage);
-  };
-
-  const handleOrderUpdate = async (updatedOrderId?: string) => {
-    setIsRefreshing(true);
-    try {
-      // Small delay to ensure Sanity has processed the update
-      await new Promise((resolve) => setTimeout(resolve, 200));
-
-      // Refresh orders list from server to ensure consistency
-      await fetchOrders(currentPage);
-
-      // Also refresh the selected order details if sidebar is still open
-      if (selectedOrder && isSidebarOpen && updatedOrderId) {
-        try {
-          const timestamp = Date.now();
-          const updatedOrderData = await safeApiCall(
-            `/api/admin/orders/${updatedOrderId}?_t=${timestamp}`
-          );
-          if (updatedOrderData?.order) {
-            setSelectedOrder(updatedOrderData.order);
-          }
-        } catch (error) {
-          console.error("Error refreshing order details:", error);
-        }
-      }
-    } catch (error) {
-      console.error("Error updating orders:", error);
-    } finally {
-      setIsRefreshing(false);
-    }
-  };
-
-  // Pagination functions
-  const handlePageChange = (newPage: number) => {
-    setCurrentPage(newPage);
-    setSelectedOrders([]); // Clear selections when changing page
-  };
-
-  // Delete functions
-  const openDeleteDialog = () => {
-    setIsDeleteDialogOpen(true);
-  };
-
-  const handleDeleteOrders = async () => {
-    setIsDeleting(true);
-    try {
-      const timestamp = Date.now();
-      await safeApiCall(`/api/admin/orders?_t=${timestamp}`, {
-        method: "DELETE",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ orderIds: selectedOrders }),
-      });
-
-      setIsDeleteDialogOpen(false);
-      setSelectedOrders([]);
-
-      const newTotal = Math.max(0, pagination.totalCount - selectedOrders.length);
-      const newTotalPages = Math.ceil(newTotal / limit);
-
-      // If we deleted everything on the current page, go back one page if possible
-      if (currentPage >= newTotalPages && currentPage > 0) {
-        setCurrentPage(Math.max(0, currentPage - 1));
-      } else {
-        // Just refresh current page
-        await fetchOrders(currentPage);
-      }
-
-    } catch (error) {
-      handleApiError(error, "Orders delete");
-    } finally {
-      setIsDeleting(false);
-    }
-  };
-
-  // Manual refresh handler
-  const handleRefresh = useCallback(async () => {
-    setIsRefreshing(true);
-    try {
-      setDebouncedSearch(""); // optional: clear search on hard refresh
-      setSearchQuery("");
-      await fetchOrders(0);
-      setCurrentPage(0);
-    } finally {
-      setIsRefreshing(false);
-    }
-  }, [fetchOrders]);
-
+  }, [orders, selectedOrders.length]);
 
   return (
-    <>
-      <div className="space-y-6 p-6 bg-gray-50/50 min-h-screen">
-        {/* Header Section */}
-        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+    <div className="space-y-8">
+      {/* Hero Header */}
+      <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-indigo-600 via-purple-600 to-pink-500 p-8 text-white">
+        <div className="absolute inset-0 bg-[url('/grid.svg')] opacity-10" />
+        <div className="absolute -top-24 -right-24 w-96 h-96 bg-white/10 rounded-full blur-3xl" />
+        <div className="absolute -bottom-24 -left-24 w-72 h-72 bg-purple-300/20 rounded-full blur-3xl" />
+
+        <div className="relative z-10 flex flex-col lg:flex-row justify-between items-start lg:items-center gap-6">
           <div>
-            <h1 className="text-2xl font-bold text-gray-900">Orders Management</h1>
-            <p className="text-sm text-gray-500">View and manage all customer orders</p>
+            <div className="flex items-center gap-2 mb-2">
+              <Sparkles className="w-5 h-5 text-yellow-300" />
+              <span className="text-sm font-medium text-white/80">Order Management</span>
+            </div>
+            <h1 className="text-3xl lg:text-4xl font-bold tracking-tight mb-2">
+              Orders Dashboard
+            </h1>
+            <p className="text-white/70 text-lg">
+              Track, manage, and fulfill your store orders seamlessly
+            </p>
           </div>
+
           <div className="flex items-center gap-3">
-            <div className="bg-white border rounded-lg p-1 flex items-center shadow-sm">
+            <Button
+              variant="secondary"
+              className="bg-white/10 hover:bg-white/20 text-white border-white/20 backdrop-blur-sm rounded-xl"
+              onClick={() => fetchOrders(currentPage)}
+            >
+              <RefreshCw className="mr-2 h-4 w-4" />
+              Refresh
+            </Button>
+            <div className="flex bg-white/10 backdrop-blur-sm p-1 rounded-xl border border-white/20">
               <Button
                 variant="ghost"
                 size="sm"
-                className={`h-8 px-2 ${viewMode === 'list' ? 'bg-gray-100 text-gray-900' : 'text-gray-500'}`}
-                onClick={() => setViewMode('list')}
+                onClick={() => setViewMode("list")}
+                className={`rounded-lg ${viewMode === "list" ? "bg-white text-gray-900" : "text-white hover:bg-white/20 hover:text-white"}`}
               >
-                <List className="w-4 h-4 mr-1" /> List
+                <List className="h-4 w-4" />
               </Button>
               <Button
                 variant="ghost"
                 size="sm"
-                className={`h-8 px-2 ${viewMode === 'grid' ? 'bg-gray-100 text-gray-900' : 'text-gray-500'}`}
-                onClick={() => setViewMode('grid')}
+                onClick={() => setViewMode("grid")}
+                className={`rounded-lg ${viewMode === "grid" ? "bg-white text-gray-900" : "text-white hover:bg-white/20 hover:text-white"}`}
               >
-                <LayoutGrid className="w-4 h-4 mr-1" /> Grid
+                <LayoutGrid className="h-4 w-4" />
               </Button>
             </div>
-            <Link href="/admin/orders/create">
-              <Button className="bg-emerald-600 hover:bg-emerald-700 shadow-sm">
-                <Plus className="h-4 w-4 mr-2" /> Create Order
-              </Button>
-            </Link>
           </div>
         </div>
+      </div>
 
-        {/* Stats Cards */}
-        <OrderStats />
+      {/* Stats Section */}
+      <OrderStats />
 
-        {/* Filter Bar */}
-        <OrderFilterBar
-          status={orderStatus}
-          onStatusChange={setOrderStatus}
-          searchQuery={searchQuery}
-          onSearchChange={setSearchQuery}
-          perPage={perPage}
-          onPerPageChange={setPerPage}
-          onRefresh={handleRefresh}
-          isRefreshing={isRefreshing}
-          startDate={startDate}
-          endDate={endDate}
-          onDateChange={handleDateChange}
-          onReset={() => {
-            setOrderStatus("all");
-            setSearchQuery("");
-            setPerPage("20");
-            setStartDate("");
-            setEndDate("");
-          }}
-        />
+      {/* Filters */}
+      <OrderFilterBar
+        status={orderStatus}
+        onStatusChange={setOrderStatus}
+        searchQuery={searchQuery}
+        onSearchChange={setSearchQuery}
+        perPage={perPage}
+        onPerPageChange={setPerPage}
+        onReset={() => {
+          setOrderStatus("all");
+          setSearchQuery("");
+          setStartDate("");
+          setEndDate("");
+          setCurrentPage(0);
+        }}
+        startDate={startDate}
+        endDate={endDate}
+        onDateChange={handleDateChange}
+      />
 
-        {/* Main Content */}
-        <div className="space-y-4">
-          {/* Selection Toolbar */}
-          {selectedOrders.length > 0 && (
-            <div className="flex items-center justify-between bg-blue-50 p-3 rounded-xl border border-blue-100 shadow-sm animate-in fade-in slide-in-from-top-2">
-              <span className="text-sm font-medium text-blue-900 px-2">
-                {selectedOrders.length} order{selectedOrders.length > 1 ? "s" : ""} selected
-              </span>
-              <div className="flex items-center gap-2">
-                <Button
-                  onClick={handleExportCSV}
-                  variant="outline"
-                  size="sm"
-                  className="gap-2 shadow-sm bg-white hover:bg-gray-50 border-blue-200 text-blue-700 hover:text-blue-800"
-                >
-                  <Download className="h-4 w-4" />
-                  Export CSV
-                </Button>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  className="gap-2 shadow-sm bg-white hover:bg-gray-50 border-blue-200 text-blue-700 hover:text-blue-800"
-                >
-                  <Printer className="h-4 w-4" />
-                  Print
-                </Button>
-                <Button
-                  onClick={openDeleteDialog}
-                  variant="destructive"
-                  size="sm"
-                  className="gap-2 shadow-sm"
-                >
-                  <Trash2 className="h-4 w-4" />
-                  Delete
-                </Button>
-              </div>
+      {/* Bulk Actions Bar */}
+      {selectedOrders.length > 0 && (
+        <div className="fixed bottom-6 left-1/2 -translate-x-1/2 bg-gradient-to-r from-gray-900 to-gray-800 text-white px-8 py-4 rounded-2xl shadow-2xl z-50 flex items-center gap-6 animate-in slide-in-from-bottom-5 fade-in duration-300 border border-gray-700">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-xl bg-emerald-500 flex items-center justify-center text-lg font-bold">
+              {selectedOrders.length}
             </div>
-          )}
+            <span className="font-medium">orders selected</span>
+          </div>
+          <div className="h-8 w-px bg-gray-600" />
+          <Button
+            size="sm"
+            className="bg-blue-600 hover:bg-blue-700 text-white rounded-xl h-9"
+            onClick={handleExportCSV}
+          >
+            <Download className="w-4 h-4 mr-2" />
+            Export
+          </Button>
+          <Button
+            size="sm"
+            className="bg-purple-600 hover:bg-purple-700 text-white rounded-xl h-9"
+            onClick={handleExportCSV}
+          >
+            <Printer className="w-4 h-4 mr-2" />
+            Print
+          </Button>
+        </div>
+      )}
 
-          {loading ? (
-            <OrdersSkeleton />
-          ) : orders.length === 0 ? (
-            <div className="bg-white rounded-xl border border-dashed border-gray-300 p-12 flex flex-col items-center justify-center text-center">
-              <div className="bg-gray-50 p-4 rounded-full mb-4">
-                <Package className="h-8 w-8 text-gray-400" />
+      {/* Orders Content */}
+      {loading ? (
+        <div className="space-y-4">
+          {[1, 2, 3, 4].map((i) => (
+            <Skeleton key={i} className="h-20 w-full rounded-2xl" />
+          ))}
+        </div>
+      ) : (
+        <>
+          {orders.length === 0 ? (
+            <div className="text-center py-20 bg-gradient-to-br from-gray-50 to-white rounded-3xl border-2 border-dashed border-gray-200">
+              <div className="w-20 h-20 mx-auto mb-6 rounded-2xl bg-gradient-to-br from-gray-100 to-gray-50 flex items-center justify-center">
+                <Package className="w-10 h-10 text-gray-300" />
               </div>
-              <h3 className="text-lg font-semibold text-gray-900">No orders found</h3>
-              <p className="text-gray-500 max-w-sm mt-1 mb-6">
-                {orderStatus !== "all" || searchQuery
-                  ? "No orders match your current filters. Try resetting them."
-                  : "There are no orders in the system yet."}
+              <h3 className="text-xl font-bold text-gray-900 mb-2">No orders found</h3>
+              <p className="text-gray-500 max-w-sm mx-auto">
+                Try adjusting your search criteria or filters to find what you're looking for.
               </p>
-              {(orderStatus !== "all" || searchQuery) && (
-                <Button variant="outline" onClick={() => { setOrderStatus("all"); setSearchQuery(""); }}>
-                  Clear Filters
-                </Button>
-              )}
+              <Button
+                variant="outline"
+                className="mt-6 rounded-xl"
+                onClick={() => {
+                  setOrderStatus("all");
+                  setSearchQuery("");
+                }}
+              >
+                Clear Filters
+              </Button>
             </div>
           ) : viewMode === "list" ? (
-            <Card className="rounded-xl overflow-hidden shadow-sm border-gray-200">
-              <Table>
-                <TableHeader className="bg-gray-50/50">
-                  <TableRow>
-                    <TableHead className="w-12 py-4">
-                      <Checkbox
-                        checked={selectedOrders.length === orders.length && orders.length > 0}
-                        onCheckedChange={toggleSelectAll}
-                      />
-                    </TableHead>
-                    <TableHead className="py-4 font-semibold text-gray-700">Order #</TableHead>
-                    <TableHead className="py-4 font-semibold text-gray-700">Customer</TableHead>
-                    <TableHead className="py-4 font-semibold text-gray-700">Amount</TableHead>
-                    <TableHead className="py-4 font-semibold text-gray-700">Status</TableHead>
-                    <TableHead className="py-4 font-semibold text-gray-700">Payment</TableHead>
-                    <TableHead className="py-4 font-semibold text-gray-700">Date</TableHead>
-                    <TableHead className="text-right py-4 font-semibold text-gray-700">Actions</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {orders.map((order) => (
-                    <TableRow key={order._id} className="hover:bg-gray-50/50 transition-colors">
-                      <TableCell>
+            <div className="bg-white rounded-3xl shadow-xl border border-gray-100 overflow-hidden">
+              {/* Table Header Bar */}
+              <div className="px-6 py-4 border-b border-gray-100 bg-gradient-to-r from-gray-50 via-white to-gray-50">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-4">
+                    <p className="text-sm font-medium text-gray-600">
+                      Showing <span className="text-gray-900 font-bold">{orders.length}</span> of{" "}
+                      <span className="text-gray-900 font-bold">{pagination.total || orders.length}</span> orders
+                    </p>
+                    {selectedOrders.length > 0 && (
+                      <span className="px-3 py-1 bg-emerald-100 text-emerald-700 rounded-full text-xs font-semibold">
+                        {selectedOrders.length} selected
+                      </span>
+                    )}
+                  </div>
+                  <div className="flex items-center gap-2 text-xs text-gray-500">
+                    <span className="flex items-center gap-1.5">
+                      <span className="w-2 h-2 rounded-full bg-emerald-500"></span> Completed
+                    </span>
+                    <span className="flex items-center gap-1.5">
+                      <span className="w-2 h-2 rounded-full bg-amber-500"></span> Pending
+                    </span>
+                    <span className="flex items-center gap-1.5">
+                      <span className="w-2 h-2 rounded-full bg-blue-500"></span> Processing
+                    </span>
+                  </div>
+                </div>
+              </div>
+
+              <div className="overflow-x-auto scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-100">
+                <table className="w-full min-w-[1000px]">
+                  <thead>
+                    <tr className="bg-gray-50/80">
+                      <th className="w-[50px] min-w-[50px] pl-6 py-4 text-left sticky left-0 bg-gray-50/80 z-10">
                         <Checkbox
-                          checked={selectedOrders.includes(order._id)}
-                          onCheckedChange={() => toggleOrderSelection(order._id)}
+                          checked={selectedOrders.length === orders.length && orders.length > 0}
+                          onCheckedChange={toggleSelectAll}
+                          className="rounded-md border-gray-300"
                         />
-                      </TableCell>
-                      <TableCell className="font-medium text-gray-900">
-                        {order.orderNumber}
-                      </TableCell>
-                      <TableCell>
-                        <div className="flex flex-col">
-                          <span className="font-medium text-gray-900">{order.customerName}</span>
-                          <span className="text-xs text-gray-500">{order.email}</span>
-                        </div>
-                      </TableCell>
-                      <TableCell>
-                        <span className="font-semibold text-gray-900">{formatCurrency(order.totalPrice)}</span>
-                      </TableCell>
-                      <TableCell>
-                        <div className="flex items-center gap-2">
-                          <Badge className={`${getStatusColor(order.status)} border-0 font-normal`}>
-                            {order.status.replace(/_/g, " ")}
-                          </Badge>
-                          {(order as any).cancellationRequested && (
-                            <Badge className="bg-red-50 text-red-600 border-red-100 text-[10px] px-1.5 py-0.5 animate-pulse">
-                              Cancellation
-                            </Badge>
-                          )}
-                        </div>
-                      </TableCell>
-                      <TableCell className="capitalize text-gray-600 text-sm">
-                        {order.paymentMethod.replace(/_/g, " ")}
-                      </TableCell>
-                      <TableCell className="text-gray-600 text-sm">{formatDate(order.orderDate)}</TableCell>
-                      <TableCell className="text-right">
-                        <Button
-                          size="sm"
-                          variant="ghost"
-                          onClick={() => handleShowOrderDetails(order)}
-                          className="hover:text-emerald-600 hover:bg-emerald-50"
+                      </th>
+                      <th className="py-4 px-4 text-left text-xs font-bold text-gray-500 uppercase tracking-wider min-w-[180px]">Order</th>
+                      <th className="py-4 px-4 text-left text-xs font-bold text-gray-500 uppercase tracking-wider min-w-[200px]">Customer</th>
+                      <th className="py-4 px-4 text-left text-xs font-bold text-gray-500 uppercase tracking-wider min-w-[120px]">Date</th>
+                      <th className="py-4 px-4 text-left text-xs font-bold text-gray-500 uppercase tracking-wider min-w-[160px]">Status</th>
+                      <th className="py-4 px-4 text-left text-xs font-bold text-gray-500 uppercase tracking-wider min-w-[130px]">Payment</th>
+                      <th className="py-4 px-4 text-right text-xs font-bold text-gray-500 uppercase tracking-wider min-w-[120px]">Amount</th>
+                      <th className="py-4 px-4 text-center pr-6 text-xs font-bold text-gray-500 uppercase tracking-wider min-w-[100px]">Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-gray-100">
+                    {orders.map((order, idx) => {
+                      const statusStyle = getStatusStyle(order.status);
+                      const initials = order.customerName.split(' ').map(n => n[0]).join('').slice(0, 2).toUpperCase();
+
+                      return (
+                        <tr
+                          key={order._id}
+                          className={`
+                            cursor-pointer transition-all duration-200 group relative
+                            ${selectedOrders.includes(order._id)
+                              ? 'bg-gradient-to-r from-emerald-50 to-teal-50'
+                              : 'hover:bg-gradient-to-r hover:from-gray-50 hover:to-white'
+                            }
+                          `}
+                          onClick={() => setSelectedOrder(order)}
                         >
-                          <Eye className="h-4 w-4" /> <span className="sr-only">View</span>
-                        </Button>
-                      </TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-            </Card>
+                          {/* Selection indicator bar */}
+                          <td className="relative pl-6 py-4 sticky left-0 bg-white group-hover:bg-gray-50 z-10" onClick={(e) => e.stopPropagation()}>
+                            {selectedOrders.includes(order._id) && (
+                              <div className="absolute left-0 top-0 bottom-0 w-1 bg-gradient-to-b from-emerald-400 to-teal-500 rounded-r-full" />
+                            )}
+                            <Checkbox
+                              checked={selectedOrders.includes(order._id)}
+                              onCheckedChange={() => toggleOrderSelection(order._id)}
+                              className="rounded-md border-gray-300"
+                            />
+                          </td>
+
+                          {/* Order Number with Icon */}
+                          <td className="py-4 px-4">
+                            <div className="flex items-center gap-3">
+                              <div className={`
+                                w-11 h-11 rounded-xl bg-gradient-to-br ${statusStyle.gradient} 
+                                flex items-center justify-center text-white font-bold text-xs shadow-lg
+                                group-hover:scale-105 transition-transform duration-200
+                              `}>
+                                #{order.orderNumber.slice(-3)}
+                              </div>
+                              <div className="flex flex-col">
+                                <span className="font-mono text-sm font-semibold text-gray-900">
+                                  {order.orderNumber}
+                                </span>
+                                <span className="text-xs text-gray-400">
+                                  {order.products?.length || 0} items
+                                </span>
+                              </div>
+                            </div>
+                          </td>
+
+                          {/* Customer with Avatar */}
+                          <td className="py-4 px-4">
+                            <div className="flex items-center gap-3">
+                              <div className="w-10 h-10 rounded-full bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center text-white font-bold text-sm shadow-md">
+                                {initials}
+                              </div>
+                              <div className="flex flex-col">
+                                <span className="font-semibold text-gray-900 text-sm">{order.customerName}</span>
+                                <span className="text-xs text-gray-500 truncate max-w-[150px]">{order.email}</span>
+                              </div>
+                            </div>
+                          </td>
+
+                          {/* Date with relative time */}
+                          <td className="py-4 px-4">
+                            <div className="flex flex-col">
+                              <span className="text-sm font-medium text-gray-900">
+                                {format(new Date(order.orderDate), "MMM d, yyyy")}
+                              </span>
+                              <span className="text-xs text-gray-400">
+                                {format(new Date(order.orderDate), "h:mm a")}
+                              </span>
+                            </div>
+                          </td>
+
+                          {/* Status with Progress Bar */}
+                          <td className="py-4 px-4">
+                            <div className="space-y-1.5">
+                              <span className={`
+                                inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold uppercase tracking-wide
+                                ${statusStyle.bg} ${statusStyle.text}
+                              `}>
+                                <span className="w-1.5 h-1.5 rounded-full bg-current animate-pulse" />
+                                {order.status.replace(/_/g, " ")}
+                              </span>
+                              {/* Mini progress bar */}
+                              <div className="w-24 h-1 bg-gray-200 rounded-full overflow-hidden">
+                                <div
+                                  className={`h-full bg-gradient-to-r ${statusStyle.gradient} rounded-full transition-all duration-500`}
+                                  style={{
+                                    width: order.status === 'completed' || order.status === 'delivered'
+                                      ? '100%'
+                                      : order.status === 'cancelled'
+                                        ? '0%'
+                                        : order.status === 'pending'
+                                          ? '15%'
+                                          : '60%'
+                                  }}
+                                />
+                              </div>
+                            </div>
+                          </td>
+
+                          {/* Payment Method */}
+                          <td className="py-4 px-4">
+                            <div className="flex items-center gap-2">
+                              <div className={`
+                                p-2 rounded-lg 
+                                ${order.paymentMethod === 'card' || order.paymentMethod === 'credit_card'
+                                  ? 'bg-blue-100'
+                                  : order.paymentMethod === 'cash' || order.paymentMethod === 'cod'
+                                    ? 'bg-green-100'
+                                    : 'bg-purple-100'
+                                }
+                              `}>
+                                <svg className={`w-4 h-4 ${order.paymentMethod === 'card' || order.paymentMethod === 'credit_card'
+                                  ? 'text-blue-600'
+                                  : order.paymentMethod === 'cash' || order.paymentMethod === 'cod'
+                                    ? 'text-green-600'
+                                    : 'text-purple-600'
+                                  }`} fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                  {order.paymentMethod === 'card' || order.paymentMethod === 'credit_card' ? (
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" />
+                                  ) : order.paymentMethod === 'cash' || order.paymentMethod === 'cod' ? (
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z" />
+                                  ) : (
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                  )}
+                                </svg>
+                              </div>
+                              <span className="text-sm font-medium text-gray-700 capitalize">
+                                {(order.paymentMethod || 'N/A').replace(/_/g, " ")}
+                              </span>
+                            </div>
+                          </td>
+
+                          {/* Amount */}
+                          <td className="py-4 px-4 text-right">
+                            <div className="flex flex-col items-end">
+                              <span className="text-lg font-bold text-gray-900">
+                                ${order.totalPrice.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                              </span>
+                              {order.status === 'completed' || order.status === 'delivered' ? (
+                                <span className="text-xs text-emerald-600 font-medium flex items-center gap-1">
+                                  <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
+                                    <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                                  </svg>
+                                  Paid
+                                </span>
+                              ) : (
+                                <span className="text-xs text-gray-400">
+                                  {order.status === 'cancelled' ? 'Refunded' : 'Awaiting'}
+                                </span>
+                              )}
+                            </div>
+                          </td>
+
+                          {/* Actions */}
+                          <td className="py-4 pr-6">
+                            <div className="flex items-center justify-center gap-1">
+                              <Button
+                                variant="ghost"
+                                size="icon"
+                                className="h-9 w-9 rounded-xl bg-gray-100 hover:bg-blue-100 text-gray-500 hover:text-blue-600 transition-all"
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  setSelectedOrder(order);
+                                }}
+                              >
+                                <Eye className="h-4 w-4" />
+                              </Button>
+                              <Button
+                                variant="ghost"
+                                size="icon"
+                                className="h-9 w-9 rounded-xl bg-gray-100 hover:bg-emerald-100 text-gray-500 hover:text-emerald-600 transition-all opacity-0 group-hover:opacity-100"
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  setSelectedOrder(order);
+                                }}
+                              >
+                                <ArrowUpRight className="h-4 w-4" />
+                              </Button>
+                            </div>
+                          </td>
+                        </tr>
+                      );
+                    })}
+                  </tbody>
+                </table>
+              </div>
+
+              {/* Table Footer */}
+              <div className="px-6 py-4 border-t border-gray-100 bg-gradient-to-r from-gray-50 via-white to-gray-50">
+                <div className="flex items-center justify-between text-sm text-gray-500">
+                  <span>Tip: Click on any row to view order details</span>
+                  <span className="flex items-center gap-2">
+                    <kbd className="px-2 py-1 bg-gray-100 rounded text-xs font-mono">↑↓</kbd>
+                    <span>Navigate</span>
+                    <kbd className="px-2 py-1 bg-gray-100 rounded text-xs font-mono ml-2">Enter</kbd>
+                    <span>Select</span>
+                  </span>
+                </div>
+              </div>
+            </div>
           ) : (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-              {orders.map(order => (
+            <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-6">
+              {orders.map((order) => (
                 <OrderCard
                   key={order._id}
                   order={order}
-                  selected={selectedOrders.includes(order._id)}
-                  onSelect={toggleOrderSelection}
-                  onViewDetails={handleShowOrderDetails}
-                  getStatusColor={getStatusColor}
+                  isSelected={selectedOrders.includes(order._id)}
+                  onSelect={() => toggleOrderSelection(order._id)}
+                  onClick={() => setSelectedOrder(order)}
+                  statusColor={getStatusStyle(order.status).bg}
                 />
               ))}
             </div>
           )}
 
           {/* Pagination */}
-          {orders.length > 0 && (
-            <div className="flex flex-col sm:flex-row items-center justify-between gap-4 pt-4 border-t">
-              <div className="text-sm text-gray-500">
-                Showing <span className="font-medium text-gray-900">{orders.length}</span> of <span className="font-medium text-gray-900">{pagination.totalCount}</span> orders
+          {pagination.totalPages > 1 && (
+            <div className="flex items-center justify-center gap-4 pt-6">
+              <Button
+                variant="outline"
+                size="lg"
+                onClick={() => setCurrentPage((p) => Math.max(0, p - 1))}
+                disabled={currentPage === 0}
+                className="rounded-xl px-6"
+              >
+                <ChevronLeft className="h-4 w-4 mr-2" />
+                Previous
+              </Button>
+
+              <div className="flex items-center gap-2">
+                {Array.from({ length: Math.min(5, pagination.totalPages) }, (_, i) => {
+                  const pageNum = currentPage < 3 ? i : currentPage - 2 + i;
+                  if (pageNum >= pagination.totalPages) return null;
+                  return (
+                    <button
+                      key={pageNum}
+                      onClick={() => setCurrentPage(pageNum)}
+                      className={`
+                        w-10 h-10 rounded-xl text-sm font-semibold transition-all
+                        ${currentPage === pageNum
+                          ? 'bg-gradient-to-br from-indigo-600 to-purple-600 text-white shadow-lg'
+                          : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                        }
+                      `}
+                    >
+                      {pageNum + 1}
+                    </button>
+                  );
+                })}
               </div>
-              <div className="flex gap-2">
-                <Button
-                  onClick={() => handlePageChange(Math.max(0, currentPage - 1))}
-                  disabled={currentPage === 0}
-                  variant="outline"
-                  size="sm"
-                  className="h-8"
-                >
-                  Previous
-                </Button>
-                <div className="flex items-center justify-center px-4 text-sm font-medium">
-                  Page {currentPage + 1}
-                </div>
-                <Button
-                  onClick={() => handlePageChange(currentPage + 1)}
-                  disabled={!pagination.hasNextPage}
-                  variant="outline"
-                  size="sm"
-                  className="h-8"
-                >
-                  Next
-                </Button>
-              </div>
+
+              <Button
+                variant="outline"
+                size="lg"
+                onClick={() => setCurrentPage((p) => Math.min(pagination.totalPages - 1, p + 1))}
+                disabled={currentPage >= pagination.totalPages - 1}
+                className="rounded-xl px-6"
+              >
+                Next
+                <ChevronRight className="h-4 w-4 ml-2" />
+              </Button>
             </div>
           )}
-        </div>
-      </div>
+        </>
+      )}
 
-      {/* Dialogs & Sidebar */}
-      <DeleteConfirmationDialog
-        isOpen={isDeleteDialogOpen}
-        onClose={() => setIsDeleteDialogOpen(false)}
-        onConfirm={handleDeleteOrders}
-        title="Delete Orders"
-        description={`Are you sure you want to delete ${selectedOrders.length} order${selectedOrders.length > 1 ? "s" : ""}?`}
-        itemCount={selectedOrders.length}
-        isLoading={isDeleting}
-      />
-
+      {/* Order Details Sidebar */}
       <OrderDetailsSidebar
-        isOpen={isSidebarOpen}
-        onClose={handleCloseSidebar}
+        isOpen={!!selectedOrder}
         order={selectedOrder}
-        onOrderUpdate={handleOrderUpdate}
-        isLoading={isLoadingOrderDetails}
+        onClose={() => setSelectedOrder(null)}
+        onOrderUpdate={() => fetchOrders(currentPage)}
       />
-    </>
+    </div>
   );
-};
-
-export default AdminOrders;
+}

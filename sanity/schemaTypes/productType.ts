@@ -125,7 +125,6 @@ export const productType = defineType({
       name: "seo",
       title: "SEO Settings",
       type: "object",
-      group: "seo",
       fields: [
         defineField({ name: "metaTitle", title: "Meta Title", type: "string" }),
         defineField({ name: "metaDescription", title: "Meta Description", type: "text", rows: 3 }),
@@ -165,6 +164,16 @@ export const productType = defineType({
       type: "boolean",
       description: "Toggle to Featured on or off",
       initialValue: false,
+    }),
+    // Legacy rating field (kept for backward compatibility with existing data)
+    defineField({
+      name: "rating",
+      title: "Rating (Legacy)",
+      type: "number",
+      readOnly: true,
+      hidden: true,
+      description: "Legacy rating field - use averageRating instead",
+      validation: (Rule) => Rule.min(0).max(5),
     }),
     defineField({
       name: "averageRating",

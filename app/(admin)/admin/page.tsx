@@ -1,12 +1,7 @@
-import AdminPremiumFeature from "@/components/admin/AdminPremiumFeature";
+import { redirect } from 'next/navigation';
 
 const AdminPage = () => {
-  return (
-    <AdminPremiumFeature
-      featureName="Admin Dashboard"
-      description="Unlock powerful analytics and management tools (coming soon) — this is a capstone project demonstration."
-    />
-  );
+  redirect('/admin/orders');
 };
 
 export default AdminPage;
