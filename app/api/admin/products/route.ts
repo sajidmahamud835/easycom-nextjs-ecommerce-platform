@@ -92,19 +92,19 @@ export async function GET(req: NextRequest) {
         ...product,
         category: product.categories?.[0]
           ? {
-              _id: product.categories[0]._id,
-              name: product.categories[0].title,
-              title: product.categories[0].title,
-              slug: product.categories[0].slug,
-            }
+            _id: product.categories[0]._id,
+            name: product.categories[0].title,
+            title: product.categories[0].title,
+            slug: product.categories[0].slug,
+          }
           : null,
         brand: product.brand
           ? {
-              _id: product.brand._id,
-              name: product.brand.title,
-              title: product.brand.title,
-              slug: product.brand.slug,
-            }
+            _id: product.brand._id,
+            name: product.brand.title,
+            title: product.brand.title,
+            slug: product.brand.slug,
+          }
           : null,
         featured: product.isFeatured,
       };
@@ -126,10 +126,9 @@ export async function GET(req: NextRequest) {
       );
     } // Build GROQ query
     const query = `
-      *[_type == "product"${
-        filterConditions.length > 0
-          ? ` && (${filterConditions.join(" && ")})`
-          : ""
+      *[_type == "product"${filterConditions.length > 0
+        ? ` && (${filterConditions.join(" && ")})`
+        : ""
       }] | order(${sortBy} ${sortOrder}) [${offset}...${offset + limit}] {
         _id,
         _createdAt,
@@ -165,10 +164,9 @@ export async function GET(req: NextRequest) {
 
     // Get count query
     const countQuery = `
-      count(*[_type == "product"${
-        filterConditions.length > 0
-          ? ` && (${filterConditions.join(" && ")})`
-          : ""
+      count(*[_type == "product"${filterConditions.length > 0
+        ? ` && (${filterConditions.join(" && ")})`
+        : ""
       }])
     `;
 
@@ -194,6 +192,100 @@ export async function GET(req: NextRequest) {
     console.error("Error fetching products:", error);
     return NextResponse.json(
       { error: "Internal server error" },
+      { status: 500 }
+    );
+  }
+}
+
+export async function POST(req: NextRequest) {
+  try {
+    const { userId } = await auth();
+    if (!userId) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
+    const clerk = await clerkClient();
+    const currentUser = await clerk.users.getUser(userId);
+    const userEmail = currentUser.primaryEmailAddress?.emailAddress;
+
+    if (!userEmail || !isUserAdmin(userEmail)) {
+      return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+    }
+
+    const {
+      name,
+      description,
+      price,
+      discount,
+      stock,
+      sku,
+      barcode,
+      weight,
+      dimensions,
+      status,
+      variant,
+      isFeatured,
+      isTodaysDeal,
+      categoryId,
+      brandId,
+      variants,
+      images,
+      videos,
+      seo
+    } = await req.json();
+
+    // Basic validation
+    if (!name || price === undefined) {
+      return NextResponse.json({ error: "Name and Price are required" }, { status: 400 });
+    }
+
+    const doc: any = {
+      _type: 'product',
+      name,
+      description,
+      price,
+      discount: discount || 0,
+      stock: stock || 0,
+      sku,
+      barcode,
+      weight: weight || 0,
+      dimensions,
+      status: status || 'new',
+      variant: variant || 'others',
+      isFeatured: isFeatured || false,
+      isTodaysDeal: isTodaysDeal || false,
+      variants,
+      images, // Assuming these are already asset references or will be handled
+      videos, // Assuming these are already asset references
+      seo,
+      slug: {
+        _type: 'slug',
+        current: name.toLowerCase().replace(/\s+/g, '-').slice(0, 96)
+      }
+    };
+
+    if (categoryId) {
+      doc.categories = [{
+        _type: 'reference',
+        _ref: categoryId,
+        _key: Math.random().toString(36).substring(7)
+      }];
+    }
+
+    if (brandId) {
+      doc.brand = {
+        _type: 'reference',
+        _ref: brandId
+      };
+    }
+
+    const createdProduct = await client.create(doc);
+
+    return NextResponse.json({ product: createdProduct }, { status: 201 });
+  } catch (error) {
+    console.error("Error creating product:", error);
+    return NextResponse.json(
+      { error: "Failed to create product" },
       { status: 500 }
     );
   }

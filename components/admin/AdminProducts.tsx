@@ -547,13 +547,19 @@ const AdminProducts: React.FC<AdminProductsProps> = ({
           <div className="bg-gradient-to-r from-violet-600 via-purple-600 to-fuchsia-500 px-6 py-4 text-white">
             <SheetHeader>
               <SheetTitle className="text-lg font-bold text-white">
-                {isEditMode ? "Edit Product" : "Product Details"}
+                {isEditMode
+                  ? (selectedProduct?._id ? "Edit Product" : "Add New Product")
+                  : "Product Details"
+                }
               </SheetTitle>
               <SheetDescription className="text-white/70 text-sm">
-                {isEditMode ? "Modify product information and save changes" : "View product information"}
+                {isEditMode
+                  ? (selectedProduct?._id ? "Modify product information and save changes" : "Create a new product in your catalog")
+                  : "View product information"
+                }
               </SheetDescription>
             </SheetHeader>
-            {selectedProduct && (
+            {selectedProduct && selectedProduct._id && (
               <div className="flex items-center gap-2 mt-3">
                 <Button
                   onClick={() => setIsEditMode(!isEditMode)}
@@ -567,23 +573,28 @@ const AdminProducts: React.FC<AdminProductsProps> = ({
             )}
           </div>
 
-          {selectedProduct && (
+          {(selectedProduct || isEditMode) && (
             <div className="px-6 py-4">
               {isEditMode ? (
                 <ProductEditForm
-                  product={selectedProduct}
+                  product={selectedProduct || {} as Product}
                   categories={categories}
                   brands={brands}
                   onSave={(updatedProduct) => {
-                    // Update the product in the list
-                    setProducts((prev) =>
-                      prev.map((p) =>
-                        p._id === updatedProduct._id ? updatedProduct : p
-                      )
-                    );
-                    setSelectedProduct(updatedProduct);
-                    // Optionally close the sidebar
-                    // setIsProductDetailsOpen(false);
+                    if (updatedProduct._id) {
+                      // Update existing
+                      setProducts((prev) =>
+                        prev.map((p) =>
+                          p._id === updatedProduct._id ? updatedProduct : p
+                        )
+                      );
+                      setSelectedProduct(updatedProduct);
+                    } else {
+                      // Add new (needs refetch or manual add if ID exists)
+                      // For now, simpler to refetch or prepend if we returned the full object with ID
+                      fetchProducts(0);
+                      setIsProductDetailsOpen(false);
+                    }
                   }}
                   onCancel={() => setIsProductDetailsOpen(false)}
                 />
@@ -591,7 +602,7 @@ const AdminProducts: React.FC<AdminProductsProps> = ({
                 // View-only mode - simplified display
                 <div className="space-y-6">
                   {/* Product Image */}
-                  {selectedProduct.images && selectedProduct.images.length > 0 && (
+                  {selectedProduct?.images && selectedProduct.images.length > 0 && (
                     <div className="aspect-square max-w-xs mx-auto rounded-xl overflow-hidden bg-gray-100 shadow-lg">
                       <Image
                         src={urlFor(selectedProduct.images[0])
@@ -608,16 +619,16 @@ const AdminProducts: React.FC<AdminProductsProps> = ({
 
                   {/* Basic Info */}
                   <div className="space-y-3 bg-gray-50 p-4 rounded-xl">
-                    <h3 className="text-lg font-bold text-gray-900">{selectedProduct.name}</h3>
-                    {selectedProduct.description && (
+                    <h3 className="text-lg font-bold text-gray-900">{selectedProduct?.name}</h3>
+                    {selectedProduct?.description && (
                       <p className="text-sm text-gray-600">{selectedProduct.description}</p>
                     )}
                     <div className="flex items-center gap-4">
                       <span className="text-xl font-bold text-emerald-600">
-                        {formatCurrency(selectedProduct.price)}
+                        {selectedProduct && formatCurrency(selectedProduct.price)}
                       </span>
-                      <Badge variant={selectedProduct.stock > 0 ? "default" : "destructive"}>
-                        {selectedProduct.stock} in stock
+                      <Badge variant={selectedProduct && selectedProduct.stock > 0 ? "default" : "destructive"}>
+                        {selectedProduct?.stock} in stock
                       </Badge>
                     </div>
                   </div>
@@ -626,19 +637,19 @@ const AdminProducts: React.FC<AdminProductsProps> = ({
                   <div className="grid grid-cols-2 gap-3 text-sm">
                     <div className="bg-gray-50 p-3 rounded-xl">
                       <span className="text-gray-500">Category</span>
-                      <p className="font-medium">{selectedProduct.category?.name || "N/A"}</p>
+                      <p className="font-medium">{selectedProduct?.category?.name || "N/A"}</p>
                     </div>
                     <div className="bg-gray-50 p-3 rounded-xl">
                       <span className="text-gray-500">Brand</span>
-                      <p className="font-medium">{selectedProduct.brand?.name || "N/A"}</p>
+                      <p className="font-medium">{selectedProduct?.brand?.name || "N/A"}</p>
                     </div>
                     <div className="bg-gray-50 p-3 rounded-xl">
                       <span className="text-gray-500">Status</span>
-                      <Badge variant="outline" className="mt-1 capitalize">{selectedProduct.status}</Badge>
+                      <Badge variant="outline" className="mt-1 capitalize">{selectedProduct?.status}</Badge>
                     </div>
                     <div className="bg-gray-50 p-3 rounded-xl">
                       <span className="text-gray-500">Featured</span>
-                      <p className="font-medium">{selectedProduct.isFeatured || selectedProduct.featured ? "Yes" : "No"}</p>
+                      <p className="font-medium">{selectedProduct?.isFeatured || selectedProduct?.featured ? "Yes" : "No"}</p>
                     </div>
                   </div>
 

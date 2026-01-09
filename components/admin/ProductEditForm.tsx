@@ -126,34 +126,51 @@ export const ProductEditForm: React.FC<ProductEditFormProps> = ({
     };
 
     const handleSave = async () => {
-        if (!product._id) return;
-
         setSaving(true);
         try {
-            const updates: Record<string, unknown> = {};
-            modifiedFields.forEach((field) => {
-                updates[field] = formData[field as keyof FormData];
-            });
+            if (product._id) {
+                // UPDATE existing product
+                const updates: Record<string, unknown> = {};
+                modifiedFields.forEach((field) => {
+                    updates[field] = formData[field as keyof FormData];
+                });
 
-            if (Object.keys(updates).length === 0) {
-                toast.info("No changes to save");
-                setSaving(false);
-                return;
+                if (Object.keys(updates).length === 0) {
+                    toast.info("No changes to save");
+                    setSaving(false);
+                    return;
+                }
+
+                const response = await fetch(`/api/admin/products/${product._id}`, {
+                    method: "PATCH",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify(updates),
+                });
+
+                if (!response.ok) {
+                    const error = await response.json();
+                    throw new Error(error.error || "Failed to update product");
+                }
+
+                toast.success("Product updated successfully!");
+                onSave({ ...product, ...formData });
+            } else {
+                // CREATE new product
+                const response = await fetch("/api/admin/products", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify(formData),
+                });
+
+                if (!response.ok) {
+                    const error = await response.json();
+                    throw new Error(error.error || "Failed to create product");
+                }
+
+                const data = await response.json();
+                toast.success("Product created successfully!");
+                onSave(data.product);
             }
-
-            const response = await fetch(`/api/admin/products/${product._id}`, {
-                method: "PATCH",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify(updates),
-            });
-
-            if (!response.ok) {
-                const error = await response.json();
-                throw new Error(error.error || "Failed to update product");
-            }
-
-            toast.success("Product updated successfully!");
-            onSave({ ...product, ...formData });
         } catch (error) {
             console.error("Error saving product:", error);
             toast.error(error instanceof Error ? error.message : "Failed to save product");
@@ -173,8 +190,14 @@ export const ProductEditForm: React.FC<ProductEditFormProps> = ({
         <div className="space-y-8 max-w-5xl mx-auto pb-10">
             {/* Header */}
             <div className="mb-6">
-                <h2 className="text-2xl font-bold tracking-tight">Edit Product</h2>
-                <p className="text-sm text-muted-foreground">Manage details for {formData.name}</p>
+                <h2 className="text-2xl font-bold tracking-tight">
+                    {product._id ? "Edit Product" : "Add New Product"}
+                </h2>
+                <p className="text-sm text-muted-foreground">
+                    {product._id
+                        ? `Manage details for ${formData.name}`
+                        : "Enter details for the new product"}
+                </p>
             </div>
 
             {modifiedFields.size > 0 && (
@@ -509,7 +532,7 @@ export const ProductEditForm: React.FC<ProductEditFormProps> = ({
                 </Button>
                 <Button
                     onClick={handleSave}
-                    disabled={saving || modifiedFields.size === 0}
+                    disabled={saving || (product._id ? modifiedFields.size === 0 : false)}
                     className="bg-black hover:bg-gray-800 text-white rounded-xl px-6 min-w-[150px] shadow-lg shadow-gray-200"
                 >
                     {saving ? (
@@ -520,7 +543,7 @@ export const ProductEditForm: React.FC<ProductEditFormProps> = ({
                     ) : (
                         <>
                             <Save className="w-4 h-4 mr-2" />
-                            Save Changes
+                            {product._id ? "Save Changes" : "Create Product"}
                         </>
                     )}
                 </Button>
