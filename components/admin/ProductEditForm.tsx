@@ -171,40 +171,10 @@ export const ProductEditForm: React.FC<ProductEditFormProps> = ({
 
     return (
         <div className="space-y-8 max-w-5xl mx-auto pb-10">
-            {/* Header Actions */}
-            <div className="flex items-center justify-between sticky top-0 bg-white/80 backdrop-blur-md z-10 py-4 border-b mb-6">
-                <div>
-                    <h2 className="text-2xl font-bold tracking-tight">Edit Product</h2>
-                    <p className="text-sm text-muted-foreground">Manage details for {formData.name}</p>
-                </div>
-                <div className="flex gap-3">
-                    <Button
-                        variant="ghost"
-                        onClick={onCancel}
-                        disabled={saving}
-                        className="rounded-xl hover:bg-gray-100"
-                    >
-                        <X className="w-4 h-4 mr-2" />
-                        Cancel
-                    </Button>
-                    <Button
-                        onClick={handleSave}
-                        disabled={saving || modifiedFields.size === 0}
-                        className="bg-black hover:bg-gray-800 text-white rounded-xl px-6"
-                    >
-                        {saving ? (
-                            <>
-                                <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                                Saving...
-                            </>
-                        ) : (
-                            <>
-                                <Save className="w-4 h-4 mr-2" />
-                                Save Changes
-                            </>
-                        )}
-                    </Button>
-                </div>
+            {/* Header */}
+            <div className="mb-6">
+                <h2 className="text-2xl font-bold tracking-tight">Edit Product</h2>
+                <p className="text-sm text-muted-foreground">Manage details for {formData.name}</p>
             </div>
 
             {modifiedFields.size > 0 && (
@@ -524,6 +494,38 @@ export const ProductEditForm: React.FC<ProductEditFormProps> = ({
                     </div>
                 </div>
             </section>
+
+            {/* Bottom Actions Bar */}
+            <div className="sticky bottom-4 z-10 mt-8 rounded-2xl p-[1px] bg-gradient-to-r from-violet-600 via-purple-600 to-fuchsia-500 shadow-2xl">
+                <div className="bg-white/95 backdrop-blur-xl p-4 rounded-2xl flex items-center justify-end gap-3">
+                    <Button
+                        variant="ghost"
+                        onClick={onCancel}
+                        disabled={saving}
+                        className="rounded-xl hover:bg-gray-100"
+                    >
+                        <X className="w-4 h-4 mr-2" />
+                        Cancel
+                    </Button>
+                    <Button
+                        onClick={handleSave}
+                        disabled={saving || modifiedFields.size === 0}
+                        className="bg-black hover:bg-gray-800 text-white rounded-xl px-6 min-w-[150px] shadow-lg shadow-gray-200"
+                    >
+                        {saving ? (
+                            <>
+                                <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                                Saving...
+                            </>
+                        ) : (
+                            <>
+                                <Save className="w-4 h-4 mr-2" />
+                                Save Changes
+                            </>
+                        )}
+                    </Button>
+                </div>
+            </div>
         </div>
     );
 };
