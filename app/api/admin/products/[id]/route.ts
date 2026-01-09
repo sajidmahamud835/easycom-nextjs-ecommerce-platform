@@ -130,6 +130,8 @@ export async function PATCH(req: NextRequest, { params }: RouteParams) {
 
         // Array fields
         if (body.tags !== undefined) patchData.tags = body.tags;
+        if (body.videos !== undefined) patchData.videos = body.videos;
+        if (body.variants !== undefined) patchData.variants = body.variants;
 
         // Reference fields - categories
         if (body.categoryId !== undefined) {

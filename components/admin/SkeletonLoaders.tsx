@@ -337,62 +337,84 @@ export const UsersSkeleton = () => (
 
 // Products Page Skeleton
 export const ProductsSkeleton = () => (
-  <div className="space-y-4 p-4">
-    {/* Header */}
-    <div className="flex flex-col space-y-4 lg:flex-row lg:items-center lg:justify-between lg:space-y-0">
-      <Skeleton className="h-6 w-48" />
-      <div className="flex flex-col space-y-2 sm:flex-row sm:items-center sm:gap-2 sm:space-y-0">
-        <Skeleton className="h-9 w-full sm:w-48" />
-        <Skeleton className="h-9 w-full sm:w-32" />
-        <Skeleton className="h-9 w-full sm:w-9" />
+  <div className="space-y-6">
+    {/* Modern Gradient Header Skeleton */}
+    <div className="bg-gradient-to-r from-violet-600 via-purple-600 to-fuchsia-500 rounded-2xl p-6 shadow-xl">
+      <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
+        <div className="flex items-center gap-4">
+          <Skeleton className="w-14 h-14 rounded-xl bg-white/20" />
+          <div className="space-y-2">
+            <Skeleton className="h-7 w-48 bg-white/20" />
+            <Skeleton className="h-4 w-64 bg-white/20" />
+          </div>
+        </div>
+        <div className="flex gap-3">
+          <Skeleton className="h-10 w-32 rounded-xl bg-white/20" />
+          <Skeleton className="h-10 w-12 rounded-xl bg-white/20" />
+        </div>
+      </div>
+    </div>
+
+    {/* Search and Filters Bar Skeleton */}
+    <div className="bg-white p-4 rounded-2xl shadow-lg border border-gray-100">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div className="flex flex-col sm:flex-row sm:items-center gap-3 flex-1">
+          <Skeleton className="h-10 w-full sm:w-64 rounded-xl" />
+          <Skeleton className="h-10 w-full sm:w-40 rounded-xl" />
+        </div>
       </div>
     </div>
 
     {/* Desktop Table Skeleton */}
     <div className="hidden md:block">
-      <Card>
+      <Card className="border-0 shadow-xl rounded-2xl overflow-hidden">
         <div className="overflow-x-auto">
           <Table>
-            <TableHeader>
+            <TableHeader className="bg-gray-50/50">
               <TableRow>
-                <TableHead>Product</TableHead>
+                <TableHead className="w-[80px]">Image</TableHead>
+                <TableHead>Product Name</TableHead>
                 <TableHead>Category</TableHead>
                 <TableHead>Brand</TableHead>
                 <TableHead>Price</TableHead>
                 <TableHead>Stock</TableHead>
                 <TableHead>Status</TableHead>
-                <TableHead>Actions</TableHead>
+                <TableHead className="text-right">Actions</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
-              {[...Array(10)].map((_, i) => (
-                <TableRow key={i}>
+              {[...Array(8)].map((_, i) => (
+                <TableRow key={i} className="hover:bg-gray-50/50">
                   <TableCell>
-                    <div className="flex items-center gap-3">
-                      <Skeleton className="w-12 h-12 rounded-lg" />
-                      <div className="space-y-1">
-                        <Skeleton className="h-4 w-32" />
-                        <Skeleton className="h-3 w-16" />
-                      </div>
+                    <Skeleton className="w-12 h-12 rounded-lg" />
+                  </TableCell>
+                  <TableCell>
+                    <div className="space-y-1">
+                      <Skeleton className="h-4 w-40" />
+                      <Skeleton className="h-3 w-24" />
                     </div>
+                  </TableCell>
+                  <TableCell>
+                    <Skeleton className="h-6 w-24 rounded-full" />
                   </TableCell>
                   <TableCell>
                     <Skeleton className="h-4 w-20" />
                   </TableCell>
                   <TableCell>
-                    <Skeleton className="h-4 w-24" />
-                  </TableCell>
-                  <TableCell>
                     <Skeleton className="h-4 w-16" />
-                  </TableCell>
-                  <TableCell>
-                    <Skeleton className="h-6 w-12 rounded-full" />
                   </TableCell>
                   <TableCell>
                     <Skeleton className="h-6 w-16 rounded-full" />
                   </TableCell>
                   <TableCell>
-                    <Skeleton className="h-8 w-8 rounded" />
+                    <Skeleton className="h-6 w-16 rounded-full" />
+                  </TableCell>
+                  <TableCell className="text-right">
+                    <div className="flex justify-end gap-2">
+                      <Skeleton className="h-8 w-8 rounded-lg" />
+                      <Skeleton className="h-8 w-8 rounded-lg" />
+                      <Skeleton className="h-8 w-8 rounded-lg" />
+                    </div>
                   </TableCell>
                 </TableRow>
               ))}
@@ -405,48 +427,37 @@ export const ProductsSkeleton = () => (
     {/* Mobile Card Skeleton */}
     <div className="md:hidden space-y-4">
       {[...Array(6)].map((_, i) => (
-        <Card key={i}>
+        <Card key={i} className="rounded-2xl overflow-hidden shadow-sm">
           <div className="p-4 space-y-4">
             {/* Product Header */}
-            <div className="flex items-start gap-3">
-              <Skeleton className="w-16 h-16 rounded-lg" />
+            <div className="flex items-start gap-4">
+              <Skeleton className="w-20 h-20 rounded-xl" />
               <div className="flex-1 space-y-2">
-                <div className="flex items-start justify-between">
-                  <div className="flex-1 space-y-1">
-                    <Skeleton className="h-4 w-3/4" />
-                    <Skeleton className="h-3 w-16" />
-                  </div>
-                  <Skeleton className="h-8 w-8 rounded" />
+                <Skeleton className="h-4 w-3/4" />
+                <Skeleton className="h-3 w-1/2" />
+                <div className="flex gap-2 pt-1">
+                  <Skeleton className="h-5 w-16 rounded-full" />
+                  <Skeleton className="h-5 w-16 rounded-full" />
                 </div>
               </div>
             </div>
 
             {/* Product Details Grid */}
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-2 gap-4 py-2 border-t border-b border-gray-100">
               <div className="space-y-1">
-                <Skeleton className="h-3 w-16" />
+                <Skeleton className="h-3 w-10" />
                 <Skeleton className="h-4 w-20" />
               </div>
               <div className="space-y-1">
                 <Skeleton className="h-3 w-12" />
                 <Skeleton className="h-4 w-24" />
               </div>
-              <div className="space-y-1">
-                <Skeleton className="h-3 w-10" />
-                <Skeleton className="h-4 w-16" />
-              </div>
-              <div className="space-y-1">
-                <Skeleton className="h-3 w-12" />
-                <Skeleton className="h-6 w-16 rounded-full" />
-              </div>
             </div>
 
-            {/* Status */}
-            <div className="flex items-center justify-between pt-2 border-t">
-              <div className="flex items-center gap-2">
-                <Skeleton className="h-3 w-12" />
-                <Skeleton className="h-6 w-16 rounded-full" />
-              </div>
+            {/* Actions */}
+            <div className="flex items-center justify-between gap-2">
+              <Skeleton className="h-9 flex-1 rounded-xl" />
+              <Skeleton className="h-9 w-9 rounded-xl" />
             </div>
           </div>
         </Card>
@@ -454,9 +465,12 @@ export const ProductsSkeleton = () => (
     </div>
 
     {/* Pagination Skeleton */}
-    <div className="flex justify-center gap-2">
-      <Skeleton className="h-9 w-20" />
-      <Skeleton className="h-9 w-16" />
+    <div className="flex items-center justify-between px-2">
+      <Skeleton className="h-4 w-32" />
+      <div className="flex gap-2">
+        <Skeleton className="h-9 w-9 rounded-lg" />
+        <Skeleton className="h-9 w-9 rounded-lg" />
+      </div>
     </div>
   </div>
 );

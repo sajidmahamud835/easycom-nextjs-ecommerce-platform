@@ -30,6 +30,13 @@ export const productType = defineType({
       of: [{ type: "image", options: { hotspot: true } }],
     }),
     defineField({
+      name: "videos",
+      title: "Product Videos",
+      type: "array",
+      of: [{ type: "file", options: { accept: "video/*" } }],
+      description: "Upload product videos (MP4, WebM, etc.)",
+    }),
+    defineField({
       name: "description",
       title: "Description",
       type: "string",

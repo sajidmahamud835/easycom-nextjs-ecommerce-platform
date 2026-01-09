@@ -1,12 +1,9 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
-import Image from "next/image";
-import { urlFor } from "@/sanity/lib/image";
+import React, { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Badge } from "@/components/ui/badge";
 import { Textarea } from "@/components/ui/textarea";
 import { Switch } from "@/components/ui/switch";
 import {
@@ -16,19 +13,25 @@ import {
     SelectTrigger,
     SelectValue,
 } from "@/components/ui/select";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Separator } from "@/components/ui/separator";
 import {
     Save,
     X,
     Loader2,
     Package,
-    ChevronLeft,
-    ChevronRight,
     AlertCircle,
+    Wand2,
+    Globe,
+    Layers,
+    Image as ImageIcon,
+    Tag,
 } from "lucide-react";
 import { toast } from "sonner";
 import { Product } from "./types";
 import { ADMIN_CATEGORIES_QUERYResult } from "@/sanity.types";
+import { MediaManager } from "./MediaManager";
+import { VariantManager } from "./VariantManager";
 
 interface ProductEditFormProps {
     product: Product;
@@ -55,6 +58,15 @@ interface FormData {
     isTodaysDeal: boolean;
     categoryId: string;
     brandId: string;
+    // New fields
+    variants: any[];
+    images: any[];
+    videos: any[];
+    seo: {
+        metaTitle: string;
+        metaDescription: string;
+        keywords: string[];
+    };
 }
 
 export const ProductEditForm: React.FC<ProductEditFormProps> = ({
@@ -65,7 +77,7 @@ export const ProductEditForm: React.FC<ProductEditFormProps> = ({
     onCancel,
 }) => {
     const [saving, setSaving] = useState(false);
-    const [currentImageIndex, setCurrentImageIndex] = useState(0);
+    const [activeTab, setActiveTab] = useState("basic");
     const [formData, setFormData] = useState<FormData>({
         name: product.name || "",
         description: product.description || "",
@@ -73,24 +85,53 @@ export const ProductEditForm: React.FC<ProductEditFormProps> = ({
         discount: product.discount || 0,
         discountPercentage: 0,
         stock: product.stock || 0,
-        sku: "",
-        barcode: "",
-        weight: 0,
-        dimensions: "",
+        sku: product.sku || "",
+        barcode: product.barcode || "",
+        weight: product.weight || 0,
+        dimensions: product.dimensions || "",
         status: product.status || "new",
         variant: product.variant || "others",
         isFeatured: product.isFeatured || product.featured || false,
-        isTodaysDeal: false,
+        isTodaysDeal: product.isTodaysDeal || false,
         categoryId: product.category?._id || "",
         brandId: product.brand?._id || "",
+        variants: product.variants || [],
+        images: product.images || [],
+        videos: product.videos || [],
+        seo: {
+            metaTitle: product.seo?.metaTitle || "",
+            metaDescription: product.seo?.metaDescription || "",
+            keywords: product.seo?.keywords || [],
+        },
     });
 
-    // Track which fields have been modified
     const [modifiedFields, setModifiedFields] = useState<Set<string>>(new Set());
 
-    const handleFieldChange = (field: keyof FormData, value: unknown) => {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const handleFieldChange = (field: keyof FormData, value: any) => {
         setFormData((prev) => ({ ...prev, [field]: value }));
         setModifiedFields((prev) => new Set(prev).add(field));
+    };
+
+    const handleSeoChange = (field: string, value: any) => {
+        setFormData((prev) => ({
+            ...prev,
+            seo: { ...prev.seo, [field]: value }
+        }));
+        setModifiedFields((prev) => new Set(prev).add("seo"));
+    };
+
+    const generateSku = () => {
+        const prefix = formData.name.substring(0, 3).toUpperCase();
+        const rand = Math.floor(Math.random() * 10000).toString().padStart(4, "0");
+        const sku = `${prefix}-${rand}`;
+        handleFieldChange("sku", sku);
+    };
+
+    const generateBarcode = () => {
+        // Simple EAN-13 like generation
+        const barcode = Math.floor(Math.random() * 1000000000000).toString().padStart(13, "0");
+        handleFieldChange("barcode", barcode);
     };
 
     const handleSave = async () => {
@@ -121,7 +162,6 @@ export const ProductEditForm: React.FC<ProductEditFormProps> = ({
                 throw new Error(error.error || "Failed to update product");
             }
 
-            const result = await response.json();
             toast.success("Product updated successfully!");
             onSave({ ...product, ...formData });
         } catch (error) {
@@ -129,22 +169,6 @@ export const ProductEditForm: React.FC<ProductEditFormProps> = ({
             toast.error(error instanceof Error ? error.message : "Failed to save product");
         } finally {
             setSaving(false);
-        }
-    };
-
-    const goToPrevImage = () => {
-        if (product.images && product.images.length > 0) {
-            setCurrentImageIndex((prev) =>
-                prev === 0 ? product.images!.length - 1 : prev - 1
-            );
-        }
-    };
-
-    const goToNextImage = () => {
-        if (product.images && product.images.length > 0) {
-            setCurrentImageIndex((prev) =>
-                prev === product.images!.length - 1 ? 0 : prev + 1
-            );
         }
     };
 
@@ -156,341 +180,357 @@ export const ProductEditForm: React.FC<ProductEditFormProps> = ({
     };
 
     return (
-        <div className="space-y-6">
-            {/* Product Images */}
-            <div className="space-y-3">
-                <Label className="text-sm font-medium text-gray-700">Product Images</Label>
-                {product.images && product.images.length > 0 ? (
-                    <div className="relative">
-                        <div className="aspect-square max-w-xs mx-auto rounded-xl overflow-hidden bg-gray-100 border border-gray-200 shadow-lg">
-                            <Image
-                                src={urlFor(product.images[currentImageIndex])
-                                    .width(300)
-                                    .height(300)
-                                    .url()}
-                                alt={`${product.name} - Image ${currentImageIndex + 1}`}
-                                width={300}
-                                height={300}
-                                className="w-full h-full object-cover"
-                            />
-                        </div>
-                        {product.images.length > 1 && (
+        <div className="space-y-6 max-w-5xl mx-auto">
+            <div className="flex items-center justify-between">
+                <div>
+                    <h2 className="text-2xl font-bold tracking-tight">Edit Product</h2>
+                    <p className="text-muted-foreground">Manage product details, media, and inventory.</p>
+                </div>
+                <div className="flex gap-3">
+                    <Button
+                        variant="outline"
+                        onClick={onCancel}
+                        disabled={saving}
+                        className="rounded-xl"
+                    >
+                        <X className="w-4 h-4 mr-2" />
+                        Cancel
+                    </Button>
+                    <Button
+                        onClick={handleSave}
+                        disabled={saving || modifiedFields.size === 0}
+                        className="bg-gradient-to-r from-violet-600 to-purple-600 hover:from-violet-700 hover:to-purple-700 text-white rounded-xl"
+                    >
+                        {saving ? (
                             <>
-                                <Button
-                                    variant="outline"
-                                    size="icon"
-                                    className="absolute left-2 top-1/2 -translate-y-1/2 bg-white/90 hover:bg-white shadow-lg h-8 w-8"
-                                    onClick={goToPrevImage}
-                                >
-                                    <ChevronLeft className="w-4 h-4" />
-                                </Button>
-                                <Button
-                                    variant="outline"
-                                    size="icon"
-                                    className="absolute right-2 top-1/2 -translate-y-1/2 bg-white/90 hover:bg-white shadow-lg h-8 w-8"
-                                    onClick={goToNextImage}
-                                >
-                                    <ChevronRight className="w-4 h-4" />
-                                </Button>
-                                <div className="text-xs text-gray-500 text-center mt-2">
-                                    {currentImageIndex + 1} of {product.images.length} images
-                                </div>
+                                <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                                Saving...
+                            </>
+                        ) : (
+                            <>
+                                <Save className="w-4 h-4 mr-2" />
+                                Save Changes
                             </>
                         )}
-                    </div>
-                ) : (
-                    <div className="aspect-square max-w-xs mx-auto rounded-xl bg-gray-100 flex items-center justify-center border border-gray-200">
-                        <Package className="w-12 h-12 text-gray-400" />
-                    </div>
-                )}
-            </div>
-
-            <Separator />
-
-            {/* Basic Information */}
-            <div className="space-y-4">
-                <h4 className="text-sm font-semibold text-gray-900">Basic Information</h4>
-
-                <div className="space-y-2">
-                    <Label htmlFor="name">Product Name *</Label>
-                    <Input
-                        id="name"
-                        value={formData.name}
-                        onChange={(e) => handleFieldChange("name", e.target.value)}
-                        placeholder="Enter product name"
-                        className="rounded-xl"
-                    />
-                </div>
-
-                <div className="space-y-2">
-                    <Label htmlFor="description">Description</Label>
-                    <Textarea
-                        id="description"
-                        value={formData.description}
-                        onChange={(e) => handleFieldChange("description", e.target.value)}
-                        placeholder="Enter product description"
-                        rows={3}
-                        className="rounded-xl"
-                    />
-                </div>
-
-                <div className="grid grid-cols-2 gap-4">
-                    <div className="space-y-2">
-                        <Label htmlFor="sku">SKU</Label>
-                        <Input
-                            id="sku"
-                            value={formData.sku}
-                            onChange={(e) => handleFieldChange("sku", e.target.value)}
-                            placeholder="SKU123"
-                            className="rounded-xl"
-                        />
-                    </div>
-                    <div className="space-y-2">
-                        <Label htmlFor="barcode">Barcode</Label>
-                        <Input
-                            id="barcode"
-                            value={formData.barcode}
-                            onChange={(e) => handleFieldChange("barcode", e.target.value)}
-                            placeholder="1234567890"
-                            className="rounded-xl"
-                        />
-                    </div>
+                    </Button>
                 </div>
             </div>
 
-            <Separator />
-
-            {/* Pricing & Inventory */}
-            <div className="space-y-4">
-                <h4 className="text-sm font-semibold text-gray-900">Pricing & Inventory</h4>
-
-                <div className="grid grid-cols-2 gap-4">
-                    <div className="space-y-2">
-                        <Label htmlFor="price">Price ($) *</Label>
-                        <Input
-                            id="price"
-                            type="number"
-                            min="0"
-                            step="0.01"
-                            value={formData.price}
-                            onChange={(e) => handleFieldChange("price", parseFloat(e.target.value) || 0)}
-                            className="rounded-xl"
-                        />
-                    </div>
-                    <div className="space-y-2">
-                        <Label htmlFor="discount">Discount ($)</Label>
-                        <Input
-                            id="discount"
-                            type="number"
-                            min="0"
-                            step="0.01"
-                            value={formData.discount}
-                            onChange={(e) => handleFieldChange("discount", parseFloat(e.target.value) || 0)}
-                            className="rounded-xl"
-                        />
-                    </div>
-                </div>
-
-                <div className="grid grid-cols-2 gap-4">
-                    <div className="space-y-2">
-                        <Label htmlFor="stock">Stock *</Label>
-                        <Input
-                            id="stock"
-                            type="number"
-                            min="0"
-                            value={formData.stock}
-                            onChange={(e) => handleFieldChange("stock", parseInt(e.target.value) || 0)}
-                            className="rounded-xl"
-                        />
-                    </div>
-                    <div className="space-y-2">
-                        <Label htmlFor="weight">Weight (kg)</Label>
-                        <Input
-                            id="weight"
-                            type="number"
-                            min="0"
-                            step="0.01"
-                            value={formData.weight}
-                            onChange={(e) => handleFieldChange("weight", parseFloat(e.target.value) || 0)}
-                            className="rounded-xl"
-                        />
-                    </div>
-                </div>
-
-                {/* Price Preview */}
-                {formData.discount > 0 && (
-                    <div className="bg-emerald-50 p-3 rounded-xl border border-emerald-100">
-                        <div className="flex items-center justify-between">
-                            <span className="text-sm text-gray-600">Final Price:</span>
-                            <div className="flex items-center gap-2">
-                                <span className="text-sm line-through text-gray-400">
-                                    {formatCurrency(formData.price)}
-                                </span>
-                                <span className="text-lg font-bold text-emerald-600">
-                                    {formatCurrency(formData.price - formData.discount)}
-                                </span>
-                            </div>
-                        </div>
-                    </div>
-                )}
-            </div>
-
-            <Separator />
-
-            {/* Classification */}
-            <div className="space-y-4">
-                <h4 className="text-sm font-semibold text-gray-900">Classification</h4>
-
-                <div className="grid grid-cols-2 gap-4">
-                    <div className="space-y-2">
-                        <Label>Category</Label>
-                        <Select
-                            value={formData.categoryId}
-                            onValueChange={(value) => handleFieldChange("categoryId", value)}
-                        >
-                            <SelectTrigger className="rounded-xl">
-                                <SelectValue placeholder="Select category" />
-                            </SelectTrigger>
-                            <SelectContent className="rounded-xl">
-                                {categories.map((cat) => (
-                                    <SelectItem key={cat._id} value={cat._id}>
-                                        {cat.title}
-                                    </SelectItem>
-                                ))}
-                            </SelectContent>
-                        </Select>
-                    </div>
-                    <div className="space-y-2">
-                        <Label>Brand</Label>
-                        <Select
-                            value={formData.brandId}
-                            onValueChange={(value) => handleFieldChange("brandId", value)}
-                        >
-                            <SelectTrigger className="rounded-xl">
-                                <SelectValue placeholder="Select brand" />
-                            </SelectTrigger>
-                            <SelectContent className="rounded-xl">
-                                {brands.map((brand) => (
-                                    <SelectItem key={brand._id} value={brand._id}>
-                                        {brand.title}
-                                    </SelectItem>
-                                ))}
-                            </SelectContent>
-                        </Select>
-                    </div>
-                </div>
-
-                <div className="grid grid-cols-2 gap-4">
-                    <div className="space-y-2">
-                        <Label>Status</Label>
-                        <Select
-                            value={formData.status}
-                            onValueChange={(value) => handleFieldChange("status", value)}
-                        >
-                            <SelectTrigger className="rounded-xl">
-                                <SelectValue placeholder="Select status" />
-                            </SelectTrigger>
-                            <SelectContent className="rounded-xl">
-                                <SelectItem value="new">New</SelectItem>
-                                <SelectItem value="hot">Hot</SelectItem>
-                                <SelectItem value="sale">Sale</SelectItem>
-                            </SelectContent>
-                        </Select>
-                    </div>
-                    <div className="space-y-2">
-                        <Label>Product Type</Label>
-                        <Select
-                            value={formData.variant}
-                            onValueChange={(value) => handleFieldChange("variant", value)}
-                        >
-                            <SelectTrigger className="rounded-xl">
-                                <SelectValue placeholder="Select type" />
-                            </SelectTrigger>
-                            <SelectContent className="rounded-xl">
-                                <SelectItem value="gadget">Gadget</SelectItem>
-                                <SelectItem value="appliances">Appliances</SelectItem>
-                                <SelectItem value="refrigerators">Refrigerators</SelectItem>
-                                <SelectItem value="others">Others</SelectItem>
-                            </SelectContent>
-                        </Select>
-                    </div>
-                </div>
-            </div>
-
-            <Separator />
-
-            {/* Features */}
-            <div className="space-y-4">
-                <h4 className="text-sm font-semibold text-gray-900">Features</h4>
-
-                <div className="space-y-3">
-                    <div className="flex items-center justify-between p-3 bg-gray-50 rounded-xl">
-                        <div>
-                            <Label htmlFor="isFeatured" className="font-medium">Featured Product</Label>
-                            <p className="text-xs text-gray-500">Display on homepage featured section</p>
-                        </div>
-                        <Switch
-                            id="isFeatured"
-                            checked={formData.isFeatured}
-                            onCheckedChange={(checked) => handleFieldChange("isFeatured", checked)}
-                        />
-                    </div>
-
-                    <div className="flex items-center justify-between p-3 bg-gray-50 rounded-xl">
-                        <div>
-                            <Label htmlFor="isTodaysDeal" className="font-medium">Today's Deal</Label>
-                            <p className="text-xs text-gray-500">Mark as a special deal</p>
-                        </div>
-                        <Switch
-                            id="isTodaysDeal"
-                            checked={formData.isTodaysDeal}
-                            onCheckedChange={(checked) => handleFieldChange("isTodaysDeal", checked)}
-                        />
-                    </div>
-                </div>
-            </div>
-
-            <Separator />
-
-            {/* Modified Fields Indicator */}
             {modifiedFields.size > 0 && (
                 <div className="flex items-center gap-2 p-3 bg-amber-50 rounded-xl border border-amber-100">
                     <AlertCircle className="w-4 h-4 text-amber-500" />
                     <span className="text-sm text-amber-700">
-                        {modifiedFields.size} field(s) modified
+                        {modifiedFields.size} field(s) modified - Remember to save!
                     </span>
                 </div>
             )}
 
-            {/* Action Buttons */}
-            <div className="flex gap-3 pt-4">
-                <Button
-                    onClick={handleSave}
-                    disabled={saving || modifiedFields.size === 0}
-                    className="flex-1 bg-gradient-to-r from-violet-600 to-purple-600 hover:from-violet-700 hover:to-purple-700 text-white rounded-xl"
-                >
-                    {saving ? (
-                        <>
-                            <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                            Saving...
-                        </>
-                    ) : (
-                        <>
-                            <Save className="w-4 h-4 mr-2" />
-                            Save Changes
-                        </>
-                    )}
-                </Button>
-                <Button
-                    variant="outline"
-                    onClick={onCancel}
-                    disabled={saving}
-                    className="rounded-xl"
-                >
-                    <X className="w-4 h-4 mr-2" />
-                    Cancel
-                </Button>
-            </div>
+            <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-4">
+                <TabsList className="grid w-full grid-cols-5 h-auto p-1 bg-gray-100 rounded-xl">
+                    <TabsTrigger value="basic" className="rounded-lg py-2">
+                        <Package className="w-4 h-4 mr-2" /> Basic Info
+                    </TabsTrigger>
+                    <TabsTrigger value="media" className="rounded-lg py-2">
+                        <ImageIcon className="w-4 h-4 mr-2" /> Media
+                    </TabsTrigger>
+                    <TabsTrigger value="inventory" className="rounded-lg py-2">
+                        <Tag className="w-4 h-4 mr-2" /> Pricing & Inventory
+                    </TabsTrigger>
+                    <TabsTrigger value="variants" className="rounded-lg py-2">
+                        <Layers className="w-4 h-4 mr-2" /> Variants
+                    </TabsTrigger>
+                    <TabsTrigger value="seo" className="rounded-lg py-2">
+                        <Globe className="w-4 h-4 mr-2" /> SEO
+                    </TabsTrigger>
+                </TabsList>
+
+                <TabsContent value="basic" className="space-y-4">
+                    <div className="grid gap-6 bg-white p-6 rounded-2xl border shadow-sm">
+                        <div className="space-y-2">
+                            <Label htmlFor="name">Product Name *</Label>
+                            <Input
+                                id="name"
+                                value={formData.name}
+                                onChange={(e) => handleFieldChange("name", e.target.value)}
+                                className="rounded-xl"
+                            />
+                        </div>
+
+                        <div className="space-y-2">
+                            <Label htmlFor="description">Description (Markdown Supported)</Label>
+                            <Textarea
+                                id="description"
+                                value={formData.description}
+                                onChange={(e) => handleFieldChange("description", e.target.value)}
+                                rows={6}
+                                className="rounded-xl min-h-[150px]"
+                            />
+                        </div>
+
+                        <div className="grid grid-cols-2 gap-6">
+                            <div className="space-y-2">
+                                <Label>Category</Label>
+                                <Select
+                                    value={formData.categoryId}
+                                    onValueChange={(value) => handleFieldChange("categoryId", value)}
+                                >
+                                    <SelectTrigger className="rounded-xl">
+                                        <SelectValue placeholder="Select category" />
+                                    </SelectTrigger>
+                                    <SelectContent className="rounded-xl">
+                                        {categories.map((cat) => (
+                                            <SelectItem key={cat._id} value={cat._id}>
+                                                {cat.title}
+                                            </SelectItem>
+                                        ))}
+                                    </SelectContent>
+                                </Select>
+                            </div>
+                            <div className="space-y-2">
+                                <Label>Brand</Label>
+                                <Select
+                                    value={formData.brandId}
+                                    onValueChange={(value) => handleFieldChange("brandId", value)}
+                                >
+                                    <SelectTrigger className="rounded-xl">
+                                        <SelectValue placeholder="Select brand" />
+                                    </SelectTrigger>
+                                    <SelectContent className="rounded-xl">
+                                        {brands.map((brand) => (
+                                            <SelectItem key={brand._id} value={brand._id}>
+                                                {brand.title}
+                                            </SelectItem>
+                                        ))}
+                                    </SelectContent>
+                                </Select>
+                            </div>
+                        </div>
+
+                        <div className="grid grid-cols-2 gap-6">
+                            <div className="space-y-2">
+                                <Label>Status</Label>
+                                <Select
+                                    value={formData.status}
+                                    onValueChange={(value) => handleFieldChange("status", value)}
+                                >
+                                    <SelectTrigger className="rounded-xl">
+                                        <SelectValue placeholder="Select status" />
+                                    </SelectTrigger>
+                                    <SelectContent className="rounded-xl">
+                                        <SelectItem value="new">New</SelectItem>
+                                        <SelectItem value="hot">Hot</SelectItem>
+                                        <SelectItem value="sale">Sale</SelectItem>
+                                    </SelectContent>
+                                </Select>
+                            </div>
+                            <div className="space-y-2">
+                                <Label>Product Type</Label>
+                                <Select
+                                    value={formData.variant}
+                                    onValueChange={(value) => handleFieldChange("variant", value)}
+                                >
+                                    <SelectTrigger className="rounded-xl">
+                                        <SelectValue placeholder="Select type" />
+                                    </SelectTrigger>
+                                    <SelectContent className="rounded-xl">
+                                        <SelectItem value="gadget">Gadget</SelectItem>
+                                        <SelectItem value="appliances">Appliances</SelectItem>
+                                        <SelectItem value="refrigerators">Refrigerators</SelectItem>
+                                        <SelectItem value="others">Others</SelectItem>
+                                    </SelectContent>
+                                </Select>
+                            </div>
+                        </div>
+
+                        <Separator />
+
+                        <div className="space-y-3">
+                            <div className="flex items-center justify-between p-4 bg-gray-50 rounded-xl">
+                                <div>
+                                    <Label htmlFor="isFeatured" className="font-medium text-base">Featured Product</Label>
+                                    <p className="text-sm text-gray-500">Show this product on the homepage featured section</p>
+                                </div>
+                                <Switch
+                                    id="isFeatured"
+                                    checked={formData.isFeatured}
+                                    onCheckedChange={(checked) => handleFieldChange("isFeatured", checked)}
+                                />
+                            </div>
+
+                            <div className="flex items-center justify-between p-4 bg-gray-50 rounded-xl">
+                                <div>
+                                    <Label htmlFor="isTodaysDeal" className="font-medium text-base">Today's Deal</Label>
+                                    <p className="text-sm text-gray-500">Mark as a special daily deal with limited time pricing</p>
+                                </div>
+                                <Switch
+                                    id="isTodaysDeal"
+                                    checked={formData.isTodaysDeal}
+                                    onCheckedChange={(checked) => handleFieldChange("isTodaysDeal", checked)}
+                                />
+                            </div>
+                        </div>
+                    </div>
+                </TabsContent>
+
+                <TabsContent value="media" className="space-y-4">
+                    <div className="bg-white p-6 rounded-2xl border shadow-sm">
+                        <MediaManager
+                            images={formData.images}
+                            videos={formData.videos}
+                            onImagesChange={(imgs) => handleFieldChange("images", imgs)}
+                            onVideosChange={(vids) => handleFieldChange("videos", vids)}
+                        />
+                    </div>
+                </TabsContent>
+
+                <TabsContent value="inventory" className="space-y-4">
+                    <div className="bg-white p-6 rounded-2xl border shadow-sm space-y-6">
+                        <div className="grid grid-cols-2 gap-6">
+                            <div className="space-y-2">
+                                <Label htmlFor="price">Price ($) *</Label>
+                                <Input
+                                    id="price"
+                                    type="number"
+                                    min="0"
+                                    step="0.01"
+                                    value={formData.price}
+                                    onChange={(e) => handleFieldChange("price", parseFloat(e.target.value) || 0)}
+                                    className="rounded-xl font-medium"
+                                />
+                            </div>
+                            <div className="space-y-2">
+                                <Label htmlFor="discount">Discount Amount ($)</Label>
+                                <Input
+                                    id="discount"
+                                    type="number"
+                                    min="0"
+                                    step="0.01"
+                                    value={formData.discount}
+                                    onChange={(e) => handleFieldChange("discount", parseFloat(e.target.value) || 0)}
+                                    className="rounded-xl"
+                                />
+                            </div>
+                        </div>
+
+                        {formData.discount > 0 && (
+                            <div className="bg-emerald-50 p-4 rounded-xl border border-emerald-100 flex items-center justify-between">
+                                <span className="text-sm text-emerald-800 font-medium">Customer Price</span>
+                                <div className="flex items-center gap-3">
+                                    <span className="text-sm text-gray-400 line-through">{formatCurrency(formData.price)}</span>
+                                    <span className="text-xl font-bold text-emerald-600">{formatCurrency(formData.price - formData.discount)}</span>
+                                </div>
+                            </div>
+                        )}
+
+                        <Separator />
+
+                        <div className="grid grid-cols-2 gap-6">
+                            <div className="space-y-2">
+                                <Label htmlFor="stock">Stock Quantity *</Label>
+                                <Input
+                                    id="stock"
+                                    type="number"
+                                    min="0"
+                                    value={formData.stock}
+                                    onChange={(e) => handleFieldChange("stock", parseInt(e.target.value) || 0)}
+                                    className="rounded-xl"
+                                />
+                            </div>
+                            <div className="space-y-2">
+                                <Label htmlFor="weight">Weight (kg)</Label>
+                                <Input
+                                    id="weight"
+                                    type="number"
+                                    min="0"
+                                    step="0.01"
+                                    value={formData.weight}
+                                    onChange={(e) => handleFieldChange("weight", parseFloat(e.target.value) || 0)}
+                                    className="rounded-xl"
+                                />
+                            </div>
+                        </div>
+
+                        <div className="grid grid-cols-2 gap-6">
+                            <div className="space-y-2">
+                                <div className="flex items-center justify-between">
+                                    <Label htmlFor="sku">SKU</Label>
+                                    <Button variant="ghost" size="sm" className="h-6 text-xs text-violet-600" onClick={generateSku}>
+                                        <Wand2 className="w-3 h-3 mr-1" /> Generate
+                                    </Button>
+                                </div>
+                                <Input
+                                    id="sku"
+                                    value={formData.sku}
+                                    onChange={(e) => handleFieldChange("sku", e.target.value)}
+                                    placeholder="SKU-123"
+                                    className="rounded-xl"
+                                />
+                            </div>
+                            <div className="space-y-2">
+                                <div className="flex items-center justify-between">
+                                    <Label htmlFor="barcode">Barcode (EAN/UPC)</Label>
+                                    <Button variant="ghost" size="sm" className="h-6 text-xs text-violet-600" onClick={generateBarcode}>
+                                        <Wand2 className="w-3 h-3 mr-1" /> Generate
+                                    </Button>
+                                </div>
+                                <Input
+                                    id="barcode"
+                                    value={formData.barcode}
+                                    onChange={(e) => handleFieldChange("barcode", e.target.value)}
+                                    placeholder="123456789"
+                                    className="rounded-xl"
+                                />
+                            </div>
+                        </div>
+                    </div>
+                </TabsContent>
+
+                <TabsContent value="variants" className="space-y-4">
+                    <VariantManager
+                        variants={formData.variants}
+                        onVariantsChange={(vars) => handleFieldChange("variants", vars)}
+                    />
+                </TabsContent>
+
+                <TabsContent value="seo" className="space-y-4">
+                    <div className="bg-white p-6 rounded-2xl border shadow-sm space-y-6">
+                        <div className="space-y-2">
+                            <Label htmlFor="metaTitle">Meta Title</Label>
+                            <Input
+                                id="metaTitle"
+                                value={formData.seo.metaTitle}
+                                onChange={(e) => handleSeoChange("metaTitle", e.target.value)}
+                                placeholder="SEO Title (defaults to product name if empty)"
+                                className="rounded-xl"
+                            />
+                            <p className="text-xs text-gray-500 text-right">{formData.seo.metaTitle.length} / 60 characters</p>
+                        </div>
+
+                        <div className="space-y-2">
+                            <Label htmlFor="metaDescription">Meta Description</Label>
+                            <Textarea
+                                id="metaDescription"
+                                value={formData.seo.metaDescription}
+                                onChange={(e) => handleSeoChange("metaDescription", e.target.value)}
+                                placeholder="Brief summary for search results..."
+                                rows={3}
+                                className="rounded-xl"
+                            />
+                            <p className="text-xs text-gray-500 text-right">{formData.seo.metaDescription.length} / 160 characters</p>
+                        </div>
+
+                        <div className="space-y-2">
+                            <Label>Keywords</Label>
+                            <Input
+                                placeholder="Enter keywords separated by commas (e.g. phone, cheap, 5g)"
+                                value={formData.seo.keywords?.join(", ") || ""}
+                                onChange={(e) => handleSeoChange("keywords", e.target.value.split(",").map(k => k.trim()))}
+                                className="rounded-xl"
+                            />
+                        </div>
+                    </div>
+                </TabsContent>
+            </Tabs>
         </div>
     );
 };
