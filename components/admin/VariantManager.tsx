@@ -102,7 +102,7 @@ export const VariantManager: React.FC<VariantManagerProps> = ({
             ) : (
                 <div className="space-y-6">
                     {variants.map((variant, vIndex) => (
-                        <div key={variant._key || vIndex} className="bg-white border rounded-xl p-5 shadow-sm space-y-4">
+                        <div key={variant._key || vIndex} className="bg-white border-0 rounded-xl p-5 shadow-lg space-y-4">
                             <div className="flex items-center gap-4">
                                 <div className="flex-1">
                                     <Label className="text-xs text-gray-500 uppercase tracking-wider">Option Name</Label>

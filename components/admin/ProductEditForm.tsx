@@ -192,7 +192,7 @@ export const ProductEditForm: React.FC<ProductEditFormProps> = ({
                     <h3 className="text-lg font-semibold text-gray-900">Media</h3>
                     <span className="text-xs text-gray-500 bg-gray-100 px-2 py-1 rounded-full">Images & Videos</span>
                 </div>
-                <div className="bg-white p-6 rounded-2xl border shadow-sm">
+                <div className="bg-white p-6 rounded-2xl border-0 shadow-lg">
                     <MediaManager
                         images={formData.images}
                         videos={formData.videos}
@@ -207,7 +207,7 @@ export const ProductEditForm: React.FC<ProductEditFormProps> = ({
             {/* Basic Information */}
             <section className="space-y-4">
                 <h3 className="text-lg font-semibold text-gray-900">Basic Information</h3>
-                <div className="grid gap-6 bg-white p-6 rounded-2xl border shadow-sm">
+                <div className="grid gap-6 bg-white p-6 rounded-2xl border-0 shadow-lg">
                     <div className="space-y-2">
                         <Label htmlFor="name">Product Name *</Label>
                         <Input
@@ -337,7 +337,7 @@ export const ProductEditForm: React.FC<ProductEditFormProps> = ({
             {/* Pricing & Inventory */}
             <section className="space-y-4">
                 <h3 className="text-lg font-semibold text-gray-900">Pricing & Inventory</h3>
-                <div className="bg-white p-6 rounded-2xl border shadow-sm space-y-6">
+                <div className="bg-white p-6 rounded-2xl border-0 shadow-lg space-y-6">
                     <div className="grid grid-cols-2 gap-6">
                         <div className="space-y-2">
                             <Label htmlFor="price">Price ($) *</Label>
@@ -457,7 +457,7 @@ export const ProductEditForm: React.FC<ProductEditFormProps> = ({
                 <div className="flex items-center justify-between">
                     <h3 className="text-lg font-semibold text-gray-900">Search Engine Optimization (SEO)</h3>
                 </div>
-                <div className="bg-white p-6 rounded-2xl border shadow-sm space-y-6">
+                <div className="bg-white p-6 rounded-2xl border-0 shadow-lg space-y-6">
                     <div className="space-y-2">
                         <Label htmlFor="metaTitle">Meta Title</Label>
                         <Input
@@ -497,7 +497,8 @@ export const ProductEditForm: React.FC<ProductEditFormProps> = ({
 
             {/* Bottom Actions Bar */}
             {/* Bottom Actions Bar */}
-            <div className="sticky bottom-4 z-10 mt-8 bg-white/80 backdrop-blur-xl p-4 rounded-2xl shadow-[0_8px_30px_rgb(0,0,0,0.12)] border border-gray-100 flex items-center justify-end gap-3">
+            {/* Bottom Actions Bar */}
+            <div className="sticky bottom-4 z-10 mt-8 bg-white/80 backdrop-blur-xl p-4 rounded-2xl shadow-[0_8px_30px_rgb(0,0,0,0.12)] border-0 flex items-center justify-end gap-3">
                 <Button
                     variant="outline"
                     onClick={onCancel}

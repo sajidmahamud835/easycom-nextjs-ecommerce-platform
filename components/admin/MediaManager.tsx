@@ -75,7 +75,7 @@ export const MediaManager: React.FC<MediaManagerProps> = ({
 
                 <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-4">
                     {images.map((img, index) => (
-                        <div key={index} className="relative group aspect-square rounded-xl overflow-hidden border bg-gray-50">
+                        <div key={index} className="relative group aspect-square rounded-xl overflow-hidden border-0 bg-gray-50 shadow-sm">
                             <Image
                                 src={urlFor(img).width(300).height(300).url()}
                                 alt={`Product image ${index + 1}`}
