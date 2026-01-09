@@ -41,6 +41,7 @@ import {
   ChevronLeft,
   ChevronRight,
   Plus,
+  Eye,
 } from "lucide-react";
 import { ProductsSkeleton } from "./SkeletonLoaders";
 import { Product } from "./types";
