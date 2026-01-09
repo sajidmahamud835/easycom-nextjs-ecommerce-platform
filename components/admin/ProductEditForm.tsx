@@ -496,20 +496,20 @@ export const ProductEditForm: React.FC<ProductEditFormProps> = ({
             </section>
 
             {/* Bottom Actions Bar */}
-            <div className="sticky bottom-4 z-10 mt-8 bg-white/80 backdrop-blur-xl p-4 rounded-2xl border border-white/20 shadow-[0_8px_30px_rgb(139,92,246,0.15)] flex items-center justify-end gap-3">
+            {/* Bottom Actions Bar */}
+            <div className="sticky bottom-4 z-10 mt-8 bg-white/80 backdrop-blur-xl p-4 rounded-2xl shadow-[0_8px_30px_rgb(0,0,0,0.12)] border border-gray-100 flex items-center justify-end gap-3">
                 <Button
-                    variant="ghost"
+                    variant="outline"
                     onClick={onCancel}
                     disabled={saving}
-                    className="rounded-xl hover:bg-gray-100"
+                    className="rounded-xl hover:bg-gray-100 border-gray-200"
                 >
-                    <X className="w-4 h-4 mr-2" />
                     Cancel
                 </Button>
                 <Button
                     onClick={handleSave}
                     disabled={saving || modifiedFields.size === 0}
-                    className="bg-gradient-to-r from-violet-600 to-purple-600 hover:from-violet-700 hover:to-purple-700 text-white rounded-xl px-6 min-w-[150px] shadow-lg shadow-violet-200"
+                    className="bg-black hover:bg-gray-800 text-white rounded-xl px-6 min-w-[150px] shadow-lg shadow-gray-200"
                 >
                     {saving ? (
                         <>
