@@ -52,12 +52,23 @@ export async function GET(req: NextRequest) {
       filterConditions.push(`paymentMethod == "${paymentMethod}"`);
     }
 
+    const startDate = searchParams.get("startDate");
+    const endDate = searchParams.get("endDate");
+
+    if (startDate) {
+      filterConditions.push(`orderDate >= "${startDate}"`);
+    }
+    if (endDate) {
+      // Ensure we cover the full end day
+      const endDateTime = endDate.includes("T") ? endDate : `${endDate}T23:59:59.999Z`;
+      filterConditions.push(`orderDate <= "${endDateTime}"`);
+    }
+
     // Build GROQ query
     const query = `
-      *[_type == "order"${
-        filterConditions.length > 0
-          ? ` && (${filterConditions.join(" && ")})`
-          : ""
+      *[_type == "order"${filterConditions.length > 0
+        ? ` && (${filterConditions.join(" && ")})`
+        : ""
       }] | order(${sortBy} ${sortOrder}) [${offset}...${offset + limit}] {
         _id,
         _createdAt,
@@ -93,10 +104,9 @@ export async function GET(req: NextRequest) {
 
     // Get count query
     const countQuery = `
-      count(*[_type == "order"${
-        filterConditions.length > 0
-          ? ` && (${filterConditions.join(" && ")})`
-          : ""
+      count(*[_type == "order"${filterConditions.length > 0
+        ? ` && (${filterConditions.join(" && ")})`
+        : ""
       }])
     `;
 
@@ -208,9 +218,8 @@ export async function DELETE(req: NextRequest) {
     return NextResponse.json(
       {
         success: true,
-        message: `Successfully deleted ${successCount} order(s)${
-          failureCount > 0 ? `, failed to delete ${failureCount}` : ""
-        }`,
+        message: `Successfully deleted ${successCount} order(s)${failureCount > 0 ? `, failed to delete ${failureCount}` : ""
+          }`,
         results: deleteResults,
       },
       {

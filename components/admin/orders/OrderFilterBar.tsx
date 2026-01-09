@@ -20,6 +20,9 @@ interface OrderFilterBarProps {
     perPage: string;
     onPerPageChange: (value: string) => void;
     onReset: () => void;
+    startDate: string;
+    endDate: string;
+    onDateChange: (start: string, end: string) => void;
 }
 
 export default function OrderFilterBar({
@@ -29,17 +32,18 @@ export default function OrderFilterBar({
     onSearchChange,
     perPage,
     onPerPageChange,
-    onReset
+    onReset,
+    startDate,
+    endDate,
+    onDateChange
 }: OrderFilterBarProps) {
-    const [isSearchExpanded, setIsSearchExpanded] = useState(false);
-
-    const hasActiveFilters = status !== "all" || searchQuery.length > 0;
+    const hasActiveFilters = status !== "all" || searchQuery.length > 0 || startDate !== "" || endDate !== "";
 
     return (
-        <div className="flex flex-col sm:flex-row items-center justify-between gap-4 bg-white p-4 rounded-xl shadow-sm border border-gray-100 mb-6">
+        <div className="flex flex-col xl:flex-row items-center justify-between gap-4 bg-white p-4 rounded-xl shadow-sm border border-gray-100 mb-6">
 
             {/* Search */}
-            <div className="relative w-full sm:w-72">
+            <div className="relative w-full xl:w-72">
                 <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
                 <Input
                     placeholder="Search order #, customer, email..."
@@ -49,7 +53,24 @@ export default function OrderFilterBar({
                 />
             </div>
 
-            <div className="flex items-center gap-2 w-full sm:w-auto overflow-x-auto pb-2 sm:pb-0">
+            <div className="flex flex-wrap items-center gap-2 w-full xl:w-auto">
+                {/* Date Range */}
+                <div className="flex items-center gap-2 bg-gray-50 p-1 rounded-md border border-gray-200">
+                    <Input
+                        type="date"
+                        value={startDate}
+                        onChange={(e) => onDateChange(e.target.value, endDate)}
+                        className="w-[130px] h-8 bg-transparent border-none text-xs focus-visible:ring-0"
+                    />
+                    <span className="text-gray-400">-</span>
+                    <Input
+                        type="date"
+                        value={endDate}
+                        onChange={(e) => onDateChange(startDate, e.target.value)}
+                        className="w-[130px] h-8 bg-transparent border-none text-xs focus-visible:ring-0"
+                    />
+                </div>
+
                 {/* Status Filter */}
                 <Select value={status} onValueChange={onStatusChange}>
                     <SelectTrigger className="w-[180px] bg-gray-50 border-gray-200 text-gray-900">
@@ -76,7 +97,7 @@ export default function OrderFilterBar({
 
                 {/* Per Page */}
                 <Select value={perPage} onValueChange={onPerPageChange}>
-                    <SelectTrigger className="w-[80px] text-gray-900">
+                    <SelectTrigger className="w-[70px] text-gray-900">
                         <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
@@ -94,7 +115,7 @@ export default function OrderFilterBar({
                         onClick={onReset}
                         className="text-gray-500 hover:text-red-500"
                     >
-                        <X className="w-4 h-4 mr-1" /> Reset
+                        <X className="w-4 h-4 mr-1" />
                     </Button>
                 )}
             </div>
