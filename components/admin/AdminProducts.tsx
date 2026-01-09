@@ -542,7 +542,7 @@ const AdminProducts: React.FC<AdminProductsProps> = ({
 
       {/* Product Details Sidebar */}
       <Sheet open={isProductDetailsOpen} onOpenChange={setIsProductDetailsOpen}>
-        <SheetContent className="w-full sm:max-w-[1000px] sm:w-[600px] md:w-[800px] lg:w-[900px] overflow-y-auto p-0">
+        <SheetContent className="w-full sm:max-w-[850px] sm:w-[540px] md:w-[720px] lg:w-[800px] overflow-y-auto p-0">
           {/* Gradient Header */}
           <div className="bg-gradient-to-r from-violet-600 via-purple-600 to-fuchsia-500 px-6 py-4 text-white">
             <SheetHeader>
