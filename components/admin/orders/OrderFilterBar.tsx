@@ -43,7 +43,7 @@ export default function OrderFilterBar({
                 <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
                 <Input
                     placeholder="Search order #, customer, email..."
-                    className="pl-10"
+                    className="pl-10 text-gray-900 placeholder:text-gray-400"
                     value={searchQuery}
                     onChange={(e) => onSearchChange(e.target.value)}
                 />
@@ -52,7 +52,7 @@ export default function OrderFilterBar({
             <div className="flex items-center gap-2 w-full sm:w-auto overflow-x-auto pb-2 sm:pb-0">
                 {/* Status Filter */}
                 <Select value={status} onValueChange={onStatusChange}>
-                    <SelectTrigger className="w-[180px] bg-gray-50 border-gray-200">
+                    <SelectTrigger className="w-[180px] bg-gray-50 border-gray-200 text-gray-900">
                         <div className="flex items-center gap-2">
                             <Filter className="w-3.5 h-3.5 text-gray-500" />
                             <SelectValue placeholder="Filter by Status" />
@@ -76,7 +76,7 @@ export default function OrderFilterBar({
 
                 {/* Per Page */}
                 <Select value={perPage} onValueChange={onPerPageChange}>
-                    <SelectTrigger className="w-[80px]">
+                    <SelectTrigger className="w-[80px] text-gray-900">
                         <SelectValue />
                     </SelectTrigger>
                     <SelectContent>

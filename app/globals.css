@@ -51,6 +51,16 @@
   --sidebar-accent-foreground: #0F1111;
   --sidebar-border: #E5E7EB;
   --sidebar-ring: #FF9900;
+
+  /* Custom Shop Theme Colors - Available in Light Mode */
+  --shop-dark-green: #047857;
+  /* Emerald 700 */
+  --shop-light-green: #10b981;
+  /* Emerald 500 */
+  --shop-light-bg: #ecfdf5;
+  /* Emerald 50 */
+  --shop-light-pink: #fdf2f8;
+  /* Pink 50 */
 }
 
 @theme inline {

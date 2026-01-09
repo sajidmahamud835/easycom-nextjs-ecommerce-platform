@@ -1,5 +1,9 @@
 "use client";
 
+import { updateOrder } from "@/actions/admin/edit-order";
+import ProductPicker, { SelectedProduct } from "./orders/ProductPicker";
+import OrderAttachments from "./orders/OrderAttachments";
+
 import React, { useState } from "react";
 import {
   Sheet,
@@ -54,6 +58,8 @@ const OrderDetailsSidebar: React.FC<OrderDetailsSidebarProps> = ({
   isLoading = false,
 }) => {
   const [isUpdating, setIsUpdating] = useState(false);
+  const [isEditingAddress, setIsEditingAddress] = useState(false);
+  const [isEditingProducts, setIsEditingProducts] = useState(false);
   const [formData, setFormData] = useState({
     status: order?.status || "",
     totalPrice: order?.totalPrice || 0,
@@ -67,6 +73,23 @@ const OrderDetailsSidebar: React.FC<OrderDetailsSidebarProps> = ({
     rescheduledDate: order?.rescheduledDate || "",
     rescheduledReason: order?.rescheduledReason || "",
     cashCollectedAmount: order?.cashCollectedAmount || 0,
+    // Address fields
+    shippingAddress: {
+      name: order?.address?.name || "",
+      address: order?.address?.address || "",
+      city: order?.address?.city || "",
+      state: order?.address?.state || "",
+      zip: order?.address?.zip || "",
+    },
+    // Product fields
+    products: (order?.products || []).map(p => ({
+      _id: p.product?._id || "",
+      name: p.product?.name || "Unknown",
+      price: p.product?.price || 0,
+      quantity: p.quantity || 1,
+      stock: 999, // default if not available
+      image: p.product?.image || ""
+    })) as SelectedProduct[]
   });
 
   React.useEffect(() => {
@@ -84,6 +107,21 @@ const OrderDetailsSidebar: React.FC<OrderDetailsSidebarProps> = ({
         rescheduledDate: order.rescheduledDate || "",
         rescheduledReason: order.rescheduledReason || "",
         cashCollectedAmount: order.cashCollectedAmount || 0,
+        shippingAddress: {
+          name: order.address?.name || "",
+          address: order.address?.address || "",
+          city: order.address?.city || "",
+          state: order.address?.state || "",
+          zip: order.address?.zip || "",
+        },
+        products: (order.products || []).map(p => ({
+          _id: p.product?._id || "",
+          name: p.product?.name || "Unknown",
+          price: p.product?.price || 0,
+          quantity: p.quantity || 1,
+          stock: 999,
+          image: p.product?.image || ""
+        })) as SelectedProduct[]
       });
     }
   }, [order]);
@@ -142,24 +180,39 @@ const OrderDetailsSidebar: React.FC<OrderDetailsSidebarProps> = ({
     }));
   };
 
+
+
   const handleUpdateOrder = async () => {
     if (!order) return;
 
     setIsUpdating(true);
     try {
-      const response = await fetch(`/api/admin/orders/${order._id}`, {
-        method: "PATCH",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(formData),
+      // Use server action logic
+      const result = await updateOrder(order._id, {
+        status: formData.status,
+        paymentStatus: formData.paymentStatus,
+        totalPrice: formData.totalPrice,
+        trackingNumber: formData.trackingNumber,
+        notes: formData.notes,
+        estimatedDelivery: formData.estimatedDelivery,
+        packingNotes: formData.packingNotes,
+        deliveryNotes: formData.deliveryNotes,
+        deliveryAttempts: formData.deliveryAttempts,
+        rescheduledDate: formData.rescheduledDate,
+        rescheduledReason: formData.rescheduledReason,
+        cashCollectedAmount: formData.cashCollectedAmount,
+        address: formData.shippingAddress,
+        products: formData.products.map(p => ({
+          _key: p._id,
+          product: { _type: "reference", _ref: p._id },
+          quantity: p.quantity,
+          price: p.price
+        }))
       });
 
-      if (!response.ok) {
-        throw new Error("Failed to update order");
+      if (!result.success) {
+        throw new Error(result.error);
       }
-
-      const result = await response.json();
 
       // Track order fulfillment analytics
       if (formData.status !== order.status) {
@@ -190,23 +243,17 @@ const OrderDetailsSidebar: React.FC<OrderDetailsSidebarProps> = ({
           })) || [],
       });
 
-      // Show success message with refund info if applicable
-      if (result.walletRefunded && result.refundAmount) {
-        showToast.success(
-          `Order updated successfully! $${result.refundAmount.toFixed(
-            2
-          )} refunded to customer's wallet.`
-        );
-      } else {
-        showToast.success("Order updated successfully");
-      }
+      showToast.success("Order updated successfully");
 
       // Refresh the orders list immediately to get the latest data
       await onOrderUpdate(order._id);
 
+      // Stop editing address
+      setIsEditingAddress(false);
+
       // Close the sidebar immediately after refresh
       onClose();
-    } catch (error) {
+    } catch (error: any) {
       console.error("Error updating order:", error);
       showToast.error("Failed to update order");
     } finally {
@@ -594,21 +641,94 @@ const OrderDetailsSidebar: React.FC<OrderDetailsSidebarProps> = ({
                     }
                   />
                 </div>
-                {order.address && (
-                  <div>
-                    <Label className="text-sm font-medium">
-                      Shipping Address
-                    </Label>
-                    <div className="text-sm bg-gray-50 p-3 rounded-md">
-                      <p>{order.address.name}</p>
-                      <p>{order.address.address}</p>
-                      <p>
-                        {order.address.city}, {order.address.state}{" "}
-                        {order.address.zip}
-                      </p>
-                    </div>
+                <div>
+                  <div className="flex items-center justify-between mb-2">
+                    <Label className="text-sm font-medium">Shipping Address</Label>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      className="h-6 text-xs text-blue-600 hover:text-blue-800 px-2"
+                      onClick={(e) => {
+                        e.preventDefault();
+                        setIsEditingAddress(!isEditingAddress);
+                      }}
+                    >
+                      {isEditingAddress ? "Cancel" : "Edit"}
+                    </Button>
                   </div>
-                )}
+
+                  {isEditingAddress ? (
+                    <div className="space-y-2 border p-3 rounded-md bg-white">
+                      <Input
+                        placeholder="Full Name"
+                        value={formData.shippingAddress?.name || ""}
+                        onChange={(e) =>
+                          setFormData(prev => ({
+                            ...prev,
+                            shippingAddress: { ...prev.shippingAddress, name: e.target.value }
+                          }))
+                        }
+                      />
+                      <Input
+                        placeholder="Street Address"
+                        value={formData.shippingAddress?.address || ""}
+                        onChange={(e) =>
+                          setFormData(prev => ({
+                            ...prev,
+                            shippingAddress: { ...prev.shippingAddress, address: e.target.value }
+                          }))
+                        }
+                      />
+                      <div className="grid grid-cols-2 gap-2">
+                        <Input
+                          placeholder="City"
+                          value={formData.shippingAddress?.city || ""}
+                          onChange={(e) =>
+                            setFormData(prev => ({
+                              ...prev,
+                              shippingAddress: { ...prev.shippingAddress, city: e.target.value }
+                            }))
+                          }
+                        />
+                        <Input
+                          placeholder="State"
+                          value={formData.shippingAddress?.state || ""}
+                          onChange={(e) =>
+                            setFormData(prev => ({
+                              ...prev,
+                              shippingAddress: { ...prev.shippingAddress, state: e.target.value }
+                            }))
+                          }
+                        />
+                      </div>
+                      <Input
+                        placeholder="ZIP Code"
+                        value={formData.shippingAddress?.zip || ""}
+                        onChange={(e) =>
+                          setFormData(prev => ({
+                            ...prev,
+                            shippingAddress: { ...prev.shippingAddress, zip: e.target.value }
+                          }))
+                        }
+                      />
+                    </div>
+                  ) : (
+                    <div className="text-sm bg-gray-50 p-3 rounded-md border border-gray-100">
+                      {formData.shippingAddress?.name ? (
+                        <>
+                          <p className="font-medium text-gray-900">{formData.shippingAddress.name}</p>
+                          <p className="text-gray-600">{formData.shippingAddress.address}</p>
+                          <p className="text-gray-600">
+                            {formData.shippingAddress.city}, {formData.shippingAddress.state}{" "}
+                            {formData.shippingAddress.zip}
+                          </p>
+                        </>
+                      ) : (
+                        <p className="text-gray-400 italic">No address provided</p>
+                      )}
+                    </div>
+                  )}
+                </div>
               </CardContent>
             </Card>
 
@@ -852,99 +972,104 @@ const OrderDetailsSidebar: React.FC<OrderDetailsSidebarProps> = ({
 
             {/* Order Items */}
             <Card>
-              <CardHeader>
+              <CardHeader className="flex flex-row items-center justify-between pb-2">
                 <CardTitle className="flex items-center gap-2">
                   <Package className="w-4 h-4" />
                   Order Items
                 </CardTitle>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="h-8 text-xs text-blue-600 hover:text-blue-800 bg-blue-50 hover:bg-blue-100"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    setIsEditingProducts(!isEditingProducts);
+                  }}
+                >
+                  {isEditingProducts ? "Done Editing" : "Edit Items"}
+                </Button>
               </CardHeader>
               <CardContent>
-                <div className="space-y-3">
-                  {order.products?.map((item, index) => {
-                    // Extract product data from the nested structure
-                    const product = item.product;
-                    const quantity = item.quantity || 1;
-                    const price = product?.price || 0;
-                    const lineTotal = price * quantity;
+                {isEditingProducts ? (
+                  <ProductPicker
+                    selectedProducts={formData.products}
+                    onProductsChange={(products) => {
+                      setFormData(prev => ({
+                        ...prev,
+                        products,
+                        totalPrice: products.reduce((sum, p) => sum + (p.price * p.quantity), 0)
+                      }));
+                    }}
+                  />
+                ) : (
+                  <div className="space-y-3">
+                    {formData.products?.map((item, index) => {
+                      const lineTotal = (item.price || 0) * (item.quantity || 0);
 
-                    // Debug logging to help identify the issue
-                    console.log("Product debug info:", {
-                      name: product?.name,
-                      price: price,
-                      quantity: quantity,
-                      lineTotal,
-                      rawItem: item,
-                    });
-
-                    return (
-                      <div
-                        key={item._key || index}
-                        className="flex items-center space-x-4 p-4 bg-gray-50 rounded-lg border border-gray-200 hover:bg-gray-100 transition-colors"
-                      >
-                        {product?.image && (
-                          <img
-                            src={product.image}
-                            alt={product.name}
-                            className="w-16 h-16 object-cover rounded-md border shadow-sm"
-                          />
-                        )}
-                        <div className="flex-1 min-w-0">
-                          <p className="font-medium text-gray-900 truncate mb-1">
-                            {product?.name || "Unknown Product"}
-                          </p>
-                          <div className="text-sm text-gray-600">
-                            <p>
-                              Qty: {quantity} × {formatCurrency(price)}
+                      return (
+                        <div
+                          key={item._id || index}
+                          className="flex items-center space-x-4 p-4 bg-gray-50 rounded-lg border border-gray-200"
+                        >
+                          {item.image ? (
+                            <img
+                              src={item.image}
+                              alt={item.name}
+                              className="w-16 h-16 object-cover rounded-md border shadow-sm"
+                            />
+                          ) : (
+                            <div className="w-16 h-16 bg-gray-200 rounded-md flex items-center justify-center">
+                              <Package className="w-8 h-8 text-gray-400" />
+                            </div>
+                          )}
+                          <div className="flex-1 min-w-0">
+                            <p className="font-medium text-gray-900 truncate mb-1">
+                              {item.name || "Unknown Product"}
                             </p>
-                            {price === 0 && (
-                              <p className="text-xs text-red-500 mt-1 flex items-center">
-                                <span className="mr-1">⚠️</span>
-                                No price data found - check order source data
+                            <div className="text-sm text-gray-600">
+                              <p>
+                                Qty: {item.quantity} × {formatCurrency(item.price || 0)}
                               </p>
-                            )}
-                            {process.env.NODE_ENV === "development" &&
-                              price === 0 && (
-                                <p className="text-xs text-orange-600 mt-1">
-                                  Available fields:{" "}
-                                  {Object.keys(item).join(", ")} | Product
-                                  fields:{" "}
-                                  {product
-                                    ? Object.keys(product).join(", ")
-                                    : "No product data"}
-                                </p>
-                              )}
+                            </div>
+                          </div>
+                          <div className="text-right">
+                            <p className="font-semibold text-lg text-gray-900">
+                              {formatCurrency(lineTotal)}
+                            </p>
                           </div>
                         </div>
-                        <div className="text-right">
-                          <p className="font-semibold text-lg text-gray-900">
-                            {formatCurrency(lineTotal)}
-                          </p>
-                        </div>
-                      </div>
-                    );
-                  })}
+                      );
+                    })}
 
-                  {/* Order Total */}
-                  <div className="border-t border-gray-200 pt-4 mt-4 bg-white rounded-lg p-4">
-                    <div className="flex justify-between items-center">
-                      <p className="font-semibold text-lg text-gray-700">
-                        Order Total:
-                      </p>
-                      <p className="font-bold text-2xl text-green-600">
-                        {formatCurrency(order.totalPrice || 0)}
-                      </p>
-                    </div>
-                    <div className="text-xs text-gray-500 mt-2">
-                      Items calculated total:{" "}
-                      {formatCurrency(
-                        order.products?.reduce((sum, item) => {
-                          const price = item.product?.price || 0;
-                          return sum + price * (item.quantity || 1);
-                        }, 0) || 0
-                      )}
+                    <div className="border-t border-gray-200 pt-4 mt-4 bg-white rounded-lg p-4">
+                      <div className="flex justify-between items-center">
+                        <p className="font-semibold text-lg text-gray-700">
+                          Order Total:
+                        </p>
+                        <p className="font-bold text-2xl text-green-600">
+                          {formatCurrency(formData.totalPrice || 0)}
+                        </p>
+                      </div>
                     </div>
                   </div>
-                </div>
+                )}
+              </CardContent>
+            </Card>
+
+            {/* Attachments */}
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Paperclip className="w-4 h-4" />
+                  Attachments
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <OrderAttachments
+                  orderId={order._id}
+                  attachments={order.attachments as any}
+                  onUpdate={() => onOrderUpdate(order._id)}
+                />
               </CardContent>
             </Card>
 

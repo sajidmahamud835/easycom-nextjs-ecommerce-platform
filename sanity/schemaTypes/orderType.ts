@@ -541,50 +541,82 @@ export const orderType = defineType({
           },
         }),
       ],
-    }),
+      defineField({
+        name: "attachments",
+        title: "Attachments",
+        type: "array",
+        of: [
+          defineArrayMember({
+            type: "file",
+            options: {
+              storeOriginalFilename: true,
+            },
+            fields: [
+              defineField({
+                name: "description",
+                title: "Description",
+                type: "string",
+              }),
+              defineField({
+                name: "category",
+                title: "Category",
+                type: "string",
+                options: {
+                  list: [
+                    { title: "Invoice", value: "invoice" },
+                    { title: "Receipt", value: "receipt" },
+                    { title: "Proof of Delivery", value: "proof_of_delivery" },
+                    { title: "Other", value: "other" },
+                  ],
+                },
+              }),
+            ],
+          }),
+      ],
+}),
   ],
-  preview: {
-    select: {
-      name: "customerName",
+preview: {
+  select: {
+    name: "customerName",
       amount: "totalPrice",
-      currency: "currency",
-      orderId: "orderNumber",
-      email: "email",
-      status: "status",
-      paymentStatus: "paymentStatus",
+        currency: "currency",
+          orderId: "orderNumber",
+            email: "email",
+              status: "status",
+                paymentStatus: "paymentStatus",
     },
-    prepare(select) {
-      const orderIdSnippet = `${select.orderId.slice(
-        0,
-        5
-      )}...${select.orderId.slice(-5)}`;
+  prepare(select) {
+    const orderIdSnippet = `${select.orderId.slice(
+      0,
+      5
+    )}...${select.orderId.slice(-5)}`;
 
-      // Format status for display
-      const statusMap: Record<string, string> = {
-        pending: "🔴 Pending",
-        address_confirmed: "🟡 Address Confirmed",
-        order_confirmed: "🟢 Order Confirmed",
-        packed: "📦 Packed",
-        ready_for_delivery: "🏭 Ready for Delivery",
-        out_for_delivery: "🚚 Out for Delivery",
-        delivered: "✅ Delivered",
-        completed: "✔️ Completed",
-        cancelled: "❌ Cancelled",
-        rescheduled: "🔄 Rescheduled",
-        failed_delivery: "⚠️ Failed Delivery",
-      };
+    // Format status for display
+    const statusMap: Record<string, string> = {
+      pending: "🔴 Pending",
+      address_confirmed: "🟡 Address Confirmed",
+      order_confirmed: "🟢 Order Confirmed",
+      packed: "📦 Packed",
+      ready_for_delivery: "🏭 Ready for Delivery",
+      out_for_delivery: "🚚 Out for Delivery",
+      delivered: "✅ Delivered",
+      completed: "✔️ Completed",
+      cancelled: "❌ Cancelled",
+      rescheduled: "🔄 Rescheduled",
+      failed_delivery: "⚠️ Failed Delivery",
+    };
 
-      const statusDisplay = statusMap[select.status] || select.status;
-      const paymentDisplay =
-        select.paymentStatus === "paid"
-          ? "💳 Paid"
-          : "💰 " + select.paymentStatus;
+    const statusDisplay = statusMap[select.status] || select.status;
+    const paymentDisplay =
+      select.paymentStatus === "paid"
+        ? "💳 Paid"
+        : "💰 " + select.paymentStatus;
 
-      return {
-        title: `${select.name} (${orderIdSnippet})`,
-        subtitle: `${statusDisplay} | ${select.amount} ${select.currency} | ${paymentDisplay}`,
-        media: BasketIcon,
-      };
-    },
+    return {
+      title: `${select.name} (${orderIdSnippet})`,
+      subtitle: `${statusDisplay} | ${select.amount} ${select.currency} | ${paymentDisplay}`,
+      media: BasketIcon,
+    };
   },
+},
 });

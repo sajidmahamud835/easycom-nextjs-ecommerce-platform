@@ -189,8 +189,7 @@ export async function PATCH(
       // Track analytics
       try {
         await fetch(
-          `${
-            process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:3000"
+          `${process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:3000"
           }/api/analytics/track`,
           {
             method: "POST",
@@ -243,8 +242,8 @@ export async function PATCH(
     return NextResponse.json({
       message: walletRefunded
         ? `Order updated successfully. $${refundAmount.toFixed(
-            2
-          )} refunded to customer's wallet.`
+          2
+        )} refunded to customer's wallet.`
         : "Order updated successfully",
       order: updatedOrder,
       walletRefunded,
@@ -359,7 +358,20 @@ export async function GET(
         cancellationReason,
         refundedToWallet,
         refundAmount,
-        amountPaid
+        cancellationReason,
+        refundedToWallet,
+        refundAmount,
+        amountPaid,
+        attachments[] {
+          _key,
+          description,
+          category,
+          asset-> {
+            _id,
+            url,
+            originalFilename
+          }
+        }
       }
     `;
 
